@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Itens - SLK Propostas Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #333; }
+        .header {
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+            color: white; padding: 20px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 1.5rem; }
+        .header a { color: white; text-decoration: none; font-weight: 600; padding: 8px 16px; border: 2px solid white; border-radius: 6px; transition: all 0.2s; }
+        .header a:hover { background: white; color: #00bcd4; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .stats {
+            display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white; border-radius: 10px; padding: 20px 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); flex: 1; min-width: 200px;
+        }
+        .stat-card h3 { color: #666; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: #00bcd4; }
+        .controls {
+            display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+        }
+        .controls input, .controls select {
+            padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px;
+            font-size: 0.95rem; outline: none; transition: border 0.2s;
+        }
+        .controls input:focus, .controls select:focus { border-color: #00bcd4; }
+        .controls input { flex: 1; min-width: 250px; }
+        table {
+            width: 100%; border-collapse: collapse; background: white;
+            border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        thead { background: #00bcd4; color: white; }
+        th { padding: 12px 15px; text-align: left; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+        td { padding: 10px 15px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+        tr:hover { background: #f8fffe; }
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .badge-equip { background: #e3f2fd; color: #1565c0; }
+        .badge-servico { background: #fce4ec; color: #c62828; }
+        .badge-cat { background: #f3e5f5; color: #6a1b9a; }
+        .loading { text-align: center; padding: 40px; color: #999; font-size: 1.1rem; }
+        .footer {
+            text-align: center; padding: 20px; margin-top: 30px;
+            color: #999; font-size: 0.8rem;
+        }
+        .footer img { height: 35px; margin-bottom: 5px; opacity: 0.7; }
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 10px; }
+            table { font-size: 0.8rem; }
+            th, td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 Meus Itens - Produtos e Serviços</h1>
+        <a href="/">← Voltar ao Formulário</a>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total de Itens</h3>
+                <div class="number" id="totalItens">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Equipamentos</h3>
+                <div class="number" id="totalEquip">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Serviços</h3>
+                <div class="number" id="totalServ">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Categorias</h3>
+                <div class="number" id="totalCats">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" id="busca" placeholder="🔍 Buscar por nome do item...">
+            <select id="filtroCat">
+                <option value="">Todas as Categorias</option>
+            </select>
+            <select id="filtroTipo">
+                <option value="">Todos os Tipos</option>
+                <option value="Equipamento">Equipamento</option>
+                <option value="Serviço">Serviço</option>
+            </select>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Tipo</th>
+                    <th>Valor Venda</th>
+                    <th>Valor Custo</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaItens">
+                <tr><td colspan="6" class="loading">Carregando itens do Meeventos...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>
+            Desenvolvido por VendAI - AI & Sales Consulting
+        </div>
+    </div>
+
+    <script>
+    let todosItens = [];
+
+    async function carregarItens() {
+        try {
+            const resp = await fetch('/api/produtos-catalogo');
+            const data = await resp.json();
+            if (data.sucesso) {
+                todosItens = data.dados;
+                atualizarEstatisticas();
+                preencherFiltros();
+                renderizarTabela(todosItens);
+            }
+        } catch(e) {
+            document.getElementById('tabelaItens').innerHTML = '<tr><td colspan="6" class="loading">Erro ao carregar itens.</td></tr>';
+        }
+    }
+
+    function atualizarEstatisticas() {
+        document.getElementById('totalItens').textContent = todosItens.length;
+        document.getElementById('totalEquip').textContent = todosItens.filter(i => i.tipo_item === 'Equipamento').length;
+        document.getElementById('totalServ').textContent = todosItens.filter(i => i.tipo_item === 'Serviço').length;
+        const cats = new Set(todosItens.map(i => i.categoria));
+        document.getElementById('totalCats').textContent = cats.size;
+    }
+
+    function preencherFiltros() {
+        const cats = [...new Set(todosItens.map(i => i.categoria))].sort();
+        const select = document.getElementById('filtroCat');
+        cats.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            select.appendChild(opt);
+        });
+    }
+
+    function renderizarTabela(itens) {
+        const tbody = document.getElementById('tabelaItens');
+        if (itens.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">Nenhum item encontrado.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = itens.map(it => `
+            <tr>
+                <td><strong>${it.id}</strong></td>
+                <td>${it.nome}</td>
+                <td><span class="badge badge-cat">${it.categoria || 'N/A'}</span></td>
+                <td><span class="badge ${it.tipo_item === 'Serviço' ? 'badge-servico' : 'badge-equip'}">${it.tipo_item}</span></td>
+                <td>R$ ${parseFloat(it.valor || 0).toFixed(2)}</td>
+                <td>R$ ${parseFloat(it.valorcusto || 0).toFixed(2)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function filtrar() {
+        const busca = document.getElementById('busca').value.toLowerCase();
+        const cat = document.getElementById('filtroCat').value;
+        const tipo = document.getElementById('filtroTipo').value;
+        let filtrados = todosItens;
+        if (busca) filtrados = filtrados.filter(i => i.nome.toLowerCase().includes(busca));
+        if (cat) filtrados = filtrados.filter(i => i.categoria === cat);
+        if (tipo) filtrados = filtrados.filter(i => i.tipo_item === tipo);
+        renderizarTabela(filtrados);
+    }
+
+    document.getElementById('busca').addEventListener('input', filtrar);
+    document.getElementById('filtroCat').addEventListener('change', filtrar);
+    document.getElementById('filtroTipo').addEventListener('change', filtrar);
+
+    carregarItens();
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+﻿# Arquivos de dados e PDFs gerados
+propostas.json
+pdfs/
+*.pdf
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos de ambiente / senhas
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLK Propostas Pro | Novos Orçamentos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#f5f7fa;padding:15px;color:#333;font-size:14px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding:12px 20px;background:linear-gradient(135deg,#00bcd4,#0097a7);border-radius:8px;color:white}
+header h1{font-size:18px;font-weight:600}
+header nav a{color:white;text-decoration:none;font-size:13px;margin-left:15px;padding:6px 12px;border:1px solid rgba(255,255,255,0.5);border-radius:5px;transition:all 0.2s}
+header nav a:hover{background:white;color:#00bcd4}
+
+.linha-colunas{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:15px}
+
+.bloco-form{background:#fff;padding:14px 18px;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.bloco-previa{background:#fff;padding:14px 18px;border:1px solid #e8e8e8;border-radius:8px;position:sticky;top:15px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+
+h3{font-size:15px;margin-bottom:10px;color:#00838f;font-weight:600}
+h4{font-size:13px;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid #e0e0e0;color:#555}
+
+label{display:block;margin-bottom:3px;font-size:13px;color:#555;font-weight:500}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:5px;font-size:14px;background:#fff;transition:border 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#00bcd4;box-shadow:0 0 0 2px rgba(0,188,212,0.1)}
+input[readonly]{background:#f5f5f5;color:#666}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-full{grid-column:1/-1}
+
+#lista_itens,#lista_vendedores,#lista_locais,#lista_clientes{
+    max-height:180px;overflow-y:auto;border:1px solid #ddd;margin-top:4px;background:#fff;display:none;border-radius:5px;position:absolute;z-index:999;width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.1)
+}
+.item-linha{padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px;transition:background 0.1s}
+.item-linha:hover{background:#e0f7fa}
+
+.item-previa{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-bottom:1px solid #f5f5f5}
+.subtotal-bloco{text-align:right;font-weight:bold;font-size:13px;padding:5px 0 8px 0;border-bottom:1px dashed #e0e0e0;color:#00838f}
+.total-geral{text-align:right;font-weight:bold;font-size:16px;padding:10px 0;color:#00bcd4}
+
+.aviso{padding:8px;text-align:center;color:#999;font-size:12px}
+.remover{color:#e53935;cursor:pointer;margin-left:8px;font-weight:bold;font-size:16px}
+.remover:hover{color:#b71c1c}
+.grupo-busca{position:relative}
+
+.area-botao{text-align:center;margin-top:15px}
+.btn{background:linear-gradient(135deg,#00bcd4,#0097a7);color:#fff;border:none;padding:12px 35px;border-radius:6px;cursor:pointer;font-size:15px;font-weight:600;display:inline-block;transition:transform 0.1s,box-shadow 0.2s;box-shadow:0 2px 8px rgba(0,188,212,0.3)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,188,212,0.4)}
+.btn:active{transform:scale(0.97)}
+.btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+.msg-sucesso{background:#e8f5e9;color:#2e7d32;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #c8e6c9}
+.msg-erro{background:#ffebee;color:#c62828;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #ffcdd2}
+
+.footer{text-align:center;padding:20px 0;margin-top:25px;border-top:1px solid #e0e0e0;color:#999;font-size:0.8rem}
+.footer img{height:35px;margin-bottom:5px;opacity:0.7}
+
+.qtd-control{display:flex;align-items:center;gap:4px}
+.qtd-btn{width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#f9f9f9;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#555}
+.qtd-btn:hover{background:#e0f7fa;border-color:#00bcd4}
+
+@media(max-width:768px){
+    .linha-colunas{grid-template-columns:1fr}
+    .bloco-previa{position:static}
+    header{flex-direction:column;gap:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+    <h1>Soulink | Novos Orçamentos</h1>
+    <nav>
+        <a href="/meus-itens">📦 Meus Itens</a>
+        <a href="/propostas">📋 Meus Orçamentos</a>
+    </nav>
+</header>
+
+<form id="form">
+<div class="linha-colunas">
+    <!-- COLUNA ESQUERDA: FORMULÁRIO -->
+    <div>
+        <!-- VENDEDOR -->
+        <div class="bloco-form">
+            <label>Vendedor:</label>
+            <div class="grupo-busca">
+                <input type="text" id="busca_vendedor" placeholder="Digite o nome do vendedor..." autocomplete="off">
+                <div id="lista_vendedores"></div>
+            </div>
+            <input type="hidden" id="id_vendedor" value="">
+        </div>
+
+        <!-- DADOS DO EVENTO -->
+        <div class="bloco-form">
+            <h3>📌 Dados do Evento</h3>
+            <div class="grid-2">
+                <div class="grid-full">
+                    <label>Nome do Evento *</label>
+                    <input type="text" id="nome_evento" required>
+                </div>
+                <div class="grid-full">
+                    <label>Local *</label>
+                    <div class="grupo-busca">
+                        <input type="text" id="busca_local" placeholder="Digite o nome do local..." required autocomplete="off">
+                        <div id="lista_locais"></div>
+                    </div>
+                </div>
+                <div>
+                    <label>Data do Evento *</label>
+                    <input type="date" id="data_evento" required>
+                </div>
+                <div>
+                    <label>Quantidade de Pessoas *</label>
+                    <input type="number" id="qtd_pessoas" min="1" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- DADOS DO CLIENTE -->
+        <div class="bloco-form">
+            <h3>👤 Dados do Cliente</h3>
+            <div class="grid-2">
+                <div class="grid-full">
+                    <label>Razão Social / Nome do Cliente *</label>
+                    <div class="grupo-busca">
+                        <input type="text" id="busca_cliente" placeholder="Digite a razão social ou nome..." required autocomplete="off">
+                        <div id="lista_clientes"></div>
+                    </div>
+                </div>
+                <div>
+                    <label>CNPJ</label>
+                    <input type="text" id="cliente_cnpj" readonly>
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="text" id="cliente_email" readonly>
+                </div>
+                <div>
+                    <label>Telefone</label>
+                    <input type="text" id="cliente_telefone" readonly>
+                </div>
+                <div>
+                    <label>Contato / Responsável</label>
+                    <input type="text" id="cliente_contato" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSCA DE ITENS -->
+        <div class="bloco-form">
+            <h3>📦 Adicionar Itens à Proposta</h3>
+            <label>Buscar Equipamento ou Serviço:</label>
+            <div class="grupo-busca">
+                <input type="text" id="busca_item" placeholder="Digite o nome do item (375 disponíveis)..." autocomplete="off">
+                <div id="lista_itens"></div>
+            </div>
+            <p style="font-size:11px;color:#999;margin-top:5px">Clique no item para adicioná-lo. Use + e - na prévia para ajustar quantidade.</p>
+        </div>
+    </div>
+
+    <!-- COLUNA DIREITA: PRÉVIA -->
+    <div class="bloco-previa">
+        <h3>📋 Prévia do Orçamento</h3>
+        <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e0e0e0">
+            <h4>📌 Dados Gerais</h4>
+            <div style="font-size:13px;line-height:1.7">
+                <strong>Vendedor:</strong> <span id="prev_vendedor">—</span><br>
+                <strong>Evento:</strong> <span id="prev_evento">—</span><br>
+                <strong>Local:</strong> <span id="prev_local">—</span><br>
+                <strong>Data:</strong> <span id="prev_data">—</span><br>
+                <strong>Pessoas:</strong> <span id="prev_pessoas">—</span>
+            </div>
+        </div>
+        <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e0e0e0">
+            <h4>👤 Dados do Cliente</h4>
+            <div style="font-size:13px;line-height:1.7">
+                <strong>Nome:</strong> <span id="prev_cliente">—</span><br>
+                <strong>CNPJ:</strong> <span id="prev_cliente_cnpj">—</span><br>
+                <strong>Email:</strong> <span id="prev_cliente_email">—</span><br>
+                <strong>Telefone:</strong> <span id="prev_cliente_telefone">—</span><br>
+                <strong>Contato:</strong> <span id="prev_cliente_contato">—</span>
+            </div>
+        </div>
+        <div style="margin-bottom:10px">
+            <h4>📦 Equipamentos</h4>
+            <div id="lista_produtos"></div>
+            <div id="subtotal_produtos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+        </div>
+        <div style="margin-bottom:10px">
+            <h4>🛠 Serviços</h4>
+            <div id="lista_servicos"></div>
+            <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+        </div>
+        <div id="total_geral" class="total-geral">Investimento Total: R$ 0,00</div>
+    </div>
+</div>
+
+<div class="area-botao">
+    <button type="submit" class="btn" id="btnSubmit">📄 Gerar Orçamento e Enviar ao Meeventos</button>
+</div>
+<div id="msg_resultado"></div>
+</form>
+
+<div class="footer">
+    <img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>
+    Desenvolvido por VendAI - AI & Sales Consulting
+</div>
+</div>
+
+<script>
+// ===== CONFIGURAÇÃO =====
+const API_BASE_URL = "/api";
+
+let todos_itens = [];
+let selecionados = [];
+let lista_vendedores = [];
+let lista_locais = [];
+let lista_clientes = [];
+
+// ===== CARREGA TODOS OS DADOS DO BACKEND =====
+async function carregar_tudo() {
+    console.log("Carregando dados do backend...");
+
+    // Vendedores
+    try {
+        const res = await fetch(`${API_BASE_URL}/vendedores`);
+        if(res.ok) {
+            const json = await res.json();
+            lista_vendedores = json.dados || [];
+            console.log(`Vendedores carregados: ${lista_vendedores.length}`);
+        }
+    } catch (e) { console.error("Erro vendedores:", e); }
+
+    // Locais
+    try {
+        const res = await fetch(`${API_BASE_URL}/locais`);
+        if(res.ok) {
+            const json = await res.json();
+            lista_locais = json.dados || [];
+            console.log(`Locais carregados: ${lista_locais.length}`);
+        }
+    } catch (e) { console.error("Erro locais:", e); }
+
+    // Clientes (745+)
+    try {
+        const res = await fetch(`${API_BASE_URL}/clientes`);
+        if(res.ok) {
+            const json = await res.json();
+            lista_clientes = json.dados || [];
+            console.log(`Clientes carregados: ${lista_clientes.length}`);
+        }
+    } catch (e) { console.error("Erro clientes:", e); }
+
+    // Produtos/Serviços (375)
+    try {
+        const res = await fetch(`${API_BASE_URL}/produtos-catalogo`);
+        if(res.ok) {
+            const json = await res.json();
+            todos_itens = json.dados || [];
+            console.log(`Produtos/Serviços carregados: ${todos_itens.length}`);
+        }
+    } catch (e) { console.error("Erro catálogo:", e); }
+}
+
+carregar_tudo();
+
+// ===== BUSCA FILTRADA GENÉRICA =====
+function mostrar_filtrado_lista(texto, lista_total, campo_nome, id_lista) {
+    const lista_el = document.getElementById(id_lista);
+    if (!texto.trim() || !lista_total.length) {
+        lista_el.style.display = "none";
+        return;
+    }
+    const termo = texto.toLowerCase().trim();
+    const filtrados = lista_total.filter(i =>
+        String(i[campo_nome] || "").toLowerCase().includes(termo)
+    ).slice(0, 50); // Limitar a 50 resultados para performance
+
+    if (filtrados.length === 0) {
+        lista_el.innerHTML = '<div class="aviso">Nenhum resultado encontrado</div>';
+        lista_el.style.display = "block";
+        return;
+    }
+    lista_el.innerHTML = "";
+    filtrados.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item-linha";
+        div.innerText = item[campo_nome] || "";
+        div.onclick = () => selecionar_da_lista(item, campo_nome, id_lista);
+        lista_el.appendChild(div);
+    });
+    lista_el.style.display = "block";
+}
+
+function selecionar_da_lista(dados, campo_nome, id_lista) {
+    if(id_lista === "lista_vendedores") {
+        document.getElementById("busca_vendedor").value = dados.nome;
+        document.getElementById("id_vendedor").value = dados.id || "";
+    } else if(id_lista === "lista_locais") {
+        document.getElementById("busca_local").value = dados.nome;
+    } else if(id_lista === "lista_clientes") {
+        document.getElementById("busca_cliente").value = dados.nome || dados.razaosocial || "";
+        document.getElementById("cliente_cnpj").value = dados.cnpjpj || dados.cpf || "";
+        document.getElementById("cliente_email").value = dados.email || "";
+        document.getElementById("cliente_telefone").value = dados.celular || dados.telefone || "";
+        document.getElementById("cliente_contato").value = dados.responsavel || dados.nome || "";
+    }
+    document.getElementById(id_lista).style.display = "none";
+    atualizar_previa_completa();
+}
+
+// ===== EVENTOS DE BUSCA =====
+document.getElementById("busca_vendedor").addEventListener("input", e => {
+    mostrar_filtrado_lista(e.target.value, lista_vendedores, "nome", "lista_vendedores");
+});
+document.getElementById("busca_local").addEventListener("input", e => {
+    mostrar_filtrado_lista(e.target.value, lista_locais, "nome", "lista_locais");
+});
+document.getElementById("busca_cliente").addEventListener("input", e => {
+    mostrar_filtrado_lista(e.target.value, lista_clientes, "nome", "lista_clientes");
+});
+
+document.getElementById("nome_evento").addEventListener("input", atualizar_previa_completa);
+document.getElementById("data_evento").addEventListener("change", atualizar_previa_completa);
+document.getElementById("qtd_pessoas").addEventListener("input", atualizar_previa_completa);
+
+// FECHAR LISTAS AO CLICAR FORA
+document.addEventListener("click", e => {
+    if(!e.target.closest(".grupo-busca")){
+        document.querySelectorAll("#lista_vendedores, #lista_locais, #lista_clientes, #lista_itens").forEach(el => el.style.display = "none");
+    }
+});
+
+// ===== BUSCA DE PRODUTOS =====
+function mostrar_filtrado_produto(texto) {
+    const lista_el = document.getElementById("lista_itens");
+    if (!texto.trim()) { lista_el.style.display = "none"; return; }
+    lista_el.style.display = "block";
+    const termo = texto.toLowerCase().trim();
+    const filtrados = todos_itens.filter(i =>
+        (i.nome || "").toLowerCase().includes(termo) || String(i.id || "").includes(termo)
+    ).slice(0, 30);
+
+    if (filtrados.length === 0) {
+        lista_el.innerHTML = '<div class="aviso">Nenhum item encontrado no catálogo</div>';
+    } else {
+        lista_el.innerHTML = filtrados.map(item => {
+            const tipo_badge = item.tipo_item === "Serviço" ? "🛠" : "📦";
+            return `<div class="item-linha" data-id="${item.id}">
+                ${tipo_badge} <strong>#${item.id}</strong> | ${item.nome} | R$ ${Number(item.valor||0).toFixed(2).replace(".",",")} | <em>${item.categoria||""}</em>
+            </div>`;
+        }).join("");
+    }
+}
+
+document.getElementById("busca_item").addEventListener("input", e => {
+    mostrar_filtrado_produto(e.target.value);
+});
+
+document.addEventListener("click", e => {
+    const linha = e.target.closest("#lista_itens .item-linha");
+    if (!linha) return;
+    const item = todos_itens.find(i => String(i.id) === String(linha.dataset.id));
+    if (!item) return;
+    const existe = selecionados.find(x => String(x.id) === String(item.id));
+    if (existe) {
+        existe.quantidade++;
+    } else {
+        selecionados.push({
+            id: item.id,
+            nome: item.nome,
+            valor: parseFloat(item.valor || 0),
+            quantidade: 1,
+            tipo_item: item.tipo_item || "Equipamento",
+            categoria: item.categoria || "",
+            externo: false
+        });
+    }
+    atualizar_previa_completa();
+    document.getElementById("busca_item").value = "";
+    document.getElementById("lista_itens").style.display = "none";
+});
+
+// ===== ATUALIZAR PRÉVIA =====
+function atualizar_previa_completa() {
+    document.getElementById("prev_vendedor").innerText = document.getElementById("busca_vendedor").value || "—";
+    document.getElementById("prev_evento").innerText = document.getElementById("nome_evento").value.trim() || "—";
+    document.getElementById("prev_local").innerText = document.getElementById("busca_local").value || "—";
+    document.getElementById("prev_data").innerText = document.getElementById("data_evento").value || "—";
+    document.getElementById("prev_pessoas").innerText = document.getElementById("qtd_pessoas").value || "—";
+    document.getElementById("prev_cliente").innerText = document.getElementById("busca_cliente").value || "—";
+    document.getElementById("prev_cliente_cnpj").innerText = document.getElementById("cliente_cnpj").value || "—";
+    document.getElementById("prev_cliente_email").innerText = document.getElementById("cliente_email").value || "—";
+    document.getElementById("prev_cliente_telefone").innerText = document.getElementById("cliente_telefone").value || "—";
+    document.getElementById("prev_cliente_contato").innerText = document.getElementById("cliente_contato").value || "—";
+
+    const lista_prod_el = document.getElementById("lista_produtos");
+    const lista_serv_el = document.getElementById("lista_servicos");
+    let html_prod = "", html_serv = "";
+    let subtotal_prod = 0, subtotal_serv = 0;
+
+    selecionados.forEach((item, idx) => {
+        const sub = item.quantidade * item.valor;
+        const linha = `<div class="item-previa">
+            <span>
+                <span class="qtd-control">
+                    <span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span>
+                    <strong>${item.quantidade}</strong>
+                    <span class="qtd-btn" data-action="plus" data-idx="${idx}">+</span>
+                </span>
+                ${item.nome}
+            </span>
+            <span>R$ ${sub.toFixed(2).replace(".",",")} <span class="remover" data-idx="${idx}">✕</span></span>
+        </div>`;
+        if (item.tipo_item === "Serviço") {
+            html_serv += linha;
+            subtotal_serv += sub;
+        } else {
+            html_prod += linha;
+            subtotal_prod += sub;
+        }
+    });
+
+    lista_prod_el.innerHTML = html_prod || '<div class="aviso">Nenhum equipamento adicionado</div>';
+    lista_serv_el.innerHTML = html_serv || '<div class="aviso">Nenhum serviço adicionado</div>';
+    document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${subtotal_prod.toFixed(2).replace(".",",")}`;
+    document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
+    document.getElementById("total_geral").innerText = `Investimento Total: R$ ${(subtotal_prod + subtotal_serv).toFixed(2).replace(".",",")}`;
+}
+
+// CONTROLES DE QUANTIDADE E REMOVER
+document.addEventListener("click", e => {
+    if (e.target.classList.contains("remover")) {
+        selecionados.splice(parseInt(e.target.dataset.idx), 1);
+        atualizar_previa_completa();
+    }
+    if (e.target.dataset.action === "plus") {
+        selecionados[parseInt(e.target.dataset.idx)].quantidade++;
+        atualizar_previa_completa();
+    }
+    if (e.target.dataset.action === "minus") {
+        const idx = parseInt(e.target.dataset.idx);
+        if (selecionados[idx].quantidade > 1) {
+            selecionados[idx].quantidade--;
+        } else {
+            selecionados.splice(idx, 1);
+        }
+        atualizar_previa_completa();
+    }
+});
+
+// ===== ENVIAR FORMULÁRIO =====
+document.getElementById("form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const msgEl = document.getElementById("msg_resultado");
+    const btnSubmit = document.getElementById("btnSubmit");
+    msgEl.innerHTML = "";
+
+    if (selecionados.length === 0) {
+        msgEl.innerHTML = '<div class="msg-erro">Adicione pelo menos um item à proposta.</div>';
+        return;
+    }
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "⏳ Processando...";
+
+const dados = {
+    // ===== DADOS VENDEDOR/EVENTO (nomes iguais ao app.py) =====
+    id_vendedor: document.getElementById("id_vendedor").value || "51",
+    nome_vendedor: document.getElementById("busca_vendedor").value, // ✅ Adiciona nome
+    nome_evento: document.getElementById("nome_evento").value,
+    local_evento: document.getElementById("busca_local").value, // ✅ Nome correto
+    data_evento: document.getElementById("data_evento").value,
+    qtd_pessoas: document.getElementById("qtd_pessoas").value,
+
+    // ===== DADOS CLIENTE (chaves EXATAS que o PDF busca) =====
+    razao_social: document.getElementById("busca_cliente").value,
+    cnpj: document.getElementById("cliente_cnpj").value,
+    telefone: document.getElementById("cliente_telefone").value,
+    email: document.getElementById("cliente_email").value,
+    responsavel: document.getElementById("cliente_contato").value, // ✅ Nome que PDF usa
+
+    itens: selecionados,
+    total_proposta: selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0)
+};
+
+    let num_orcamento = "";
+
+    // 1. PRIMEIRO: Enviar para Meeventos para obter o número do orçamento
+    try {
+        const resMe = await fetch(`${API_BASE_URL}/enviar-orcamento`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(dados)
+        });
+        const jsonMe = await resMe.json();
+        if (jsonMe.sucesso) {
+            num_orcamento = jsonMe.id_orcamento || "";
+            msgEl.innerHTML = `<div class="msg-sucesso">💎 Orçamento <strong>#${num_orcamento}</strong> criado com sucesso no Meeventos!</div>`;
+        } else {
+            msgEl.innerHTML = `<div class="msg-erro">⚠️ Erro no Meeventos: ${jsonMe.erro || jsonMe.detalhes || "Erro desconhecido"}</div>`;
+        }
+    } catch (err) {
+        msgEl.innerHTML = `<div class="msg-erro">⚠️ Erro ao enviar para Meeventos: ${err.message}</div>`;
+    }
+
+    // 2. DEPOIS: Gerar PDF, SALVAR na pasta + registrar no histórico
+    dados.num_orcamento = num_orcamento;
+    try {
+        const resPdf = await fetch(`${API_BASE_URL}/gerar-proposta`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(dados)
+        });
+        const jsonPdf = await resPdf.json();
+
+        if (jsonPdf.sucesso) {
+            // ✅ Abre o PDF que foi SALVO na pasta pdfs/
+            window.open(jsonPdf.url_pdf, "_blank");
+
+            msgEl.innerHTML += `
+                <div class="msg-sucesso">
+                    ✅ Proposta <strong>#${jsonPdf.numero_proposta}</strong> SALVA com sucesso!<br>
+                    📂 Arquivo: <strong>${jsonPdf.arquivo_pdf}</strong><br>
+                    <a href="${jsonPdf.url_pdf}" target="_blank" style="color:#006064;font-weight:600">
+                        📄 Clique aqui se o PDF não abriu automaticamente
+                    </a>
+                </div>`;
+
+            // ✅ Atualiza os valores na tela com o que foi salvo oficialmente
+            if (jsonPdf.blocos) {
+                document.getElementById("subtotal_produtos").innerText = 
+                    `Subtotal: R$ ${Number(jsonPdf.blocos.locacao.subtotal||0).toFixed(2).replace(".",",")}`;
+                document.getElementById("subtotal_servicos").innerText = 
+                    `Subtotal: R$ ${Number(jsonPdf.blocos.servicos.subtotal||0).toFixed(2).replace(".",",")}`;
+                document.getElementById("total_geral").innerText = 
+                    `Investimento Total: R$ ${Number(jsonPdf.blocos.total_geral||0).toFixed(2).replace(".",",")}`;
+            }
+
+            // ✅ Mostra no console para confirmar
+            console.log("✅ Proposta salva no servidor:", jsonPdf);
+
+        } else {
+            msgEl.innerHTML += `<div class="msg-erro">❌ Erro: ${jsonPdf.erro || "Erro desconhecido"}</div>`;
+        }
+    } catch (err) {
+        msgEl.innerHTML += `<div class="msg-erro">❌ Erro ao gerar/salvar proposta: ${err.message}</div>`;
+    }
+    btnSubmit.textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
+});
+</script>
+</body>
+</html>

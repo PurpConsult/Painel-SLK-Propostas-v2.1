@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SLK | Minhas Propostas</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+body { background: #f4f6f8; padding: 15px; color: #333; font-size: 14px; }
+.wrap { max-width: 1200px; margin: 0 auto; }
+
+header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding: 12px 20px;
+    background: #000; border-radius: 6px;
+}
+header h1 { color: #fff; font-size: 18px; }
+header a { color: #4da6ff; text-decoration: none; font-size: 14px; margin-left: 15px; }
+header a:hover { color: #80c1ff; text-decoration: underline; }
+
+.aviso {
+    background: #fff3cd; border: 1px solid #ffeaa7;
+    color: #856404; padding: 12px 16px; border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.tabela-wrap {
+    background: #fff; border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden; border: 1px solid #e9ecef;
+}
+
+table { width: 100%; border-collapse: collapse; }
+th, td {
+    padding: 12px 14px; text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+th {
+    background: #0056b3; color: #fff;
+    font-weight: 600; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+}
+tbody tr:hover { background: #f8f9fa; }
+
+.numero { font-weight: 700; color: #0056b3; }
+.data { color: #666; font-size: 13px; }
+.valor { font-weight: 700; color: #28a745; text-align: right; }
+.versao {
+    display: inline-block; background: #e3f2fd; color: #0d47a1;
+    padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+}
+
+.btn-pdf {
+    display: inline-block; background: #28a745; color: #fff !important;
+    padding: 6px 14px; border-radius: 4px; text-decoration: none !important;
+    font-size: 13px; font-weight: 600;
+}
+.btn-pdf:hover { background: #218838; }
+
+.vazio {
+    text-align: center; padding: 60px 20px; color: #888;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+    <h1>📋 Minhas Propostas</h1>
+    <div>
+        <a href="/">🏠 Voltar ao Painel</a>
+        <a href="/produtos">📦 Itens</a>
+    </div>
+</header>
+
+<div id="conteudo"></div>
+
+</div>
+
+<script>
+async function carregar() {
+    const el = document.getElementById("conteudo");
+    try {
+        const res = await fetch("/api/propostas");
+        const r = await res.json();
+        const lista = r.dados || [];
+
+        if (!lista.length) {
+            el.innerHTML = `
+            <div class="tabela-wrap">
+                <div class="vazio">
+                    <h3>Nenhuma proposta gerada ainda 😊</h3>
+                    <p style="margin-top:8px">Volte ao painel e crie sua primeira proposta!</p>
+                </div>
+            </div>`;
+            return;
+        }
+
+        let html = `
+        <div class="tabela-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nº Proposta</th>
+                    <th>Cliente</th>
+                    <th>Evento</th>
+                    <th>Última Versão</th>
+                    <th>Data</th>
+                    <th style="text-align:right">Valor Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        for (const p of lista) {
+            const valor = parseFloat(p.total || 0).toFixed(2).replace(".",",");
+            const ult = p.versoes[0]; // a primeira já é a mais nova
+            html += `
+                <tr>
+                    <td class="numero">${p.numero}</td>
+                    <td>${p.cliente}</td>
+                    <td>${p.evento}</td>
+                    <td><span class="versao">v${p.ultima_versao}</span></td>
+                    <td class="data">${p.ultima_data}</td>
+                    <td class="valor">R$ ${valor}</td>
+                    <td style="text-align:right">
+                        ${ult.arquivo_pdf ? `<a class="btn-pdf" href="/pdfs/${ult.arquivo_pdf}" target="_blank">📄 Ver PDF</a>` : ""}
+                    </td>
+                </tr>
+            `;
+        }
+
+        html += `</tbody></table></div>`;
+        el.innerHTML = html;
+
+    } catch (e) {
+        console.error(e);
+        el.innerHTML = `<div class="aviso">❌ Erro ao carregar propostas. Tente recarregar a página.</div>`;
+    }
+}
+
+carregar();
+</script>
+</body>
+</html>
