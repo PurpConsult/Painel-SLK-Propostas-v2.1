@@ -355,11 +355,14 @@ def api_calcular():
 @app.route("/api/gerar-proposta", methods=["POST"])
 def api_gerar_proposta():
     dados = request.get_json(force=True) or {}
+    # ✅ CORREÇÃO: NOME IGUAL AO QUE O FRONTEND ENVIA!
+    versao_editar = dados.get("editar_numero")       # Número fixo da proposta
+    versao_atual = dados.get("editar_versao", 0)     # ✅ nome igual do HTML, valor padrão 0
 
     blocos = calcular_blocos(dados.get("itens", []))
     dados["blocos"] = blocos
 
-    # ✅ Objetos evento e cliente com nomes corretos para receber os dados
+    # Monta objeto evento/cliente mantendo estrutura que já funciona
     if "evento" not in dados:
         dados["evento"] = {
             "nome_evento": dados.get("nome_evento", "-"),
@@ -369,7 +372,6 @@ def api_gerar_proposta():
             "nome_vendedor": dados.get("nome_vendedor", "-"),
             "id_vendedor": dados.get("id_vendedor", "51")
         }
-
     if "cliente" not in dados:
         dados["cliente"] = {
             "razao_social": dados.get("razao_social") or "-",
@@ -388,36 +390,46 @@ def api_gerar_proposta():
             "idvendedor": str(dados["evento"]["id_vendedor"]),
             "numeroconvidados": str(dados["evento"]["qtd_pessoas"]),
             "nomeresponsavel": dados["cliente"]["responsavel"],
-            "observacao": f"SOULINK | Novos Orçamentos | Total R$ {blocos['total_geral']:.2f}"
+            "observacao": f"SOULINK | Versão {versao_atual+1} | Total R$ {blocos['total_geral']:.2f}"
         }
         r = requests.post(f"{API_BASE}/budgets", headers={**HEADERS, "Content-Type": "application/json"}, json=payload_envio, timeout=15)
         if r.status_code < 300:
             resp = r.json() or {}
             numero_meeventos = str(resp.get("id") or resp.get("numero") or resp.get("idorcamento") or "")
+        else:
+            print(f"⚠️ Meeventos retornou status: {r.status_code} — Verifique URL/Token")
     except Exception as e:
         print(f"[Meeventos] Aviso: não enviado -> {e}")
 
-    pdf_buf = gerar_pdf_buffer(dados, numero_meeventos)
-    nome_pdf = f"orcamento_{(numero_meeventos or ('PROV-'+str(int(datetime.now().timestamp())))).replace('/','-')}.pdf"
-    
+    # ✅ NOME DO PDF COM VERSÃO, MESMO NÚMERO PRINCIPAL
+    if versao_editar:
+        numero_final = versao_editar
+        nova_versao = versao_atual + 1
+    else:
+        todas = _ler_json(ARQUIVO_PROPOSTAS, [])
+        qtd_prov = len([p for p in todas if p.get("numero","").startswith("PROV-")])
+        numero_final = numero_meeventos or f"PROV-{qtd_prov+1:04d}"
+        nova_versao = 1
+
+    nome_pdf = f"orcamento_{numero_final}_v{nova_versao}.pdf"
+    pdf_buf = gerar_pdf_buffer(dados, f"{numero_final} / V{nova_versao}")
+
     os.makedirs(PASTA_PDFS, exist_ok=True)
     caminho_completo_pdf = os.path.join(PASTA_PDFS, nome_pdf)
-    print("📝 Tentando salvar em:", caminho_completo_pdf)
+    print(f"📝 Salvar: Nº={numero_final} | Versão={nova_versao} -> {caminho_completo_pdf}")
 
-    # ✅ Bloco salvar PDF INDENTADO CERTO, sem erro de return fora
     try:
         with open(caminho_completo_pdf, "wb") as f:
             f.write(pdf_buf.getvalue())
-        print(f"✅ PDF SALVO COM SUCESSO! -> {caminho_completo_pdf}")
+        print(f"✅ Salvo com sucesso!")
     except Exception as e:
         print(f"❌ ERRO AO SALVAR PDF: {str(e)}")
         return jsonify({"sucesso": False, "erro": f"Falha ao salvar PDF: {str(e)}"}), 500
 
-    # ✅ Salvar no JSON e finalizar resposta
     todas_propostas = _ler_json(ARQUIVO_PROPOSTAS, [])
     todas_propostas.append({
-        "numero": numero_meeventos or f"PROV-{len(todas_propostas)+1:04d}",
-        "versao": 1,
+        "numero": numero_final,       # ✅ MESMO NÚMERO SEMPRE NA EDIÇÃO
+        "versao": nova_versao,        # ✅ SÓ AUMENTA VERSÃO
         "data_criacao": datetime.now().strftime("%d/%m/%Y %H:%M"),
         "numero_oficial": numero_meeventos or None,
         "cliente": dados.get("cliente", {}),
@@ -426,11 +438,13 @@ def api_gerar_proposta():
         "observacoes": dados.get("observacoes", "") or "",
         "arquivo_pdf": nome_pdf
     })
+
     _salvar_json(ARQUIVO_PROPOSTAS, todas_propostas)
 
     return jsonify({
         "sucesso": True,
-        "numero_proposta": numero_meeventos or f"PROV-{len(todas_propostas):04d}",
+        "numero_proposta": numero_final,
+        "versao": nova_versao,
         "arquivo_pdf": nome_pdf,
         "url_pdf": f"/pdfs/{nome_pdf}",
         "blocos": blocos,

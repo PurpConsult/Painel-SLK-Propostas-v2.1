@@ -77,6 +77,9 @@ input[readonly]{background:#f5f5f5;color:#666}
 </header>
 
 <form id="form">
+<!-- Campos ocultos para edição -->
+<input type="hidden" id="editar_numero" value="">
+<input type="hidden" id="editar_versao" value="">
 <div class="linha-colunas">
     <!-- COLUNA ESQUERDA: FORMULÁRIO -->
     <div>
@@ -467,20 +470,23 @@ document.getElementById("form").addEventListener("submit", async e => {
 const dados = {
     // ===== DADOS VENDEDOR/EVENTO (nomes iguais ao app.py) =====
     id_vendedor: document.getElementById("id_vendedor").value || "51",
-    nome_vendedor: document.getElementById("busca_vendedor").value, // ✅ Adiciona nome
+    nome_vendedor: document.getElementById("busca_vendedor").value,
     nome_evento: document.getElementById("nome_evento").value,
-    local_evento: document.getElementById("busca_local").value, // ✅ Nome correto
+    local_evento: document.getElementById("busca_local").value,
     data_evento: document.getElementById("data_evento").value,
     qtd_pessoas: document.getElementById("qtd_pessoas").value,
 
-    // ===== DADOS CLIENTE (chaves EXATAS que o PDF busca) =====
+    // ===== DADOS CLIENTE =====
     razao_social: document.getElementById("busca_cliente").value,
     cnpj: document.getElementById("cliente_cnpj").value,
     telefone: document.getElementById("cliente_telefone").value,
     email: document.getElementById("cliente_email").value,
-    responsavel: document.getElementById("cliente_contato").value, // ✅ Nome que PDF usa
+    responsavel: document.getElementById("cliente_contato").value,
 
     itens: selecionados,
+    // === LINHAS NOVAS ADICIONADAS ===
+    editar_numero: document.getElementById('editar_numero').value,
+    editar_versao: parseInt(document.getElementById('editar_versao').value) || 0, // <-- COLOQUEI VÍRGULA AQUI!
     total_proposta: selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0)
 };
 
@@ -548,6 +554,52 @@ const dados = {
     }
     btnSubmit.textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
 });
+<script>
+// ✅ FUNÇÃO DE CARREGAR EDIÇÃO COMPLETA E COM IDs CORRETOS
+window.onload = function(){
+    let num = localStorage.getItem("editar_numero");
+    let ver = localStorage.getItem("editar_versao");
+    let dadosSalvos = localStorage.getItem("dados_editar");
+
+    if(num && ver && dadosSalvos){
+        // Coloca valores nos campos ocultos
+        document.getElementById('editar_numero').value = num;
+        document.getElementById('editar_versao').value = ver;
+
+        // Carrega dados e preenche os campos COM SEUS IDs CORRETOS
+        let d = JSON.parse(dadosSalvos);
+        
+        if(d.evento){
+            if(d.evento.nome_evento) document.getElementById('nome_evento').value = d.evento.nome_evento;
+            if(d.evento.data_evento) document.getElementById('data_evento').value = d.evento.data_evento;
+            if(d.evento.local_evento) document.getElementById('busca_local').value = d.evento.local_evento; // ✅ ID CERTO
+            if(d.evento.qtd_pessoas) document.getElementById('qtd_pessoas').value = d.evento.qtd_pessoas;
+            if(d.evento.nome_vendedor) document.getElementById('busca_vendedor').value = d.evento.nome_vendedor; // ✅ ID CERTO
+            if(d.evento.id_vendedor) document.getElementById('id_vendedor').value = d.evento.id_vendedor;
+        }
+        if(d.cliente){
+            if(d.cliente.razao_social) document.getElementById('busca_cliente').value = d.cliente.razao_social; // ✅ ID CERTO
+            if(d.cliente.cnpj) document.getElementById('cliente_cnpj').value = d.cliente.cnpj;
+            if(d.cliente.telefone) document.getElementById('cliente_telefone').value = d.cliente.telefone;
+            if(d.cliente.email) document.getElementById('cliente_email').value = d.cliente.email;
+            if(d.cliente.responsavel) document.getElementById('cliente_contato').value = d.cliente.responsavel;
+        }
+
+        // ✅ CARREGA OS ITENS TAMBÉM (faltava o principal!)
+        if(d.itens){
+            selecionados = d.itens;
+        }
+
+        // Atualiza a prévia automaticamente depois de preencher tudo
+        atualizar_previa_completa();
+
+        // Limpa para não reutilizar depois
+        localStorage.removeItem("editar_numero");
+        localStorage.removeItem("editar_versao");
+        localStorage.removeItem("dados_editar");
+    }
+}
 </script>
+<!-- ✅ FECHAMENTO CERTO, SEM DUPLICIDADE -->
 </body>
 </html>
