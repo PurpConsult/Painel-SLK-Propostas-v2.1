@@ -67,17 +67,15 @@ p { margin:4px 0; }
     <h1>📋 Minhas Propostas</h1>
     <div>
         <a href="/">🏠 Voltar ao Painel</a>
-        <a href="/produtos">📦 Itens</a>
+        <a href="/meus-itens">📦 Itens</a>
     </div>
 </header>
 
-<!-- ÁREA ÚNICA DA LISTA -->
 <div id="lista-propostas"></div>
 
 </div>
 
 <script>
-// ✅ FUNÇÃO ÚNICA E COMPLETA: MOSTRA PROPOSTA + TODO HISTÓRICO DE VERSÕES
 async function carregarPropostas() {
     const el = document.getElementById("lista-propostas");
     try {
@@ -104,17 +102,14 @@ async function carregarPropostas() {
                 <hr style="margin:10px 0;">
                 <p style="font-weight:bold; margin-bottom:6px;">📜 Histórico de versões:</p>`;
 
-            // 📜 LISTA CADA VERSÃO COM BOTÃO EDITAR E PDF
             item.versoes.forEach(v => {
-                // Escapa aspas para não quebrar ao enviar dados
-                const dadosV = JSON.stringify(v).replace(/"/g, '&quot;');
                 const valorV = parseFloat(v.total||0).toFixed(2).replace(".",",");
 
                 html += `<div class="linha-versao">
                     <span><span class="versao-tag">v${v.versao}</span> ${v.data} — <strong>R$ ${valorV}</strong></span>
                     <div>
                         ${v.arquivo_pdf ? `<a class="btn-pdf" href="/pdfs/${v.arquivo_pdf}" target="_blank">📄 Ver PDF</a>` : ""}
-                        <button class="btn-editar" onclick="irEditar('${item.numero}', ${v.versao}, '${dadosV}')">✏️ Editar</button>
+                        <button class="btn-editar" onclick="irEditar('${item.numero}', ${v.versao}, this)">✏️ Editar</button>
                     </div>
                 </div>`;
             });
@@ -130,15 +125,52 @@ async function carregarPropostas() {
     }
 }
 
-// ✅ FUNÇÃO QUE ENVIA DADOS PARA O INDEX E ABRE FORMULÁRIO
-function irEditar(numProposta, versao, dadosVersao){
-    localStorage.setItem("editar_numero", numProposta);
-    localStorage.setItem("editar_versao", versao);
-    localStorage.setItem("dados_editar", dadosVersao);
-    window.location.href = "/";
+function irEditar(numProposta, versao, botao){
+    fetch("/api/propostas")
+        .then(res => res.json())
+        .then(r => {
+            const lista = r.dados || [];
+            const proposta = lista.find(p => p.numero === numProposta);
+            
+            if (!proposta) {
+                alert("Proposta não encontrada");
+                return;
+            }
+
+            // ✅ MAPEAMENTO COMPLETO USANDO OS CAMPOS DO BACKEND
+            const dadosOrganizados = JSON.stringify({
+                evento: {
+                    nome_evento: proposta.evento || "",
+                    data_evento: proposta.data_evento || "",
+                    local_evento: proposta.local_evento || "",
+                    qtd_pessoas: proposta.qtd_pessoas || "",
+                    nome_vendedor: proposta.nome_vendedor || "",
+                    id_vendedor: proposta.id_vendedor || ""
+                },
+                cliente: {
+                    razao_social: proposta.cliente || "",
+                    cnpj: proposta.cnpj || "",
+                    telefone: proposta.telefone || "",
+                    email: proposta.email || "",
+                    responsavel: proposta.responsavel || ""
+                },
+                itens: proposta.itens || []
+            });
+
+            localStorage.setItem("editar_numero", numProposta);
+            localStorage.setItem("editar_versao", String(versao));
+            localStorage.setItem("dados_editar", dadosOrganizados);
+
+            console.log("✅ Dados salvos para edição:", JSON.parse(dadosOrganizados));
+
+            window.location.href = "/";
+        })
+        .catch(e => {
+            console.error("Erro ao buscar proposta:", e);
+            alert("Erro ao carregar dados da proposta");
+        });
 }
 
-// Inicia automaticamente
 window.onload = carregarPropostas;
 </script>
 
