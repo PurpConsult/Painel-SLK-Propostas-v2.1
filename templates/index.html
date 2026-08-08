@@ -215,7 +215,7 @@ input[readonly]{background:#f5f5f5;color:#666}
 const API_BASE_URL = "/api";
 
 let todos_itens = [];
-let selecionados = [];
+let selecionados = []; // VARIÁVEL GLOBAL - ESSA QUE USAMOS PARA TUDO!
 let lista_vendedores = [];
 let lista_locais = [];
 let lista_clientes = [];
@@ -224,7 +224,6 @@ let lista_clientes = [];
 async function carregar_tudo() {
     console.log("Carregando dados do backend...");
 
-    // Vendedores
     try {
         const res = await fetch(`${API_BASE_URL}/vendedores`);
         if(res.ok) {
@@ -234,7 +233,6 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro vendedores:", e); }
 
-    // Locais
     try {
         const res = await fetch(`${API_BASE_URL}/locais`);
         if(res.ok) {
@@ -244,7 +242,6 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro locais:", e); }
 
-    // Clientes (745+)
     try {
         const res = await fetch(`${API_BASE_URL}/clientes`);
         if(res.ok) {
@@ -254,7 +251,6 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro clientes:", e); }
 
-    // Produtos/Serviços (375)
     try {
         const res = await fetch(`${API_BASE_URL}/produtos-catalogo`);
         if(res.ok) {
@@ -277,7 +273,7 @@ function mostrar_filtrado_lista(texto, lista_total, campo_nome, id_lista) {
     const termo = texto.toLowerCase().trim();
     const filtrados = lista_total.filter(i =>
         String(i[campo_nome] || "").toLowerCase().includes(termo)
-    ).slice(0, 50); // Limitar a 50 resultados para performance
+    ).slice(0, 50);
 
     if (filtrados.length === 0) {
         lista_el.innerHTML = '<div class="aviso">Nenhum resultado encontrado</div>';
@@ -327,7 +323,6 @@ document.getElementById("nome_evento").addEventListener("input", atualizar_previ
 document.getElementById("data_evento").addEventListener("change", atualizar_previa_completa);
 document.getElementById("qtd_pessoas").addEventListener("input", atualizar_previa_completa);
 
-// FECHAR LISTAS AO CLICAR FORA
 document.addEventListener("click", e => {
     if(!e.target.closest(".grupo-busca")){
         document.querySelectorAll("#lista_vendedores, #lista_locais, #lista_clientes, #lista_itens").forEach(el => el.style.display = "none");
@@ -468,31 +463,24 @@ document.getElementById("form").addEventListener("submit", async e => {
     btnSubmit.textContent = "⏳ Processando...";
 
 const dados = {
-    // ===== DADOS VENDEDOR/EVENTO (nomes iguais ao app.py) =====
     id_vendedor: document.getElementById("id_vendedor").value || "51",
     nome_vendedor: document.getElementById("busca_vendedor").value,
     nome_evento: document.getElementById("nome_evento").value,
     local_evento: document.getElementById("busca_local").value,
     data_evento: document.getElementById("data_evento").value,
     qtd_pessoas: document.getElementById("qtd_pessoas").value,
-
-    // ===== DADOS CLIENTE =====
     razao_social: document.getElementById("busca_cliente").value,
     cnpj: document.getElementById("cliente_cnpj").value,
     telefone: document.getElementById("cliente_telefone").value,
     email: document.getElementById("cliente_email").value,
     responsavel: document.getElementById("cliente_contato").value,
-
     itens: selecionados,
-    // === LINHAS NOVAS ADICIONADAS ===
     editar_numero: document.getElementById('editar_numero').value,
-    editar_versao: parseInt(document.getElementById('editar_versao').value) || 0, // <-- COLOQUEI VÍRGULA AQUI!
+    editar_versao: parseInt(document.getElementById('editar_versao').value) || 0,
     total_proposta: selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0)
 };
 
     let num_orcamento = "";
-
-    // 1. PRIMEIRO: Enviar para Meeventos para obter o número do orçamento
     try {
         const resMe = await fetch(`${API_BASE_URL}/enviar-orcamento`, {
             method: "POST",
@@ -510,7 +498,6 @@ const dados = {
         msgEl.innerHTML = `<div class="msg-erro">⚠️ Erro ao enviar para Meeventos: ${err.message}</div>`;
     }
 
-    // 2. DEPOIS: Gerar PDF, SALVAR na pasta + registrar no histórico
     dados.num_orcamento = num_orcamento;
     try {
         const resPdf = await fetch(`${API_BASE_URL}/gerar-proposta`, {
@@ -521,31 +508,19 @@ const dados = {
         const jsonPdf = await resPdf.json();
 
         if (jsonPdf.sucesso) {
-            // ✅ Abre o PDF que foi SALVO na pasta pdfs/
             window.open(jsonPdf.url_pdf, "_blank");
-
             msgEl.innerHTML += `
                 <div class="msg-sucesso">
                     ✅ Proposta <strong>#${jsonPdf.numero_proposta}</strong> SALVA com sucesso!<br>
                     📂 Arquivo: <strong>${jsonPdf.arquivo_pdf}</strong><br>
-                    <a href="${jsonPdf.url_pdf}" target="_blank" style="color:#006064;font-weight:600">
-                        📄 Clique aqui se o PDF não abriu automaticamente
-                    </a>
+                    <a href="${jsonPdf.url_pdf}" target="_blank" style="color:#006064;font-weight:600">📄 Clique aqui se o PDF não abriu automaticamente</a>
                 </div>`;
-
-            // ✅ Atualiza os valores na tela com o que foi salvo oficialmente
             if (jsonPdf.blocos) {
-                document.getElementById("subtotal_produtos").innerText = 
-                    `Subtotal: R$ ${Number(jsonPdf.blocos.locacao.subtotal||0).toFixed(2).replace(".",",")}`;
-                document.getElementById("subtotal_servicos").innerText = 
-                    `Subtotal: R$ ${Number(jsonPdf.blocos.servicos.subtotal||0).toFixed(2).replace(".",",")}`;
-                document.getElementById("total_geral").innerText = 
-                    `Investimento Total: R$ ${Number(jsonPdf.blocos.total_geral||0).toFixed(2).replace(".",",")}`;
+                document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${Number(jsonPdf.blocos.locacao.subtotal||0).toFixed(2).replace(".",",")}`;
+                document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${Number(jsonPdf.blocos.servicos.subtotal||0).toFixed(2).replace(".",",")}`;
+                document.getElementById("total_geral").innerText = `Investimento Total: R$ ${Number(jsonPdf.blocos.total_geral||0).toFixed(2).replace(".",",")}`;
             }
-
-            // ✅ Mostra no console para confirmar
             console.log("✅ Proposta salva no servidor:", jsonPdf);
-
         } else {
             msgEl.innerHTML += `<div class="msg-erro">❌ Erro: ${jsonPdf.erro || "Erro desconhecido"}</div>`;
         }
@@ -554,52 +529,77 @@ const dados = {
     }
     btnSubmit.textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
 });
+</script>
+
 <script>
-// ✅ FUNÇÃO DE CARREGAR EDIÇÃO COMPLETA E COM IDs CORRETOS
-window.onload = function(){
+// ✅ CARREGAMENTO DE EDIÇÃO CORRIGIDO E LIMPO
+window.addEventListener("DOMContentLoaded", function(){
     let num = localStorage.getItem("editar_numero");
     let ver = localStorage.getItem("editar_versao");
     let dadosSalvos = localStorage.getItem("dados_editar");
 
     if(num && ver && dadosSalvos){
-        // Coloca valores nos campos ocultos
-        document.getElementById('editar_numero').value = num;
-        document.getElementById('editar_versao').value = ver;
-
-        // Carrega dados e preenche os campos COM SEUS IDs CORRETOS
-        let d = JSON.parse(dadosSalvos);
+        // Preenche campos ocultos
+        const elNum = document.getElementById('editar_numero');
+        const elVer = document.getElementById('editar_versao');
+        if(elNum) elNum.value = num;
+        if(elVer) elVer.value = ver;
+           
+        let d;  // ✅ Declare d aqui, fora do try
+        try{
+            d = JSON.parse(dadosSalvos);  // ✅ Atribui valor
+            console.log("📥 Dados recebidos para edição:", d);
+        }catch(e){
+            console.log("❌ Dados inválidos:", e);
+            return;
+        }
         
+        // Preenche evento/vendedor
         if(d.evento){
-            if(d.evento.nome_evento) document.getElementById('nome_evento').value = d.evento.nome_evento;
-            if(d.evento.data_evento) document.getElementById('data_evento').value = d.evento.data_evento;
-            if(d.evento.local_evento) document.getElementById('busca_local').value = d.evento.local_evento; // ✅ ID CERTO
-            if(d.evento.qtd_pessoas) document.getElementById('qtd_pessoas').value = d.evento.qtd_pessoas;
-            if(d.evento.nome_vendedor) document.getElementById('busca_vendedor').value = d.evento.nome_vendedor; // ✅ ID CERTO
-            if(d.evento.id_vendedor) document.getElementById('id_vendedor').value = d.evento.id_vendedor;
+            if(d.evento.nome_evento) { const el=document.getElementById('nome_evento'); if(el) el.value=d.evento.nome_evento; }
+            if(d.evento.data_evento) { const el=document.getElementById('data_evento'); if(el) el.value=d.evento.data_evento; }
+            if(d.evento.local_evento) { const el=document.getElementById('busca_local'); if(el) el.value=d.evento.local_evento; }
+            if(d.evento.qtd_pessoas) { const el=document.getElementById('qtd_pessoas'); if(el) el.value=d.evento.qtd_pessoas; }
+            if(d.evento.nome_vendedor) { const el=document.getElementById('busca_vendedor'); if(el) el.value=d.evento.nome_vendedor; }
+            if(d.evento.id_vendedor) { const el=document.getElementById('id_vendedor'); if(el) el.value=d.evento.id_vendedor; }
         }
+
+        // Preenche cliente
         if(d.cliente){
-            if(d.cliente.razao_social) document.getElementById('busca_cliente').value = d.cliente.razao_social; // ✅ ID CERTO
-            if(d.cliente.cnpj) document.getElementById('cliente_cnpj').value = d.cliente.cnpj;
-            if(d.cliente.telefone) document.getElementById('cliente_telefone').value = d.cliente.telefone;
-            if(d.cliente.email) document.getElementById('cliente_email').value = d.cliente.email;
-            if(d.cliente.responsavel) document.getElementById('cliente_contato').value = d.cliente.responsavel;
+            if(d.cliente.razao_social) { const el=document.getElementById('busca_cliente'); if(el) el.value=d.cliente.razao_social; }
+            if(d.cliente.cnpj) { const el=document.getElementById('cliente_cnpj'); if(el) el.value=d.cliente.cnpj; }
+            if(d.cliente.telefone) { const el=document.getElementById('cliente_telefone'); if(el) el.value=d.cliente.telefone; }
+            if(d.cliente.email) { const el=document.getElementById('cliente_email'); if(el) el.value=d.cliente.email; }
+            if(d.cliente.responsavel) { const el=document.getElementById('cliente_contato'); if(el) el.value=d.cliente.responsavel; }
         }
 
-        // ✅ CARREGA OS ITENS TAMBÉM (faltava o principal!)
-        if(d.itens){
-            selecionados = d.itens;
+        // ✅ AQUI O SEGREDO: ATRIBUI DIRETO NA VARIÁVEL GLOBAL!
+        if(d.itens && Array.isArray(d.itens) && d.itens.length > 0){
+            selecionados = d.itens.map(i => ({
+                id: i.id,
+                nome: i.nome,
+                valor: parseFloat(i.valor || 0),
+                quantidade: parseInt(i.quantidade || 1),
+                tipo_item: i.tipo_item || "Equipamento",
+                categoria: i.categoria || "",
+                externo: false
+            }));
+            console.log("✅ Itens carregados com sucesso:", selecionados);
         }
 
-        // Atualiza a prévia automaticamente depois de preencher tudo
-        atualizar_previa_completa();
+        // ✅ Atualiza tela toda
+        if(typeof atualizar_previa_completa === "function"){
+            atualizar_previa_completa();
+            console.log("✅ Prévia atualizada na tela");
+        }
 
-        // Limpa para não reutilizar depois
+        // Limpa armazenamento para não repetir
         localStorage.removeItem("editar_numero");
         localStorage.removeItem("editar_versao");
         localStorage.removeItem("dados_editar");
     }
-}
+});
 </script>
-<!-- ✅ FECHAMENTO CERTO, SEM DUPLICIDADE -->
+
 </body>
 </html>
