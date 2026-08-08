@@ -403,6 +403,9 @@ def index(): return render_template("index.html")
 @app.route("/propostas")
 def pagina_propostas(): return render_template("propostas.html")
 
+@app.route("/editar")
+def pagina_editar(): return render_template("editar.html")
+
 @app.route("/meus-itens")
 def meus_itens(): return render_template("meus_itens.html")
 
