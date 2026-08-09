@@ -334,6 +334,70 @@ def api_gerar_proposta():
         "blocos": blocos
     })
 
+@app.route("/api/propostas/<numero>", methods=["DELETE"])
+def api_excluir_proposta(numero):
+    todas = _ler_json(ARQUIVO_PROPOSTAS, [])
+    proposta_alvo = next((p for p in todas if str(p.get("numero")) == str(numero)), None)
+    
+    if not proposta_alvo:
+        return jsonify(sucesso=False, erro="Proposta não encontrada"), 404
+
+    id_meeventos = proposta_alvo.get("numero_oficial")
+    print(f"===== INÍCIO EXCLUSÃO =====")
+    print(f"Número proposta local: {numero}")
+    print(f"ID recebido para Meeventos: >>{id_meeventos}<<") # <<<< MOSTRA O VALOR EXATO!
+
+    sucesso_api = False
+    mensagem_api = ""
+
+    # SÓ TENTA SE TEM ID VÁLIDO NÚMERICO/TEXTO
+    if id_meeventos and str(id_meeventos).strip() not in ("", "None", "-"):
+        # LISTA COMPLETA DE TODAS AS FORMAS QUE PODEM FUNCIONAR
+        testes = [
+            ("DELETE /budgets/ID", "DELETE", f"{API_BASE}/budgets/{id_meeventos}", None),
+            ("DELETE /budget/ID", "DELETE", f"{API_BASE}/budget/{id_meeventos}", None),
+            ("POST /budgets/delete com id", "POST", f"{API_BASE}/budgets/delete", {"id":id_meeventos}),
+            ("POST /budgets/excluir com id", "POST", f"{API_BASE}/budgets/excluir", {"id":id_meeventos}),
+            ("DELETE sem v1", "DELETE", f"{API_BASE.replace('/v1','')}/budgets/{id_meeventos}", None),
+            ("DELETE v2", "DELETE", f"{API_BASE.replace('/v1','/v2')}/budgets/{id_meeventos}", None),
+            ("DELETE por ?id=", "DELETE", f"{API_BASE}/budgets?id={id_meeventos}", None),
+            ("POST geral remover", "POST", f"{API_BASE}/remove-budget", {"id":id_meeventos}),
+        ]
+
+        for nome_teste, metodo, url, corpo in testes:
+            try:
+                print(f"\n-- Testando: {nome_teste}")
+                print(f"URL: {url}")
+                if metodo.upper() == "DELETE":
+                    r = requests.delete(url, headers=HEADERS, timeout=10)
+                else:
+                    r = requests.post(url, json=corpo, headers={**HEADERS,"Content-Type":"application/json"}, timeout=10)
+
+                print(f"Status: {r.status_code} | Resposta: {r.text[:200]}")
+
+                if r.status_code < 300 and "Rota não encontrada" not in r.text:
+                    sucesso_api = True
+                    mensagem_api = f"✅ Excluído com sucesso: {nome_teste}"
+                    break
+
+            except Exception as e:
+                print(f"Erro nesse teste: {str(e)}")
+                continue
+
+    else:
+        mensagem_api = "⚠️ Sem ID válido registrado da Meeventos, só apagou localmente"
+
+    # APAGA SEMPRE LOCALMENTE DE FORMA SEGURA
+    filtradas = [p for p in todas if str(p.get("numero")) != str(numero)]
+    _salvar_json(ARQUIVO_PROPOSTAS, filtradas)
+
+    print(f"===== FIM =====")
+    return jsonify(
+        sucesso=True,
+        mensagem="Proposta excluída localmente.",
+        detalhe_meeventos=mensagem_api if mensagem_api else "Nenhuma rota de exclusão funcionou até o momento"
+    )
+
 @app.route("/api/propostas")
 def api_listar_propostas():
     todas = _ler_json(ARQUIVO_PROPOSTAS, [])
