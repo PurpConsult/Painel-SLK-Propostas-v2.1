@@ -9,9 +9,9 @@
 body { background: #f5f7fa; padding: 15px; color: #333; font-size: 14px; line-height: 1.5; }
 .wrap { max-width: 1200px; margin: 0 auto; }
 
-/* ===== CABEÇALHO PADRÃO IGUAL PÁGINA DE EDIÇÃO ===== */
+/* ===== CABEÇALHO ===== */
 header {
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:10px;
     margin-bottom: 15px; padding: 12px 20px;
     background: linear-gradient(135deg, #00bcd4, #0097a7);
     border-radius: 8px; color: white;
@@ -24,11 +24,24 @@ header a {
 }
 header a:hover { background: white; color: #00bcd4; }
 
+/* ===== CAMPO DE BUSCA ===== */
+.bloco-busca{
+    background:#fff; padding:15px 20px; border-radius:8px; border:1px solid #e8e8e8;
+    box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:15px;
+}
+.bloco-busca label{font-weight:600; color:#00838f; margin-bottom:6px; display:block;}
+#busca-orcamento{
+    width:100%; max-width:450px; padding:9px 12px; border:1px solid #ddd;
+    border-radius:5px; font-size:14px; transition:border 0.2s;
+}
+#busca-orcamento:focus{outline:none; border-color:#00bcd4; box-shadow:0 0 0 2px rgba(0,188,212,0.15);}
+
 .aviso {
     background: #fff3cd; border: 1px solid #ffeaa7;
     color: #856404; padding: 12px 16px; border-radius: 6px;
     margin-bottom: 15px;
 }
+.aviso-busca{background:#eaf7f9; border:1px solid #b2ebf2; color:#006069;}
 
 .card {
     background: #fff; border-radius: 8px;
@@ -64,8 +77,7 @@ p { margin:4px 0; }
 .valor { font-weight:bold; color:#0097a7; }
 .versao-tag {
     background:rgba(0,188,212,0.15); color:#006069; font-weight:bold;
-    padding:2px 8px; border-radius:12px; font-size:12px;
-}
+    padding:2px 8px; border-radius:12px; font-size:12px; }
 .vazio {
     text-align: center; padding: 60px 20px; color: #888;
     background:white; border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,0.04);
@@ -84,57 +96,36 @@ p { margin:4px 0; }
     </div>
 </header>
 
+<!-- CAMPO DE BUSCA -->
+<div class="bloco-busca">
+    <label for="busca-orcamento">🔍 Buscar por: Número | Cliente | Evento</label>
+    <input type="text" id="busca-orcamento" placeholder="Digite para filtrar...">
+</div>
+
 <div id="lista-propostas"></div>
 
 </div>
 
 <script>
+// Guarda TODOS os orçamentos carregados para filtrar depois
+let listaCompleta = [];
+
+// Ao carregar página: busca dados e prepara filtro
+window.onload = function(){
+    carregarPropostas();
+    // CONECTA A DIGITAÇÃO À FUNÇÃO DE FILTRO (estava faltando!)
+    document.getElementById("busca-orcamento").addEventListener("input", atualizarListaFiltrada);
+};
+
+// Carrega dados da API
 async function carregarPropostas() {
     const el = document.getElementById("lista-propostas");
     try {
         const res = await fetch("/api/propostas");
         const r = await res.json();
-        const lista = r.dados || [];
+        listaCompleta = r.dados || []; // Salva tudo na variável global
 
-        if (!lista.length) {
-            el.innerHTML = `
-            <div class="vazio">
-                <h3>Nenhum orçamento gerado ainda 😊</h3>
-                <p style="margin-top:8px">Volte ao painel e crie seu primeiro orçamento!</p>
-            </div>`;
-            return;
-        }
-
-        let html = "";
-        lista.forEach(item => {
-            html += `<div class="card">
-                <h4>📌 Orçamento Nº: <strong>${item.numero}</strong></h4>
-                <p><strong>Cliente:</strong> ${item.cliente}</p>
-                <p><strong>Evento:</strong> ${item.evento}</p>
-                <p><strong>Último valor:</strong> <span class="valor">R$ ${parseFloat(item.total||0).toFixed(2).replace(".",",")}</span></p>
-                <hr style="margin:10px 0; border-color:#e8e8e8;">
-                <p style="font-weight:bold; margin-bottom:6px; color:#00838f;">📜 Histórico de versões:</p>`;
-
-            item.versoes.forEach(v => {
-                const valorV = parseFloat(v.total||0).toFixed(2).replace(".",",");
-
-                html += `<div class="linha-versao">
-                    <span><span class="versao-tag">v${v.versao}</span> ${v.data} — <strong>R$ ${valorV}</strong></span>
-                    <div>
-                        ${v.arquivo_pdf ? `<a class="btn-pdf" href="/pdfs/${v.arquivo_pdf}" target="_blank">📄 Ver PDF</a>` : ""}
-                        <button class="btn-editar" onclick="irEditar('${item.numero}', ${v.versao}, this)">✏️ Editar</button>
-                    </div>
-                </div>`;
-            });
-
-            html += `
-                <div style="margin-top:15px; border-top:1px solid #e8e8e8; padding-top:10px; text-align:right;">
-                    <button class="btn-excluir" onclick="excluirProposta('${item.numero}')">🗑️ Excluir Orçamento</button>
-                </div>
-            </div>`;
-        });
-
-        el.innerHTML = html;
+        atualizarListaFiltrada(); // Monta lista inicial (sem filtro)
 
     } catch (e) {
         console.error(e);
@@ -142,6 +133,60 @@ async function carregarPropostas() {
     }
 }
 
+// FUNÇÃO PRINCIPAL DE FILTRAR E EXIBIR
+function atualizarListaFiltrada(){
+    const el = document.getElementById("lista-propostas");
+    const termo = document.getElementById("busca-orcamento").value.trim().toLowerCase();
+
+    // Filtra por número, cliente ou evento
+    let filtrados = listaCompleta.filter(item => {
+        return (
+            item.numero.toString().toLowerCase().includes(termo) ||
+            item.cliente.toString().toLowerCase().includes(termo) ||
+            item.evento.toString().toLowerCase().includes(termo)
+        );
+    });
+
+    // Mensagem quando vazio
+    if (!filtrados.length) {
+        el.innerHTML = termo ?
+            `<div class="vazio aviso-busca"><h3>Nenhum resultado encontrado para: "${termo}"</h3></div>` :
+            `<div class="vazio"><h3>Nenhum orçamento gerado ainda 😊</h3><p style="margin-top:8px">Volte ao painel e crie seu primeiro orçamento!</p></div>`;
+        return;
+    }
+
+    // MONTA LISTA COMPLETA COM OS FILTRADOS
+    let html = "";
+    filtrados.forEach(item => {
+        html += `<div class="card">
+            <h4>📌 Orçamento Nº: <strong>${item.numero}</strong></h4>
+            <p><strong>Cliente:</strong> ${item.cliente}</p>
+            <p><strong>Evento:</strong> ${item.evento}</p>
+            <p><strong>Último valor:</strong> <span class="valor">R$ ${parseFloat(item.total||0).toFixed(2).replace(".",",")}</span></p>
+            <hr style="margin:10px 0; border-color:#e8e8e8;">
+            <p style="font-weight:bold; margin-bottom:6px; color:#00838f;">📜 Histórico de versões:</p>`;
+
+        item.versoes.forEach(v => {
+            const valorV = parseFloat(v.total||0).toFixed(2).replace(".",",");
+            html += `<div class="linha-versao">
+                <span><span class="versao-tag">v${v.versao}</span> ${v.data} — <strong>R$ ${valorV}</strong></span>
+                <div>
+                    ${v.arquivo_pdf ? `<a class="btn-pdf" href="/pdfs/${v.arquivo_pdf}" target="_blank">📄 Ver PDF</a>` : ""}
+                    <button class="btn-editar" onclick="irEditar('${item.numero}', ${v.versao}, this)">✏️ Editar</button>
+                </div>
+            </div>`;
+        });
+
+        html += `<div style="margin-top:15px; border-top:1px solid #e8e8e8; padding-top:10px; text-align:right;">
+                    <button class="btn-excluir" onclick="excluirProposta('${item.numero}')">🗑️ Excluir Orçamento</button>
+                </div>
+            </div>`;
+    });
+
+    el.innerHTML = html;
+}
+
+// Funções originais mantidas IGUAIS
 function irEditar(numProposta, versao, botao){
     fetch("/api/propostas")
         .then(res => res.json())
@@ -154,7 +199,6 @@ function irEditar(numProposta, versao, botao){
                 return;
             }
 
-            // ✅ MAPEAMENTO COMPLETO USANDO OS CAMPOS DO BACKEND
             const dadosOrganizados = JSON.stringify({
                 evento: {
                     nome_evento: proposta.evento || "",
@@ -177,9 +221,6 @@ function irEditar(numProposta, versao, botao){
             localStorage.setItem("editar_numero", numProposta);
             localStorage.setItem("editar_versao", String(versao));
             localStorage.setItem("dados_editar", dadosOrganizados);
-
-            console.log("✅ Dados salvos para edição:", JSON.parse(dadosOrganizados));
-
             window.location.href = "/editar";
         })
         .catch(e => {
@@ -192,18 +233,14 @@ async function excluirProposta(numero) {
     if (!confirm(`Tem certeza que deseja excluir o orçamento ${numero}? Isso também tentará removê-lo do MeEventos.`)) {
         return;
     }
-
     try {
         const res = await fetch(`/api/propostas/${numero}`, { method: 'DELETE' });
         const r = await res.json();
-
         if (r.sucesso) {
             let msg = r.mensagem;
-            if (r.detalhe_meeventos) {
-                msg += "\n\nStatus MeEventos: " + r.detalhe_meeventos;
-            }
+            if (r.detalhe_meeventos) msg += "\n\nStatus MeEventos: " + r.detalhe_meeventos;
             alert(msg);
-            carregarPropostas();
+            carregarPropostas(); // Recarrega tudo após excluir
         } else {
             alert("Erro ao excluir: " + (r.erro || "Erro desconhecido"));
         }
@@ -212,8 +249,6 @@ async function excluirProposta(numero) {
         alert("Erro na requisição de exclusão.");
     }
 }
-
-window.onload = carregarPropostas;
 </script>
 
 </body>
