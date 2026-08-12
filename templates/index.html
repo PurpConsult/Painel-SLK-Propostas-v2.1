@@ -34,7 +34,17 @@ input[readonly]{background:#f5f5f5;color:#666}
 .item-linha{padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px;transition:background 0.1s}
 .item-linha:hover{background:#e0f7fa}
 
-.item-previa{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-bottom:1px solid #f5f5f5}
+	.item-previa{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-bottom:1px solid #f5f5f5}
+	.item-com-locacao{border-bottom:1px solid #f5f5f5;padding-bottom:7px;margin-bottom:5px}
+	.item-com-locacao .item-previa{border-bottom:0}
+	.locacao-externa{margin:2px 8px 0;padding:8px;border-radius:5px;background:#fff8e7;border:1px solid #f2d38a;color:#644d18}
+	.locacao-cab{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer}
+	.locacao-cab input{width:auto;accent-color:#d79b00}
+	.locacao-campos{display:grid;grid-template-columns:1.45fr 0.8fr;gap:7px;margin-top:7px}
+	.locacao-campos label{font-size:11px;color:#75612e;margin-bottom:2px}
+	.locacao-campos input{padding:6px 7px;font-size:12px;background:#fff}
+	.resumo-externo{display:none;margin-top:10px;padding:9px 10px;border-radius:6px;background:#fff8e7;border:1px solid #f2d38a;color:#5f4b18;font-size:12px;line-height:1.55}
+	.resumo-externo.ativo{display:block}
 .subtotal-bloco{text-align:right;font-weight:bold;font-size:13px;padding:5px 0 8px 0;border-bottom:1px dashed #e0e0e0;color:#00838f}
 .total-geral{text-align:right;font-weight:bold;font-size:16px;padding:10px 0;color:#00bcd4}
 
@@ -69,7 +79,7 @@ input[readonly]{background:#f5f5f5;color:#666}
 <body>
 <div class="wrap">
 <header>
-    <h1>Soulink | Novos Orçamentos</h1>
+    <h1>SLK Propostas Pro</h1>
     <nav>
         <a href="/meus-itens">📦 Meus Itens</a>
         <a href="/propostas">📋 Meus Orçamentos</a>
@@ -77,9 +87,6 @@ input[readonly]{background:#f5f5f5;color:#666}
 </header>
 
 <form id="form">
-<!-- Campos ocultos para edição -->
-<input type="hidden" id="editar_numero" value="">
-<input type="hidden" id="editar_versao" value="">
 <div class="linha-colunas">
     <!-- COLUNA ESQUERDA: FORMULÁRIO -->
     <div>
@@ -194,7 +201,8 @@ input[readonly]{background:#f5f5f5;color:#666}
             <div id="lista_servicos"></div>
             <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
         </div>
-        <div id="total_geral" class="total-geral">Investimento Total: R$ 0,00</div>
+		<div id="total_geral" class="total-geral">Investimento Total: R$ 0,00</div>
+		<div id="resumo_externo" class="resumo-externo" aria-live="polite"></div>
     </div>
 </div>
 
@@ -215,7 +223,7 @@ input[readonly]{background:#f5f5f5;color:#666}
 const API_BASE_URL = "/api";
 
 let todos_itens = [];
-let selecionados = []; // VARIÁVEL GLOBAL - ESSA QUE USAMOS PARA TUDO!
+let selecionados = [];
 let lista_vendedores = [];
 let lista_locais = [];
 let lista_clientes = [];
@@ -224,6 +232,7 @@ let lista_clientes = [];
 async function carregar_tudo() {
     console.log("Carregando dados do backend...");
 
+    // Vendedores
     try {
         const res = await fetch(`${API_BASE_URL}/vendedores`);
         if(res.ok) {
@@ -233,6 +242,7 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro vendedores:", e); }
 
+    // Locais
     try {
         const res = await fetch(`${API_BASE_URL}/locais`);
         if(res.ok) {
@@ -242,6 +252,7 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro locais:", e); }
 
+    // Clientes (745+)
     try {
         const res = await fetch(`${API_BASE_URL}/clientes`);
         if(res.ok) {
@@ -251,6 +262,7 @@ async function carregar_tudo() {
         }
     } catch (e) { console.error("Erro clientes:", e); }
 
+    // Produtos/Serviços (375)
     try {
         const res = await fetch(`${API_BASE_URL}/produtos-catalogo`);
         if(res.ok) {
@@ -261,7 +273,50 @@ async function carregar_tudo() {
     } catch (e) { console.error("Erro catálogo:", e); }
 }
 
-carregar_tudo();
+function preencherFormularioDeEdicao() {
+    const dadosSalvos = localStorage.getItem("dados_editar");
+    if (!dadosSalvos) return;
+
+    try {
+        const dados = JSON.parse(dadosSalvos);
+        const evento = dados.evento || {};
+        const cliente = dados.cliente || {};
+
+        document.getElementById("busca_vendedor").value = evento.nome_vendedor || evento.vendedor || "";
+        document.getElementById("id_vendedor").value = evento.id_vendedor || "";
+        document.getElementById("nome_evento").value = evento.nome_evento || "";
+        document.getElementById("busca_local").value = evento.local_evento || evento.local || "";
+        document.getElementById("data_evento").value = evento.data_evento || "";
+        document.getElementById("qtd_pessoas").value = evento.qtd_pessoas || "";
+        document.getElementById("busca_cliente").value = cliente.razao_social || cliente.nome || "";
+        document.getElementById("cliente_cnpj").value = cliente.documento || cliente.cnpj || "";
+        document.getElementById("cliente_email").value = cliente.email || "";
+        document.getElementById("cliente_telefone").value = cliente.telefone || "";
+        document.getElementById("cliente_contato").value = cliente.contato || cliente.responsavel || "";
+
+		selecionados = (dados.itens || []).map(item => ({
+            ...item,
+            id: item.id || item.codigo || "",
+            nome: item.nome || item.descricao || "Item sem descrição",
+            valor: Number(item.valor || item.valor_unitario || 0),
+            quantidade: Number(item.quantidade || 1),
+			tipo_item: item.tipo_item || item.tipo || "Equipamento",
+			externo: item.externo === true || String(item.externo || "").toLowerCase() === "true",
+			fornecedor_externo: item.fornecedor_externo || item.fornecedor || "",
+			custo_externo: Number(item.custo_externo || item.custo_fornecedor || 0)
+		}));
+        atualizar_previa_completa();
+        document.getElementById("btnSubmit").textContent = "💾 Salvar nova versão da proposta";
+        console.log("Proposta carregada para edição:", dados);
+    } catch (erro) {
+        console.error("Não foi possível carregar os dados para edição:", erro);
+        localStorage.removeItem("dados_editar");
+        localStorage.removeItem("editar_numero");
+        localStorage.removeItem("editar_versao");
+    }
+}
+
+carregar_tudo().finally(preencherFormularioDeEdicao);
 
 // ===== BUSCA FILTRADA GENÉRICA =====
 function mostrar_filtrado_lista(texto, lista_total, campo_nome, id_lista) {
@@ -273,7 +328,7 @@ function mostrar_filtrado_lista(texto, lista_total, campo_nome, id_lista) {
     const termo = texto.toLowerCase().trim();
     const filtrados = lista_total.filter(i =>
         String(i[campo_nome] || "").toLowerCase().includes(termo)
-    ).slice(0, 50);
+    ).slice(0, 50); // Limitar a 50 resultados para performance
 
     if (filtrados.length === 0) {
         lista_el.innerHTML = '<div class="aviso">Nenhum resultado encontrado</div>';
@@ -323,6 +378,7 @@ document.getElementById("nome_evento").addEventListener("input", atualizar_previ
 document.getElementById("data_evento").addEventListener("change", atualizar_previa_completa);
 document.getElementById("qtd_pessoas").addEventListener("input", atualizar_previa_completa);
 
+// FECHAR LISTAS AO CLICAR FORA
 document.addEventListener("click", e => {
     if(!e.target.closest(".grupo-busca")){
         document.querySelectorAll("#lista_vendedores, #lista_locais, #lista_clientes, #lista_itens").forEach(el => el.style.display = "none");
@@ -364,15 +420,17 @@ document.addEventListener("click", e => {
     if (existe) {
         existe.quantidade++;
     } else {
-        selecionados.push({
+		selecionados.push({
             id: item.id,
             nome: item.nome,
             valor: parseFloat(item.valor || 0),
             quantidade: 1,
             tipo_item: item.tipo_item || "Equipamento",
             categoria: item.categoria || "",
-            externo: false
-        });
+			externo: false,
+			fornecedor_externo: "",
+			custo_externo: 0
+		});
     }
     atualizar_previa_completa();
     document.getElementById("busca_item").value = "";
@@ -397,10 +455,10 @@ function atualizar_previa_completa() {
     let html_prod = "", html_serv = "";
     let subtotal_prod = 0, subtotal_serv = 0;
 
-    selecionados.forEach((item, idx) => {
-        const sub = item.quantidade * item.valor;
-        const linha = `<div class="item-previa">
-            <span>
+	selecionados.forEach((item, idx) => {
+		const sub = item.quantidade * item.valor;
+		const linha = `<div class="item-com-locacao"><div class="item-previa">
+			<span>
                 <span class="qtd-control">
                     <span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span>
                     <strong>${item.quantidade}</strong>
@@ -408,8 +466,8 @@ function atualizar_previa_completa() {
                 </span>
                 ${item.nome}
             </span>
-            <span>R$ ${sub.toFixed(2).replace(".",",")} <span class="remover" data-idx="${idx}">✕</span></span>
-        </div>`;
+			<span>R$ ${sub.toFixed(2).replace(".",",")} <span class="remover" data-idx="${idx}">✕</span></span>
+		</div>${renderizarLocacaoExterna(item, idx)}</div>`;
         if (item.tipo_item === "Serviço") {
             html_serv += linha;
             subtotal_serv += sub;
@@ -423,8 +481,66 @@ function atualizar_previa_completa() {
     lista_serv_el.innerHTML = html_serv || '<div class="aviso">Nenhum serviço adicionado</div>';
     document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${subtotal_prod.toFixed(2).replace(".",",")}`;
     document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
-    document.getElementById("total_geral").innerText = `Investimento Total: R$ ${(subtotal_prod + subtotal_serv).toFixed(2).replace(".",",")}`;
+	document.getElementById("total_geral").innerText = `Investimento Total: R$ ${(subtotal_prod + subtotal_serv).toFixed(2).replace(".",",")}`;
+	atualizarResumoLocacaoExterna();
 }
+
+function escaparHtml(valor) {
+    return String(valor || "").replace(/[&<>'"]/g, caractere => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+    })[caractere]);
+}
+
+function dinheiro(valor) {
+    return `R$ ${Number(valor || 0).toFixed(2).replace(".", ",")}`;
+}
+
+function renderizarLocacaoExterna(item, idx) {
+    const externo = item.externo === true;
+    const custo = Number(item.custo_externo || 0);
+    return `<div class="locacao-externa">
+        <label class="locacao-cab"><input type="checkbox" data-externo-campo="externo" data-idx="${idx}" ${externo ? "checked" : ""}> Locação externa? <span>Controle interno</span></label>
+        ${externo ? `<div class="locacao-campos">
+            <div><label>Fornecedor</label><input type="text" data-externo-campo="fornecedor_externo" data-idx="${idx}" value="${escaparHtml(item.fornecedor_externo)}" placeholder="Nome do fornecedor"></div>
+            <div><label>Custo unitário</label><input type="number" min="0" step="0.01" inputmode="decimal" data-externo-campo="custo_externo" data-idx="${idx}" value="${custo || ""}" placeholder="0,00"></div>
+        </div>` : ""}
+    </div>`;
+}
+
+function atualizarResumoLocacaoExterna() {
+    const resumo = document.getElementById("resumo_externo");
+    const itensExternos = selecionados.filter(item => item.externo === true);
+    if (!itensExternos.length) {
+        resumo.classList.remove("ativo");
+        resumo.innerHTML = "";
+        return;
+    }
+    const receita = itensExternos.reduce((total, item) => total + Number(item.quantidade || 0) * Number(item.valor || 0), 0);
+    const custo = itensExternos.reduce((total, item) => total + Number(item.quantidade || 0) * Number(item.custo_externo || 0), 0);
+    const margem = receita - custo;
+    const percentual = receita > 0 ? (margem / receita) * 100 : 0;
+    resumo.classList.add("ativo");
+    resumo.innerHTML = `<strong>🔒 Controle interno — locações externas</strong><br>Receita: ${dinheiro(receita)} · Custo: ${dinheiro(custo)} · Margem bruta: <strong>${dinheiro(margem)} (${percentual.toFixed(1).replace(".", ",")}%)</strong><br><span>Esses dados são salvos no histórico e não aparecem no PDF comercial.</span>`;
+}
+
+document.addEventListener("change", e => {
+    const campo = e.target.dataset.externoCampo;
+    if (!campo) return;
+    const item = selecionados[Number(e.target.dataset.idx)];
+    if (!item) return;
+    if (campo === "externo") item.externo = e.target.checked;
+    if (campo === "fornecedor_externo") item.fornecedor_externo = e.target.value.trim();
+    if (campo === "custo_externo") item.custo_externo = Math.max(0, Number(e.target.value || 0));
+    atualizar_previa_completa();
+});
+
+document.addEventListener("input", e => {
+    if (e.target.dataset.externoCampo !== "custo_externo") return;
+    const item = selecionados[Number(e.target.dataset.idx)];
+    if (!item) return;
+    item.custo_externo = Math.max(0, Number(e.target.value || 0));
+    atualizarResumoLocacaoExterna();
+});
 
 // CONTROLES DE QUANTIDADE E REMOVER
 document.addEventListener("click", e => {
@@ -462,144 +578,52 @@ document.getElementById("form").addEventListener("submit", async e => {
     btnSubmit.disabled = true;
     btnSubmit.textContent = "⏳ Processando...";
 
-const dados = {
-    id_vendedor: document.getElementById("id_vendedor").value || "51",
-    nome_vendedor: document.getElementById("busca_vendedor").value,
-    nome_evento: document.getElementById("nome_evento").value,
-    local_evento: document.getElementById("busca_local").value,
-    data_evento: document.getElementById("data_evento").value,
-    qtd_pessoas: document.getElementById("qtd_pessoas").value,
-    razao_social: document.getElementById("busca_cliente").value,
-    cnpj: document.getElementById("cliente_cnpj").value,
-    telefone: document.getElementById("cliente_telefone").value,
-    email: document.getElementById("cliente_email").value,
-    responsavel: document.getElementById("cliente_contato").value,
-    itens: selecionados,
-    editar_numero: document.getElementById('editar_numero').value,
-    editar_versao: parseInt(document.getElementById('editar_versao').value) || 0,
-    total_proposta: selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0)
-};
+    const dados = {
+        vendedor_nome: document.getElementById("busca_vendedor").value,
+        id_vendedor: document.getElementById("id_vendedor").value || "51",
+        nome_evento: document.getElementById("nome_evento").value,
+        local_nome: document.getElementById("busca_local").value,
+        data_evento: document.getElementById("data_evento").value,
+        qtd_pessoas: document.getElementById("qtd_pessoas").value,
+        cliente_nome: document.getElementById("busca_cliente").value,
+        cliente_cnpj: document.getElementById("cliente_cnpj").value,
+        cliente_email: document.getElementById("cliente_email").value,
+        cliente_telefone: document.getElementById("cliente_telefone").value,
+        cliente_contato: document.getElementById("cliente_contato").value,
+        itens: selecionados,
+        total_proposta: selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0),
+        numero_original: localStorage.getItem("editar_numero") || "",
+        versao_origem: localStorage.getItem("editar_versao") || ""
+    };
 
-    let num_orcamento = "";
+    // O backend envia a proposta nova ao Meeventos, salva o PDF e registra todo o histórico.
     try {
-        const resMe = await fetch(`${API_BASE_URL}/enviar-orcamento`, {
+        const resposta = await fetch(`${API_BASE_URL}/gerar-proposta`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(dados)
         });
-        const jsonMe = await resMe.json();
-        if (jsonMe.sucesso) {
-            num_orcamento = jsonMe.id_orcamento || "";
-            msgEl.innerHTML = `<div class="msg-sucesso">💎 Orçamento <strong>#${num_orcamento}</strong> criado com sucesso no Meeventos!</div>`;
+        const resultado = await resposta.json();
+        if (resposta.ok && resultado.sucesso) {
+            const textoMeeventos = resultado.enviado_meeventos
+                ? `enviada ao Meeventos com o número <strong>#${resultado.numero_proposta}</strong>`
+                : `salva localmente como <strong>#${resultado.numero_proposta}</strong>`;
+            msgEl.innerHTML = `<div class="msg-sucesso">✅ Proposta ${textoMeeventos}. Versão registrada no histórico.</div>`;
+            if (resultado.url_pdf) window.open(resultado.url_pdf, "_blank");
+            localStorage.removeItem("dados_editar");
+            localStorage.removeItem("editar_numero");
+            localStorage.removeItem("editar_versao");
+            document.getElementById("btnSubmit").textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
         } else {
-            msgEl.innerHTML = `<div class="msg-erro">⚠️ Erro no Meeventos: ${jsonMe.erro || jsonMe.detalhes || "Erro desconhecido"}</div>`;
+            msgEl.innerHTML = `<div class="msg-erro">Não foi possível salvar a proposta: ${resultado.erro || "erro desconhecido"}</div>`;
         }
     } catch (err) {
-        msgEl.innerHTML = `<div class="msg-erro">⚠️ Erro ao enviar para Meeventos: ${err.message}</div>`;
+        msgEl.innerHTML = `<div class="msg-erro">Erro ao salvar proposta: ${err.message}</div>`;
     }
 
-    dados.num_orcamento = num_orcamento;
-    try {
-        const resPdf = await fetch(`${API_BASE_URL}/gerar-proposta`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(dados)
-        });
-        const jsonPdf = await resPdf.json();
-
-        if (jsonPdf.sucesso) {
-            window.open(jsonPdf.url_pdf, "_blank");
-            msgEl.innerHTML += `
-                <div class="msg-sucesso">
-                    ✅ Proposta <strong>#${jsonPdf.numero_proposta}</strong> SALVA com sucesso!<br>
-                    📂 Arquivo: <strong>${jsonPdf.arquivo_pdf}</strong><br>
-                    <a href="${jsonPdf.url_pdf}" target="_blank" style="color:#006064;font-weight:600">📄 Clique aqui se o PDF não abriu automaticamente</a>
-                </div>`;
-            if (jsonPdf.blocos) {
-                document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${Number(jsonPdf.blocos.locacao.subtotal||0).toFixed(2).replace(".",",")}`;
-                document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${Number(jsonPdf.blocos.servicos.subtotal||0).toFixed(2).replace(".",",")}`;
-                document.getElementById("total_geral").innerText = `Investimento Total: R$ ${Number(jsonPdf.blocos.total_geral||0).toFixed(2).replace(".",",")}`;
-            }
-            console.log("✅ Proposta salva no servidor:", jsonPdf);
-        } else {
-            msgEl.innerHTML += `<div class="msg-erro">❌ Erro: ${jsonPdf.erro || "Erro desconhecido"}</div>`;
-        }
-    } catch (err) {
-        msgEl.innerHTML += `<div class="msg-erro">❌ Erro ao gerar/salvar proposta: ${err.message}</div>`;
-    }
+    btnSubmit.disabled = false;
     btnSubmit.textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
 });
 </script>
-
-<script>
-// ✅ CARREGAMENTO DE EDIÇÃO CORRIGIDO E LIMPO
-window.addEventListener("DOMContentLoaded", function(){
-    let num = localStorage.getItem("editar_numero");
-    let ver = localStorage.getItem("editar_versao");
-    let dadosSalvos = localStorage.getItem("dados_editar");
-
-    if(num && ver && dadosSalvos){
-        // Preenche campos ocultos
-        const elNum = document.getElementById('editar_numero');
-        const elVer = document.getElementById('editar_versao');
-        if(elNum) elNum.value = num;
-        if(elVer) elVer.value = ver;
-           
-        let d;  // ✅ Declare d aqui, fora do try
-        try{
-            d = JSON.parse(dadosSalvos);  // ✅ Atribui valor
-            console.log("📥 Dados recebidos para edição:", d);
-        }catch(e){
-            console.log("❌ Dados inválidos:", e);
-            return;
-        }
-        
-        // Preenche evento/vendedor
-        if(d.evento){
-            if(d.evento.nome_evento) { const el=document.getElementById('nome_evento'); if(el) el.value=d.evento.nome_evento; }
-            if(d.evento.data_evento) { const el=document.getElementById('data_evento'); if(el) el.value=d.evento.data_evento; }
-            if(d.evento.local_evento) { const el=document.getElementById('busca_local'); if(el) el.value=d.evento.local_evento; }
-            if(d.evento.qtd_pessoas) { const el=document.getElementById('qtd_pessoas'); if(el) el.value=d.evento.qtd_pessoas; }
-            if(d.evento.nome_vendedor) { const el=document.getElementById('busca_vendedor'); if(el) el.value=d.evento.nome_vendedor; }
-            if(d.evento.id_vendedor) { const el=document.getElementById('id_vendedor'); if(el) el.value=d.evento.id_vendedor; }
-        }
-
-        // Preenche cliente
-        if(d.cliente){
-            if(d.cliente.razao_social) { const el=document.getElementById('busca_cliente'); if(el) el.value=d.cliente.razao_social; }
-            if(d.cliente.cnpj) { const el=document.getElementById('cliente_cnpj'); if(el) el.value=d.cliente.cnpj; }
-            if(d.cliente.telefone) { const el=document.getElementById('cliente_telefone'); if(el) el.value=d.cliente.telefone; }
-            if(d.cliente.email) { const el=document.getElementById('cliente_email'); if(el) el.value=d.cliente.email; }
-            if(d.cliente.responsavel) { const el=document.getElementById('cliente_contato'); if(el) el.value=d.cliente.responsavel; }
-        }
-
-        // ✅ AQUI O SEGREDO: ATRIBUI DIRETO NA VARIÁVEL GLOBAL!
-        if(d.itens && Array.isArray(d.itens) && d.itens.length > 0){
-            selecionados = d.itens.map(i => ({
-                id: i.id,
-                nome: i.nome,
-                valor: parseFloat(i.valor || 0),
-                quantidade: parseInt(i.quantidade || 1),
-                tipo_item: i.tipo_item || "Equipamento",
-                categoria: i.categoria || "",
-                externo: false
-            }));
-            console.log("✅ Itens carregados com sucesso:", selecionados);
-        }
-
-        // ✅ Atualiza tela toda
-        if(typeof atualizar_previa_completa === "function"){
-            atualizar_previa_completa();
-            console.log("✅ Prévia atualizada na tela");
-        }
-
-        // Limpa armazenamento para não repetir
-        localStorage.removeItem("editar_numero");
-        localStorage.removeItem("editar_versao");
-        localStorage.removeItem("dados_editar");
-    }
-});
-</script>
-
 </body>
 </html>
