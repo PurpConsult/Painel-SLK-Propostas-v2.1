@@ -155,8 +155,8 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     NE = ParagraphStyle('NE', parent=styles['Normal'], fontSize=10, leading=14, spaceAfter=3)
     ROT = ParagraphStyle('ROT', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor("#666"))
     H2  = ParagraphStyle('H2',  parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor("#0056b3"), spaceBefore=10, spaceAfter=6)
-    TIT = ParagraphStyle('TIT', parent=styles['Heading1'], fontSize=17, alignment=1, textColor=colors.HexColor("#111"))
-    SUB = ParagraphStyle('SUB', parent=styles['Normal'], fontSize=10, alignment=1, textColor=colors.HexColor("#666"), spaceAfter=12)
+    TIT = ParagraphStyle('TIT', parent=styles['Heading1'], fontSize=14, leading=18, alignment=1, textColor=colors.HexColor("#111"))
+    SUB = ParagraphStyle('SUB', parent=styles['Normal'], fontSize=9, leading=12, alignment=1, textColor=colors.HexColor("#666"), spaceAfter=0)
     NEG = ParagraphStyle('NEG', parent=NE, fontName='Helvetica-Bold')
 
     def fmt(v): return f"R$ {float(v):,.2f}".replace(",","X").replace(".",",").replace("X",".")
@@ -196,10 +196,18 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
         logo = Image(CAMINHO_LOGO, width=4*cm, height=2.5*cm) if os.path.exists(CAMINHO_LOGO) else Paragraph("<b>SOULINK EVENTOS</b>", TIT)
     except:
         logo = Paragraph("<b>SOULINK EVENTOS</b>", TIT)
-    cab = Table([[logo, Paragraph(f"<b>ORÇAMENTO</b><br/>Nº {numero}", TIT)]], colWidths=[5*cm,12*cm])
-    cab.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'MIDDLE'),('ALIGN',(1,0),(1,0),'CENTER'),('BOTTOMPADDING',(0,0),(-1,-1),10)]))
+    cabecalho_central = Paragraph(
+        f"<b>ORÇAMENTO Nº {numero}</b><br/>"
+        f"<font size='9' color='#666666'>Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}</font>",
+        TIT
+    )
+    cab = Table([[logo, cabecalho_central]], colWidths=[5*cm,12*cm])
+    cab.setStyle(TableStyle([
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('ALIGN',(1,0),(1,0),'CENTER'),
+        ('BOTTOMPADDING',(0,0),(-1,-1),8),
+    ]))
     elementos.append(cab)
-    elementos.append(Paragraph(f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}", SUB))
     elementos.append(Spacer(1,0.3*cm))
 
     # 📌 DADOS DO EVENTO
@@ -256,10 +264,15 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     t1 = Table(CAB+dloc, colWidths=LARG)
     e1 = list(EST_BASE) + [('BACKGROUND',(0,0),(-1,0),colors.HexColor("#0056b3")),('TEXTCOLOR',(0,0),(-1,0),colors.white)]
     t1.setStyle(e1); elementos.append(t1)
-    s1 = Table([["","","",Paragraph("SUBTOTAL EQUIPAMENTOS:",NEG),Paragraph(fmt(loc['subtotal']),NEG)]], colWidths=LARG)
-    s1.setStyle(TableStyle([('ALIGN',(3,0),(-1,-1),'RIGHT'),
-        ('BACKGROUND',(3,0),(-1,-1),colors.HexColor("#e3f2fd")),('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
-        ('GRID',(0,0),(-1,-1),.4,colors.HexColor("#bbdefb"))]))
+    s1 = Table([[Paragraph("<b>SUBTOTAL EQUIPAMENTOS</b>", NEG), Paragraph(fmt(loc['subtotal']), NEG)]], colWidths=[13.0*cm,4.5*cm])
+    s1.setStyle(TableStyle([
+        ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#e3f2fd")),
+        ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
+        ('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),
+        ('LINEABOVE',(0,0),(-1,-1),.6,colors.HexColor("#91c8ef")),
+    ]))
     elementos.append(s1); elementos.append(Spacer(1,0.6*cm))
 
     # 🛠 SERVIÇOS
@@ -269,20 +282,29 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     t2 = Table(CAB+dsv, colWidths=LARG)
     e2 = list(EST_BASE) + [('BACKGROUND',(0,0),(-1,0),colors.HexColor("#28a745")),('TEXTCOLOR',(0,0),(-1,0),colors.white)]
     t2.setStyle(e2); elementos.append(t2)
-    s2 = Table([["","","",Paragraph("SUBTOTAL SERVIÇOS:",NEG),Paragraph(fmt(svc['subtotal']),NEG)]], colWidths=LARG)
-    s2.setStyle(TableStyle([('ALIGN',(3,0),(-1,-1),'RIGHT'),
-        ('BACKGROUND',(3,0),(-1,-1),colors.HexColor("#e8f5e9")),('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
-        ('GRID',(0,0),(-1,-1),.4,colors.HexColor("#a5d6a7"))]))
+    s2 = Table([[Paragraph("<b>SUBTOTAL SERVIÇOS</b>", NEG), Paragraph(fmt(svc['subtotal']), NEG)]], colWidths=[13.0*cm,4.5*cm])
+    s2.setStyle(TableStyle([
+        ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#e8f5e9")),
+        ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
+        ('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),
+        ('LINEABOVE',(0,0),(-1,-1),.6,colors.HexColor("#94cf9d")),
+    ]))
     elementos.append(s2); elementos.append(Spacer(1,0.7*cm))
 
     # 💰 TOTAL
     TT = ParagraphStyle('TT',parent=NEG,fontSize=12,textColor=colors.HexColor("#e65100"))
     TTV = ParagraphStyle('TTV',parent=NEG,fontSize=14,textColor=colors.HexColor("#e65100"))
-    tt = Table([["","","",Paragraph("INVESTIMENTO TOTAL:",TT),Paragraph(fmt(total),TTV)]], colWidths=LARG)
-    tt.setStyle(TableStyle([('ALIGN',(3,0),(-1,-1),'RIGHT'),
-        ('BACKGROUND',(3,0),(-1,-1),colors.HexColor("#fff3e0")),
+    tt = Table([[Paragraph("INVESTIMENTO TOTAL", TT), Paragraph(fmt(total), TTV)]], colWidths=[13.0*cm,4.5*cm])
+    tt.setStyle(TableStyle([
+        ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#fff3e0")),
         ('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8),
-        ('BOX',(3,0),(-1,-1),1,colors.HexColor("#ffb74d"))]))
+        ('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),
+        ('BOX',(0,0),(-1,-1),1,colors.HexColor("#ffb74d")),
+    ]))
     elementos.append(tt); elementos.append(Spacer(1,0.8*cm))
 
     # Observações
