@@ -3,163 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SLK | Minhas Propostas</title>
+<title>SOULINK | Orçamentos</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
-body { background: #f4f6f8; padding: 15px; color: #333; font-size: 14px; }
-.wrap { max-width: 1200px; margin: 0 auto; }
-
-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; padding: 12px 20px;
-    background: #000; border-radius: 6px;
-}
-header h1 { color: #fff; font-size: 18px; }
-header a { color: #4da6ff; text-decoration: none; font-size: 14px; margin-left: 15px; }
-header a:hover { color: #80c1ff; text-decoration: underline; }
-
-.aviso {
-    background: #fff3cd; border: 1px solid #ffeaa7;
-    color: #856404; padding: 12px 16px; border-radius: 6px;
-    margin-bottom: 15px;
-}
-
-.card {
-    background: #fff; border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    border: 1px solid #e9ecef !important;
-    padding:18px; margin-bottom:15px;
-}
-h4 { color:#0056b3; margin-bottom:8px; font-size:16px; }
+* { box-sizing:border-box; margin:0; padding:0; font-family:Arial, Helvetica, sans-serif; }
+body { background:#f4f6f8; color:#28323a; font-size:14px; padding:15px; }
+.wrap { max-width:1200px; margin:0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:20px; padding:12px 20px; background:linear-gradient(135deg,#00bcd4,#0097a7); border-radius:8px; }
+header h1 { color:#fff; font-size:18px; }
+header a { color:#fff; text-decoration:none; font-size:13px; margin-left:8px; padding:6px 12px; border:1px solid rgba(255,255,255,.55); border-radius:5px; transition:all .2s; }
+header a:hover { background:#fff; color:#0097a7; }
+.card { background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.08); border:1px solid #e4eaed; padding:18px; margin-bottom:15px; }
+.cabecalho-proposta { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+h2 { color:#005f78; font-size:16px; margin-bottom:8px; }
 p { margin:4px 0; }
-.linha-versao {
-    padding:10px 8px; border-bottom:1px solid #eee;
-    display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:8px;
-}
-.btn-pdf {
-    display: inline-block; background: #28a745; color: #fff !important;
-    padding: 6px 14px; border-radius: 4px; text-decoration: none !important;
-    font-size: 13px; font-weight: 600;
-}
-.btn-pdf:hover { background: #218838; }
-.btn-editar {
-    background:#0056b3; color:white; border:none;
-    padding:5px 12px; border-radius:4px; cursor:pointer;
-    font-size:13px;
-}
-.btn-editar:hover { background:#004494; }
-.valor { font-weight:bold; color:#28a745; }
-.versao-tag {
-    background:#e3f2fd; color:#0d47a1; font-weight:bold;
-    padding:2px 8px; border-radius:12px; font-size:12px;
-}
-.vazio {
-    text-align: center; padding: 60px 20px; color: #888;
-    background:white; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.08);
-}
+.linha-versao { padding:10px 8px; border-bottom:1px solid #edf1f2; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.linha-versao:last-child { border-bottom:0; }
+.btn { display:inline-block; border:0; border-radius:4px; padding:6px 11px; color:#fff; text-decoration:none; cursor:pointer; font-size:12px; font-weight:700; margin-left:5px; transition:opacity .15s, transform .15s; }
+.btn:hover { opacity:.88; } .btn:active { transform:scale(.97); } .btn:disabled { opacity:.55; cursor:not-allowed; }
+.btn-pdf { background:#138a58; } .btn-editar { background:#006c8d; } .btn-prereserva { background:#b7791f; } .btn-aprovar { background:#138a58; } .btn-perdida { background:#be4450; }
+.valor { font-weight:700; color:#138a58; }
+.versao-tag, .status-tag { display:inline-block; border-radius:14px; padding:3px 9px; font-size:12px; font-weight:700; }
+.versao-tag { background:#e3f2fd; color:#0d47a1; margin-right:5px; }
+.status-rascunho { background:#e7f0ff; color:#1d4f91; }.status-data_a_definir { background:#fff3cd; color:#735a00; }.status-pre_reserva { background:#fff0d5; color:#8a4c00; }.status-aprovada { background:#d6f3e4; color:#126a42; }.status-perdida { background:#fde4e5; color:#9b2730; }
+.acoes-status { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+.aviso { background:#fff3cd; border:1px solid #ffe19a; color:#725800; padding:9px 12px; border-radius:6px; }
+.vazio { text-align:center; padding:60px 20px; color:#65727a; background:#fff; border:1px solid #e4eaed; border-radius:8px; }
+footer { text-align:center; padding:16px; color:#819098; font-size:11px; } footer img { height:30px; margin-bottom:4px; opacity:.75; }
+@media (max-width:760px) { body { padding:10px; } header { align-items:flex-start; flex-direction:column; } header a { display:inline-block; margin:6px 6px 0 0; } .btn { margin:0 4px 0 0; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-<header>
-    <h1>📋 Minhas Propostas</h1>
-    <div>
-        <a href="/">🏠 Voltar ao Painel</a>
-        <a href="/meus-itens">📦 Itens</a>
-    </div>
-</header>
-
-<!-- ÁREA ÚNICA DA LISTA -->
-<div id="lista-propostas"></div>
-
-</div>
-
+<main class="wrap">
+  <header>
+    <h1>SOULINK | Orçamentos</h1>
+    <div><a href="/">Voltar ao Painel</a><a href="/meus-itens">Itens</a><a href="/financeiro">Financeiro</a></div>
+  </header>
+  <section id="lista-propostas" aria-live="polite"></section>
+  <footer><img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>Desenvolvido por VendAI — AI &amp; Sales Consulting</footer>
+</main>
 <script>
-// ✅ FUNÇÃO ÚNICA E COMPLETA: MOSTRA PROPOSTA + TODO HISTÓRICO DE VERSÕES
+function escaparHtml(valor) { return String(valor ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function moeda(valor) { return `R$ ${Number(valor || 0).toFixed(2).replace('.', ',')}`; }
+function rotuloStatus(status) { return ({rascunho:'Rascunho',data_a_definir:'Data a definir',pre_reserva:'Pré-reserva',aprovada:'Aprovada',perdida:'Perdida'})[status] || 'Rascunho'; }
+function acoesStatus(numero, versao, status) {
+  if (status === 'aprovada') return '<span class="aviso">Versão aprovada preservada como cópia fechada no Financeiro.</span>';
+  if (status === 'data_a_definir') return '<span class="aviso">Informe a data do evento antes de pré-reservar ou aprovar.</span>';
+  const numeroSeguro = escaparHtml(numero);
+  return `<button class="btn btn-prereserva" data-status="pre_reserva" data-numero="${numeroSeguro}" data-versao="${versao}">Pré-reserva</button><button class="btn btn-aprovar" data-status="aprovada" data-numero="${numeroSeguro}" data-versao="${versao}">Aprovar</button><button class="btn btn-perdida" data-status="perdida" data-numero="${numeroSeguro}" data-versao="${versao}">Marcar perdida</button>`;
+}
 async function carregarPropostas() {
-    const el = document.getElementById("lista-propostas");
-    try {
-        const res = await fetch("/api/propostas");
-        const r = await res.json();
-        const lista = r.dados || [];
-
-        if (!lista.length) {
-            el.innerHTML = `
-            <div class="vazio">
-                <h3>Nenhuma proposta gerada ainda 😊</h3>
-                <p style="margin-top:8px">Volte ao painel e crie sua primeira proposta!</p>
-            </div>`;
-            return;
-        }
-
-        let html = "";
-        lista.forEach(item => {
-            html += `<div class="card">
-                <h4>📌 Proposta Nº: <strong>${item.numero}</strong></h4>
-                <p><strong>Cliente:</strong> ${item.cliente}</p>
-                <p><strong>Evento:</strong> ${item.evento}</p>
-                <p><strong>Último valor:</strong> <span class="valor">R$ ${parseFloat(item.total||0).toFixed(2).replace(".",",")}</span></p>
-                <hr style="margin:10px 0;">
-                <p style="font-weight:bold; margin-bottom:6px;">📜 Histórico de versões:</p>`;
-
-            // 📜 LISTA CADA VERSÃO COM BOTÃO EDITAR E PDF
-            item.versoes.forEach(v => {
-                const valorV = parseFloat(v.total||0).toFixed(2).replace(".",",");
-
-                html += `<div class="linha-versao">
-                    <span><span class="versao-tag">v${v.versao}</span> ${v.data} — <strong>R$ ${valorV}</strong></span>
-                    <div>
-                        ${v.arquivo_pdf ? `<a class="btn-pdf" href="/pdfs/${v.arquivo_pdf}" target="_blank">📄 Ver PDF</a>` : ""}
-                        <button class="btn-editar" onclick="irEditar('${item.numero}', ${v.versao}, this)">✏️ Editar</button>
-                    </div>
-                </div>`;
-            });
-
-            html += `</div>`;
-        });
-
-        el.innerHTML = html;
-
-    } catch (e) {
-        console.error(e);
-        el.innerHTML = `<div class="aviso">❌ Erro ao carregar propostas. Recarregue a página.</div>`;
-    }
+  const el = document.getElementById('lista-propostas');
+  try {
+    const res = await fetch('/api/propostas');
+    const resposta = await res.json();
+    const lista = resposta.dados || [];
+    if (!lista.length) { el.innerHTML = '<div class="vazio"><h3>Nenhuma proposta gerada ainda</h3><p style="margin-top:8px">Volte ao painel e crie sua primeira proposta.</p></div>'; return; }
+    el.innerHTML = lista.map(item => {
+      const status = item.status || 'rascunho';
+      const versoes = (item.versoes || []).map(v => `<div class="linha-versao"><span><span class="versao-tag">Versão ${escaparHtml(v.versao)}</span><span class="status-tag status-${escaparHtml(v.status || 'rascunho')}">${rotuloStatus(v.status)}</span> ${escaparHtml(v.data)} — <strong>${moeda(v.total)}</strong></span><div>${v.arquivo_pdf ? `<a class="btn btn-pdf" href="/pdfs/${encodeURIComponent(v.arquivo_pdf)}" target="_blank" rel="noopener">Ver PDF</a>` : ''}<button class="btn btn-editar" data-editar-numero="${escaparHtml(item.numero)}" data-editar-versao="${escaparHtml(v.versao)}">Editar</button></div></div>`).join('');
+      return `<article class="card"><div class="cabecalho-proposta"><div><h2>Proposta Nº: <strong>${escaparHtml(item.numero)}</strong> <span class="status-tag status-${escaparHtml(status)}">${rotuloStatus(status)}</span></h2><p><strong>Cliente:</strong> ${escaparHtml(item.cliente)}</p><p><strong>Evento:</strong> ${escaparHtml(item.evento)}</p><p><strong>Último valor:</strong> <span class="valor">${moeda(item.total)}</span></p></div></div><div class="acoes-status">${acoesStatus(item.numero, item.ultima_versao, status)}</div><hr style="margin:12px 0;border:0;border-top:1px solid #edf1f2"><p style="font-weight:700;margin-bottom:6px">Histórico de versões</p>${versoes}</article>`;
+    }).join('');
+  } catch (erro) { console.error(erro); el.innerHTML = '<div class="aviso">Erro ao carregar propostas. Recarregue a página.</div>'; }
 }
-
-// ✅ FUNÇÃO CORRIGIDA: Passa o objeto COMPLETO da proposta
-function irEditar(numProposta, versao){
-    fetch(`/api/propostas/${encodeURIComponent(numProposta)}/versoes/${versao}`)
-        .then(res => res.json())
-        .then(r => {
-            const proposta = r.dados;
-            if (!r.sucesso || !proposta) {
-                alert("Proposta não encontrada");
-                return;
-            }
-
-            const dadosOrganizados = JSON.stringify(proposta);
-
-            // Salva no localStorage
-            localStorage.setItem("editar_numero", numProposta);
-            localStorage.setItem("editar_versao", String(versao));
-            localStorage.setItem("dados_editar", dadosOrganizados);
-
-            console.log("✅ Dados salvos para edição:", JSON.parse(dadosOrganizados));
-
-            // Redireciona para o formulário
-            window.location.href = "/";
-        })
-        .catch(e => {
-            console.error("Erro ao buscar proposta:", e);
-            alert("Erro ao carregar dados da proposta");
-        });
+async function atualizarStatus(numero, versao, status) {
+  if (!window.confirm(`Confirma alterar esta versão para “${rotuloStatus(status).toLowerCase()}”?`)) return;
+  try {
+    const resposta = await fetch(`/api/propostas/${encodeURIComponent(numero)}/versoes/${versao}/status`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+    const dados = await resposta.json();
+    if (!dados.sucesso) throw new Error(dados.erro || 'Não foi possível atualizar o status.');
+    await carregarPropostas();
+  } catch (erro) { alert(erro.message || 'Não foi possível atualizar o status.'); }
 }
-
-// Inicia automaticamente
+function irEditar(numProposta, versao) {
+  fetch(`/api/propostas/${encodeURIComponent(numProposta)}/versoes/${versao}`).then(res => res.json()).then(r => {
+    const proposta = r.dados;
+    if (!r.sucesso || !proposta) { alert('Proposta não encontrada'); return; }
+    const dadosOrganizados = JSON.stringify(proposta);
+    localStorage.setItem('editar_numero', numProposta);
+    localStorage.setItem('editar_versao', String(versao));
+    localStorage.setItem('dados_editar', dadosOrganizados);
+    window.location.href = '/';
+  }).catch(() => alert('Erro ao carregar dados da proposta'));
+}
+document.getElementById('lista-propostas').addEventListener('click', evento => {
+  const editar = evento.target.closest('button[data-editar-numero]');
+  if (editar) { irEditar(editar.dataset.editarNumero, Number(editar.dataset.editarVersao)); return; }
+  const status = evento.target.closest('button[data-status]');
+  if (status) atualizarStatus(status.dataset.numero, Number(status.dataset.versao), status.dataset.status);
+});
 window.onload = carregarPropostas;
 </script>
-
 </body>
 </html>

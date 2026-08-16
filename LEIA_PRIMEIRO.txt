@@ -1,4 +1,0 @@
-LEIA AS INSTRUCOES_ATUALIZACAO_LOCAL.md ANTES DE SUBSTITUIR OS ARQUIVOS.
-
-Este pacote NAO contem propostas.json nem a pasta pdfs.
-Assim, seu historico de propostas e PDFs existentes permanecem preservados.
