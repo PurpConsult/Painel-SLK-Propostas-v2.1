@@ -15,3 +15,11 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+# Dados comerciais locais — não enviar ao GitHub
+propostas.json
+pdfs/
+imagens_itens_aprovadas.json
+propostas_backup_*.json
+app_backup_*.py
+app_local_*.txt
+templates_backup_*/

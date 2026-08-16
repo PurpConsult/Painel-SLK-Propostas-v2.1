@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Itens - SLK Propostas Pro</title>
+    <title>SOULINK | Meus Itens</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #333; }
@@ -50,6 +50,20 @@
         .badge-equip { background: #e3f2fd; color: #1565c0; }
         .badge-servico { background: #fce4ec; color: #c62828; }
         .badge-cat { background: #f3e5f5; color: #6a1b9a; }
+        .foto-item { width: 58px; height: 42px; object-fit: cover; border-radius: 6px; border: 1px solid #d5e9ed; display: block; }
+        .foto-vazia { color: #9aa9ad; font-size: 0.75rem; }
+        .fonte-foto { color: #688087; font-size: 0.7rem; margin-top: 3px; display: block; max-width: 90px; }
+        .imagem-status { display: inline-block; margin-top: 5px; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+        .imagem-pendente { background: #fff3cd; color: #7a5d00; }
+        .imagem-aprovada { background: #d1e7dd; color: #0f5132; }
+        .imagem-rejeitada { background: #f8d7da; color: #842029; }
+        .acoes-imagem { display: flex; gap: 6px; flex-wrap: wrap; min-width: 148px; }
+        .acao-imagem { border: 0; border-radius: 6px; padding: 7px 9px; cursor: pointer; font-size: 0.76rem; font-weight: 700; transition: transform .15s, opacity .15s; }
+        .acao-imagem:active { transform: scale(.97); }
+        .aprovar-imagem { background: #0f8f70; color: white; }
+        .rejeitar-imagem { background: #e4636d; color: white; }
+        .acao-imagem:hover { opacity: .88; }
+        .sem-acoes { color: #9aa9ad; font-size: 0.75rem; }
         .loading { text-align: center; padding: 40px; color: #999; font-size: 1.1rem; }
         .footer {
             text-align: center; padding: 20px; margin-top: 30px;
@@ -65,7 +79,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>📦 Meus Itens - Produtos e Serviços</h1>
+        <h1>SOULINK | Meus Itens</h1>
         <a href="/">← Voltar ao Formulário</a>
     </div>
 
@@ -108,12 +122,14 @@
                     <th>Nome</th>
                     <th>Categoria</th>
                     <th>Tipo</th>
+                    <th>Imagem sugerida</th>
+                    <th>Revisão</th>
                     <th>Valor Venda</th>
                     <th>Valor Custo</th>
                 </tr>
             </thead>
             <tbody id="tabelaItens">
-                <tr><td colspan="6" class="loading">Carregando itens do Meeventos...</td></tr>
+                <tr><td colspan="8" class="loading">Carregando itens do Meeventos...</td></tr>
             </tbody>
         </table>
 
@@ -137,7 +153,7 @@
                 renderizarTabela(todosItens);
             }
         } catch(e) {
-            document.getElementById('tabelaItens').innerHTML = '<tr><td colspan="6" class="loading">Erro ao carregar itens.</td></tr>';
+                document.getElementById('tabelaItens').innerHTML = '<tr><td colspan="8" class="loading">Erro ao carregar itens.</td></tr>';
         }
     }
 
@@ -162,19 +178,35 @@
     function renderizarTabela(itens) {
         const tbody = document.getElementById('tabelaItens');
         if (itens.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="loading">Nenhum item encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="loading">Nenhum item encontrado.</td></tr>';
             return;
         }
-        tbody.innerHTML = itens.map(it => `
+        tbody.innerHTML = itens.map(it => {
+            const imagem = it.imagem_candidata || {};
+            const revisao = it.imagem_revisao || {};
+            const statusImagem = revisao.status || 'pendente';
+            const fotoHtml = imagem.image_url
+                ? `<a href="${imagem.image_url}" target="_blank" rel="noopener" title="Abrir imagem para revisão"><img class="foto-item" src="${imagem.image_url}" alt="Imagem sugerida para ${it.nome}" onerror="this.closest('a').replaceWith(document.createTextNode('Imagem indisponível'))"><span class="fonte-foto">${imagem.source || 'Imagem sugerida'}</span></a>`
+                : '<span class="foto-vazia">Sem sugestão</span>';
+            const statusHtml = imagem.image_url
+                ? `<span class="imagem-status imagem-${statusImagem}">${statusImagem === 'aprovada' ? 'Aprovada' : statusImagem === 'rejeitada' ? 'Rejeitada' : 'Aguardando revisão'}</span>`
+                : '<span class="sem-acoes">Sem imagem para revisar</span>';
+            const acoesHtml = imagem.image_url
+                ? `<div class="acoes-imagem"><button class="acao-imagem aprovar-imagem" data-imagem-id="${it.id}" data-decisao="aprovar">Aprovar</button><button class="acao-imagem rejeitar-imagem" data-imagem-id="${it.id}" data-decisao="rejeitar">Rejeitar</button></div>`
+                : '<span class="sem-acoes">—</span>';
+            return `
             <tr>
                 <td><strong>${it.id}</strong></td>
                 <td>${it.nome}</td>
                 <td><span class="badge badge-cat">${it.categoria || 'N/A'}</span></td>
                 <td><span class="badge ${it.tipo_item === 'Serviço' ? 'badge-servico' : 'badge-equip'}">${it.tipo_item}</span></td>
+                <td>${fotoHtml}${statusHtml}</td>
+                <td>${acoesHtml}</td>
                 <td>R$ ${parseFloat(it.valor || 0).toFixed(2)}</td>
                 <td>R$ ${parseFloat(it.valorcusto || 0).toFixed(2)}</td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     }
 
     function filtrar() {
@@ -191,6 +223,28 @@
     document.getElementById('busca').addEventListener('input', filtrar);
     document.getElementById('filtroCat').addEventListener('change', filtrar);
     document.getElementById('filtroTipo').addEventListener('change', filtrar);
+
+    document.getElementById('tabelaItens').addEventListener('click', async (evento) => {
+        const botao = evento.target.closest('button[data-imagem-id]');
+        if (!botao) return;
+        const decisao = botao.dataset.decisao;
+        const acaoTexto = decisao === 'aprovar' ? 'aprovar' : 'rejeitar';
+        if (!window.confirm(`Deseja ${acaoTexto} esta imagem para uso comercial no PDF?`)) return;
+        botao.disabled = true;
+        try {
+            const resposta = await fetch(`/api/imagens-itens/${encodeURIComponent(botao.dataset.imagemId)}/decisao`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decisao })
+            });
+            const dados = await resposta.json();
+            if (!dados.sucesso) throw new Error(dados.erro || 'Não foi possível registrar a decisão.');
+            await carregarItens();
+        } catch (erro) {
+            alert(erro.message || 'Não foi possível registrar a decisão da imagem.');
+            botao.disabled = false;
+        }
+    });
 
     carregarItens();
     </script>

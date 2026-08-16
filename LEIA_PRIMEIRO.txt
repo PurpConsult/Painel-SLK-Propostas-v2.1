@@ -1,0 +1,15 @@
+ATUALIZAÇÃO SOULINK | ORÇAMENTOS
+
+Este pacote atualiza a aparência do sistema e o rodapé comercial do PDF.
+
+ANTES DE COMEÇAR
+1. Feche o sistema, pressionando Ctrl + C no PowerShell onde ele estiver aberto.
+2. Guarde este ZIP em uma pasta fácil de localizar.
+3. Abra o arquivo INSTRUCOES_ATUALIZACAO_LOCAL.md e siga os passos na ordem.
+
+IMPORTANTE
+- Não apague o arquivo propostas.json.
+- Não apague a pasta pdfs.
+- Esses dois locais guardam o histórico das propostas e os PDFs já gerados.
+
+Depois da atualização, abra http://localhost:5000 e pressione Ctrl + F5 no navegador.

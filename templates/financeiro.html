@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOULINK | Financeiro</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+body { background:#f4f6f8; color:#28323a; padding:15px; font-size:14px; }
+.wrap { max-width:1200px; margin:0 auto; }
+header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; padding:12px 20px; background:linear-gradient(135deg,#00bcd4,#0097a7); border-radius:8px; }
+header h1 { color:#fff; font-size:18px; }
+header a { color:#fff; text-decoration:none; font-size:13px; padding:6px 12px; border:1px solid rgba(255,255,255,.55); border-radius:5px; }
+header a:hover { background:#fff; color:#0097a7; }
+.resumo { display:flex; gap:15px; flex-wrap:wrap; margin-bottom:16px; }
+.metric { background:#fff; padding:18px; border:1px solid #e3e9ec; border-radius:8px; min-width:220px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.metric small { color:#60717a; display:block; text-transform:uppercase; font-weight:700; font-size:11px; margin-bottom:6px; }
+.metric strong { color:#007d9f; font-size:24px; }
+.card { background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.08); border:1px solid #e9ecef; }
+table { border-collapse:collapse; width:100%; }
+th { background:#007d9f; color:#fff; text-align:left; font-size:12px; padding:12px; text-transform:uppercase; }
+td { padding:12px; border-bottom:1px solid #eef2f3; vertical-align:top; }
+tr:last-child td { border-bottom:0; }
+.valor { color:#0f7d57; font-weight:700; }
+.pdf { display:inline-block; background:#138a58; color:#fff; text-decoration:none; padding:6px 10px; border-radius:4px; font-weight:700; font-size:12px; }
+.vazio { background:#fff; border:1px solid #e9ecef; border-radius:8px; padding:50px 20px; text-align:center; color:#65727a; }
+.nota { margin:0 0 16px; padding:12px 14px; border-left:4px solid #00a0b5; background:#e9f9fb; color:#24515a; border-radius:4px; }
+footer { text-align:center; padding:16px; color:#819098; font-size:11px; } footer img { height:30px; margin-bottom:4px; opacity:.75; }
+@media (max-width:760px) { body{padding:10px} header{align-items:flex-start; flex-direction:column} .card{overflow-x:auto} table{min-width:760px} }
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><h1>SOULINK | Financeiro</h1><div><a href="/propostas">← Meus Orçamentos</a><a href="/">Painel</a></div></header>
+<p class="nota"><strong>Visão somente leitura.</strong> Esta página mostra apenas versões aprovadas; não altera o histórico, o PDF ou o orçamento no Meeventos.</p>
+<section class="resumo"><div class="metric"><small>Versões aprovadas</small><strong id="quantidade">—</strong></div><div class="metric"><small>Total aprovado</small><strong id="total">—</strong></div></section>
+<section id="conteudo"></section>
+<footer><img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>Desenvolvido por VendAI — AI &amp; Sales Consulting</footer>
+</main>
+<script>
+function moeda(valor) { return `R$ ${Number(valor || 0).toFixed(2).replace('.', ',')}`; }
+async function carregarFinanceiro() {
+  const conteudo = document.getElementById('conteudo');
+  try {
+    const resposta = await fetch('/api/financeiro');
+    const dados = await resposta.json();
+    document.getElementById('quantidade').textContent = dados.quantidade || 0;
+    document.getElementById('total').textContent = moeda(dados.total_aprovado);
+    if (!(dados.dados || []).length) { conteudo.innerHTML = '<div class="vazio"><h3>Nenhuma versão aprovada ainda</h3><p style="margin-top:8px">Quando uma proposta for aprovada em Meus Orçamentos, sua cópia fechada aparecerá aqui.</p></div>'; return; }
+    conteudo.innerHTML = `<div class="card"><table><thead><tr><th>Proposta</th><th>Cliente</th><th>Evento</th><th>Data do evento</th><th>Aprovação</th><th>Valor</th><th>Documento</th></tr></thead><tbody>${dados.dados.map(item => `<tr><td><strong>${item.numero}</strong><br><small>Versão ${item.versao}</small></td><td>${item.cliente}</td><td>${item.evento}</td><td>${item.data_evento}</td><td>${item.aprovada_em}</td><td class="valor">${moeda(item.total)}</td><td>${item.arquivo_pdf ? `<a class="pdf" target="_blank" href="/pdfs/${item.arquivo_pdf}">Ver PDF</a>` : '—'}</td></tr>`).join('')}</tbody></table></div>`;
+  } catch (erro) { conteudo.innerHTML = '<div class="vazio">Não foi possível carregar a visão financeira. Tente novamente.</div>'; }
+}
+carregarFinanceiro();
+</script>
+</body>
+</html>

@@ -1,0 +1,1514 @@
+{
+  "gerado_em": "2026-08-15T18:24:36Z",
+  "items": {
+    "1": {
+      "en": "Setup and Teardown",
+      "es": "Montaje y desmontaje"
+    },
+    "10": {
+      "en": "Production Package P",
+      "es": "Paquete de producción P"
+    },
+    "100": {
+      "en": "Chair (meeting table)",
+      "es": "Silla (mesa de reuniones)"
+    },
+    "101": {
+      "en": "Charging totem",
+      "es": "Tótem cargador"
+    },
+    "102": {
+      "en": "Card sleeve",
+      "es": "Funda para tarjeta"
+    },
+    "103": {
+      "en": "2-seater sofa",
+      "es": "Sofá de 2 plazas"
+    },
+    "104": {
+      "en": "3-seater sofa",
+      "es": "Sofá de 3 plazas"
+    },
+    "105": {
+      "en": "Wireless system for cavaquinho",
+      "es": "Sistema inalámbrico para cavaquinho"
+    },
+    "106": {
+      "en": "Shure PSM900 in-ear",
+      "es": "Shure PSM900 in-ear"
+    },
+    "107": {
+      "en": "LED totem",
+      "es": "Tótem LED"
+    },
+    "108": {
+      "en": "65\" LED TV",
+      "es": "TV LED 65\""
+    },
+    "109": {
+      "en": "82\" LED TV",
+      "es": "TV LED 82\""
+    },
+    "11": {
+      "en": "DJ Aloysio",
+      "es": "DJ Aloysio"
+    },
+    "110": {
+      "en": "70\" LED TV",
+      "es": "TV LED 70\""
+    },
+    "111": {
+      "en": "5000-lumen projector",
+      "es": "Proyector de 5000 lúmenes"
+    },
+    "112": {
+      "en": "PS with client's visual identity",
+      "es": "PS con identidad visual del cliente"
+    },
+    "113": {
+      "en": "Ellipsoidal",
+      "es": "Elipsoidal"
+    },
+    "114": {
+      "en": "Moving head BEAN 18R",
+      "es": "Cabeza móvil BEAN 18R"
+    },
+    "115": {
+      "en": "P5 LED back screen",
+      "es": "Pantalla LED trasera P5"
+    },
+    "116": {
+      "en": "Moving head MAC Aura W300",
+      "es": "Cabeza móvil MAC Aura W300"
+    },
+    "117": {
+      "en": "Shure wireless mic system for cavaquinho",
+      "es": "Sistema Shure de micrófono inalámbrico para cavaquinho"
+    },
+    "118": {
+      "en": "Shure in-ear system PSM-900",
+      "es": "Sistema in-ear Shure PSM-900"
+    },
+    "119": {
+      "en": "Interactive lectern with TV",
+      "es": "Atril interactivo con TV"
+    },
+    "12": {
+      "en": "DJ André Collyer",
+      "es": "DJ André Collyer"
+    },
+    "120": {
+      "en": "LIBRAS interpreter",
+      "es": "Intérprete de LIBRAS"
+    },
+    "121": {
+      "en": "Two-way radios",
+      "es": "Radios de dos vías"
+    },
+    "122": {
+      "en": "Banner 0,80 x 1,80 m for banner stand",
+      "es": "Banner 0,80 x 1,80 m para soporte de banner"
+    },
+    "123": {
+      "en": "Certificate holder folder in courino, with UV printing in 1 color. Final material proof included.",
+      "es": "Carpeta porta-certificado en courino, con impresión UV en 1 color. Incluye prueba del material final."
+    },
+    "124": {
+      "en": "Tribute plaque, measuring up to 15 x 10 cm, in brushed steel",
+      "es": "Placa de homenaje, midiendo hasta 15 x 10 cm, en acero cepillado"
+    },
+    "125": {
+      "en": "Production and printing of posters measuring 60 x 40 cm, printed in polychrome on 120 g recycled paper",
+      "es": "Confección e impresión de carteles midiendo 60 x 40 cm, impresos en policromía sobre papel reciclado 120 g"
+    },
+    "126": {
+      "en": "Certificate",
+      "es": "Certificado"
+    },
+    "127": {
+      "en": "Medals",
+      "es": "Medallas"
+    },
+    "128": {
+      "en": "Event coordinator",
+      "es": "Coordinador de eventos"
+    },
+    "129": {
+      "en": "Front light banner with grommets",
+      "es": "Lona front light con ojales"
+    },
+    "13": {
+      "en": "Band Jéssica Martin",
+      "es": "Banda Jéssica Martin"
+    },
+    "130": {
+      "en": "Tablet Samsung Galaxy Tab A8",
+      "es": "Tablet Samsung Galaxy Tab A8"
+    },
+    "131": {
+      "en": "Medal",
+      "es": "Medalla"
+    },
+    "132": {
+      "en": "Instagrammable structure with metalon frame and LED",
+      "es": "Instagramable con estructura de metalon y LED"
+    },
+    "133": {
+      "en": "Metalon with event logo in neon flex measuring 2,00 x 1,00",
+      "es": "Metalon con logo en neon flex del evento midiendo 2,00 x 1,00"
+    },
+    "134": {
+      "en": "Overlaid LED cube",
+      "es": "Cubo LED sobrepuesto"
+    },
+    "135": {
+      "en": "Transfer",
+      "es": "Transfer"
+    },
+    "136": {
+      "en": "Single-row display",
+      "es": "Expositor unifila"
+    },
+    "137": {
+      "en": "White EAMS bistro table",
+      "es": "Mesa bistró EAMS blanca"
+    },
+    "138": {
+      "en": "Full-length mirror",
+      "es": "Espejo de cuerpo entero"
+    },
+    "139": {
+      "en": "Glass side table",
+      "es": "Mesa auxiliar de vidrio"
+    },
+    "14": {
+      "en": "Photography",
+      "es": "Fotografía"
+    },
+    "140": {
+      "en": "Credentialing station",
+      "es": "Estación de acreditación"
+    },
+    "141": {
+      "en": "Ecobags",
+      "es": "Bolsas ecológicas"
+    },
+    "142": {
+      "en": "Aluminum luggage tag",
+      "es": "Etiqueta para maleta de aluminio"
+    },
+    "143": {
+      "en": "Simultaneous translation",
+      "es": "Traducción simultánea"
+    },
+    "144": {
+      "en": "Tarpaulin",
+      "es": "Lona"
+    },
+    "145": {
+      "en": "Simultaneous Interpretation Booth",
+      "es": "Cabina de interpretación simultánea"
+    },
+    "146": {
+      "en": "Chrome Leather Chair - YAN",
+      "es": "Silla cromada de cuero - YAN"
+    },
+    "147": {
+      "en": "Blackout Adhesive",
+      "es": "Adhesivo blackout"
+    },
+    "148": {
+      "en": "Graphic Installation",
+      "es": "Instalación gráfica"
+    },
+    "149": {
+      "en": "White Damask Tablecloth",
+      "es": "Mantel blanco de damasco"
+    },
+    "15": {
+      "en": "Filming",
+      "es": "Filmación"
+    },
+    "150": {
+      "en": "Napkin",
+      "es": "Servilleta"
+    },
+    "151": {
+      "en": "Napkin Holder",
+      "es": "Servilletero"
+    },
+    "152": {
+      "en": "DJ + Sax Stanley Netto",
+      "es": "DJ + Sax Stanley Netto"
+    },
+    "153": {
+      "en": "Stand 2,00x2,00 m with 42\" TV + Counter",
+      "es": "Stand 2,00x2,00 m con TV de 42\" + Mostrador"
+    },
+    "154": {
+      "en": "Spanish Interpreter",
+      "es": "Intérprete de español"
+    },
+    "155": {
+      "en": "Stand 4,00 x 2,00 m",
+      "es": "Stand 4,00 x 2,00 m"
+    },
+    "156": {
+      "en": "Teleprompter",
+      "es": "Teleprompter"
+    },
+    "157": {
+      "en": "Event Recording with Video Editing",
+      "es": "Grabación del evento con edición de video"
+    },
+    "158": {
+      "en": "PS Plate",
+      "es": "Placa PS"
+    },
+    "159": {
+      "en": "Lectern Plaque",
+      "es": "Placa para atril"
+    },
+    "16": {
+      "en": "Streaming",
+      "es": "Streaming"
+    },
+    "160": {
+      "en": "Mobile Translation",
+      "es": "Traducción móvil"
+    },
+    "161": {
+      "en": "Black Light Samba Show",
+      "es": "Espectáculo Black Light Samba"
+    },
+    "162": {
+      "en": "Quadriedo Structure",
+      "es": "Estructura Quadriedo"
+    },
+    "163": {
+      "en": "Tulip Chair",
+      "es": "Silla Tulipán"
+    },
+    "164": {
+      "en": "43\" Touch TV",
+      "es": "TV táctil 43\""
+    },
+    "165": {
+      "en": "43\" LED TV",
+      "es": "TV LED 43\""
+    },
+    "166": {
+      "en": "Delivery and Pickup",
+      "es": "Entrega y retiro"
+    },
+    "167": {
+      "en": "Cartoon Photo IA",
+      "es": "Foto caricatura IA"
+    },
+    "168": {
+      "en": "Button",
+      "es": "Botón"
+    },
+    "169": {
+      "en": "LEDBOX",
+      "es": "LEDBOX"
+    },
+    "17": {
+      "en": "Stool",
+      "es": "Taburete"
+    },
+    "170": {
+      "en": "Photo Totem",
+      "es": "Tótem de fotos"
+    },
+    "171": {
+      "en": "Adhesive Stickers",
+      "es": "Pegatinas adhesivas"
+    },
+    "172": {
+      "en": "Funny Photo Props",
+      "es": "Accesorios divertidos para fotos"
+    },
+    "173": {
+      "en": "Festa Junina Activation",
+      "es": "Activación para Festa Junina"
+    },
+    "174": {
+      "en": "Interactive Totem 43\"",
+      "es": "Tótem interactivo 43\""
+    },
+    "175": {
+      "en": "Interactive Totem 55\"",
+      "es": "Tótem interactivo 55\""
+    },
+    "176": {
+      "en": "Plain White Tablecloth",
+      "es": "Mantel blanco liso"
+    },
+    "177": {
+      "en": "Plain White Napkin",
+      "es": "Servilleta blanca lisa"
+    },
+    "178": {
+      "en": "Charger Plate",
+      "es": "Plato de presentación"
+    },
+    "179": {
+      "en": "LED Ellipses",
+      "es": "Elipses LED"
+    },
+    "18": {
+      "en": "Sofa",
+      "es": "Sofá"
+    },
+    "180": {
+      "en": "Mechanical Bull",
+      "es": "Toro mecánico"
+    },
+    "181": {
+      "en": "Swan/Tulip Armchair",
+      "es": "Butaca Swan/Tulip"
+    },
+    "182": {
+      "en": "Wind Banner",
+      "es": "Bandera publicitaria"
+    },
+    "183": {
+      "en": "Neon Flex Logo",
+      "es": "Logotipo en Neon Flex"
+    },
+    "184": {
+      "en": "Custom Parasol",
+      "es": "Parasol personalizado"
+    },
+    "185": {
+      "en": "Simple Photo",
+      "es": "Simple Photo"
+    },
+    "186": {
+      "en": "Band",
+      "es": "Banda"
+    },
+    "187": {
+      "en": "Tablecloths",
+      "es": "Manteles"
+    },
+    "188": {
+      "en": "Channel Letter",
+      "es": "Letra corpórea"
+    },
+    "189": {
+      "en": "Voice and Acoustic Guitar",
+      "es": "Voz y guitarra acústica"
+    },
+    "19": {
+      "en": "Coffee Table",
+      "es": "Mesa de centro"
+    },
+    "190": {
+      "en": "Executive Swivel Chair",
+      "es": "Silla ejecutiva giratoria"
+    },
+    "191": {
+      "en": "Promoter",
+      "es": "Promotor"
+    },
+    "192": {
+      "en": "PIONNER XR3 Controller + Table 1 x 50 cm",
+      "es": "Controladora PIONNER XR3 + Mesa 1 x 50 cm"
+    },
+    "193": {
+      "en": "SOFA FM 1,60 X 0,80",
+      "es": "SOFÁ FM 1,60 X 0,80"
+    },
+    "194": {
+      "en": "BAND, VOCALS, ACOUSTIC GUITAR + ACOUSTIC DRUMS",
+      "es": "BANDA, VOZ, GUITARRA ACÚSTICA + BATERÍA ACÚSTICA"
+    },
+    "195": {
+      "en": "BISTRO TABLE, BLACK OR FARMHOUSE",
+      "es": "MESA BISTRÓ, NEGRA O ESTILO RÚSTICO"
+    },
+    "196": {
+      "en": "STOOL, BLACK OR FARMHOUSE",
+      "es": "BANQUETA, NEGRA O ESTILO RÚSTICO"
+    },
+    "197": {
+      "en": "LED TOTEM MEASURING 0,50 X 2,00M",
+      "es": "TÓTEM LED MEDIENDO 0,50 X 2,00M"
+    },
+    "198": {
+      "en": "VIDEO TECHNICIAN",
+      "es": "TÉCNICO DE VÍDEO"
+    },
+    "199": {
+      "en": "LED PANEL P3",
+      "es": "PANEL LED P3"
+    },
+    "2": {
+      "en": "Audiovisual Technician",
+      "es": "Técnico audiovisual"
+    },
+    "20": {
+      "en": "Bistro Table",
+      "es": "Mesa bistró"
+    },
+    "200": {
+      "en": "STREAMING ON PLATFORMS",
+      "es": "TRANSMISIÓN EN PLATAFORMAS"
+    },
+    "201": {
+      "en": "PUFF",
+      "es": "PUFF"
+    },
+    "202": {
+      "en": "ACRYLIC SIGN",
+      "es": "LETRERO DE ACRÍLICO"
+    },
+    "203": {
+      "en": "SWING",
+      "es": "COLUMPIO"
+    },
+    "204": {
+      "en": "CLAW MACHINE",
+      "es": "MÁQUINA DE GARRAS"
+    },
+    "205": {
+      "en": "CARNIVAL ACCESSORIES",
+      "es": "ACCESORIOS DE CARNAVAL"
+    },
+    "206": {
+      "en": "STOOL",
+      "es": "BANQUETA"
+    },
+    "207": {
+      "en": "COUNTER",
+      "es": "MOSTRADOR"
+    },
+    "208": {
+      "en": "TABLE",
+      "es": "MESA"
+    },
+    "209": {
+      "en": "QUEUE NUMBER TOTEM",
+      "es": "TÓTEM DE NÚMERO DE FILA"
+    },
+    "21": {
+      "en": "Large Plank",
+      "es": "Tabla grande"
+    },
+    "210": {
+      "en": "FLOORING",
+      "es": "PISO"
+    },
+    "211": {
+      "en": "CHEMICAL TOILET",
+      "es": "BAÑO QUÍMICO"
+    },
+    "212": {
+      "en": "SIGNAGE BARRIER",
+      "es": "VALLA DE SEÑALIZACIÓN"
+    },
+    "213": {
+      "en": "TENT",
+      "es": "CARPA"
+    },
+    "214": {
+      "en": "BANNER 0,60 X 1,20M FOR BANNER STAND",
+      "es": "BANNER 0,60 X 1,20M PARA SOPORTE DE BANNER"
+    },
+    "215": {
+      "en": "MENU",
+      "es": "MENÚ"
+    },
+    "216": {
+      "en": "THANK YOU LETTER",
+      "es": "CARTA DE AGRADECIMIENTO"
+    },
+    "217": {
+      "en": "INDUSTRIAL AIR COOLER",
+      "es": "CLIMATIZADOR INDUSTRIAL"
+    },
+    "218": {
+      "en": "ARTIFICIAL GRASS",
+      "es": "CÉSPED SINTÉTICO"
+    },
+    "219": {
+      "en": "DOUBLE-SIDED SELF-SUPPORTING TOTEM",
+      "es": "TÓTEM AUTOPORTANTE DE DOBLE CARA"
+    },
+    "22": {
+      "en": "Tall Plants",
+      "es": "Plantas altas"
+    },
+    "220": {
+      "en": "SIGNAGE TOTEM",
+      "es": "TÓTEM DE SEÑALIZACIÓN"
+    },
+    "221": {
+      "en": "ROUND TAGS",
+      "es": "ETIQUETAS REDONDAS"
+    },
+    "222": {
+      "en": "BANNER 0,80 X 1,40 M FOR BANNER STAND",
+      "es": "BANNER 0,80 X 1,40 M PARA SOPORTE DE BANNER"
+    },
+    "223": {
+      "en": "STANLEY CUP",
+      "es": "VASO STANLEY"
+    },
+    "224": {
+      "en": "PLASTIC CUP",
+      "es": "VASO DE PLÁSTICO"
+    },
+    "225": {
+      "en": "POLYESTER RIBBONS",
+      "es": "CINTAS DE POLIÉSTER"
+    },
+    "226": {
+      "en": "QUIZ MACHINE (PASSA OU REPASSA)",
+      "es": "MÁQUINA DE QUIZ (PASSA OU REPASSA)"
+    },
+    "227": {
+      "en": "COUNTER 2,0 X 1,0 X 0,50 M.",
+      "es": "MOSTRADOR 2,0 X 1,0 X 0,50 M."
+    },
+    "228": {
+      "en": "SECURITY",
+      "es": "SEGURIDAD"
+    },
+    "229": {
+      "en": "CLEANING ASSISTANT",
+      "es": "AUXILIAR DE LIMPIEZA"
+    },
+    "23": {
+      "en": "Flower Arrangement",
+      "es": "Arreglo floral"
+    },
+    "230": {
+      "en": "CARPET",
+      "es": "ALFOMBRA"
+    },
+    "231": {
+      "en": "QUIZ: KNOW IT OR NOT",
+      "es": "QUIZ: SABE O NO SABE"
+    },
+    "232": {
+      "en": "WRAPPED BACKDROP",
+      "es": "BACKDROP ENVUELTO"
+    },
+    "233": {
+      "en": "OPERATIONAL",
+      "es": "OPERACIONAL"
+    },
+    "234": {
+      "en": "LOGISTICS",
+      "es": "LOGÍSTICA"
+    },
+    "235": {
+      "en": "HYDRAULIC CHAIR",
+      "es": "SILLA HIDRÁULICA"
+    },
+    "236": {
+      "en": "DRESSING ROOM",
+      "es": "CAMARÍN"
+    },
+    "237": {
+      "en": "SOFTBOX",
+      "es": "SOFTBOX"
+    },
+    "238": {
+      "en": "BASS CABINET",
+      "es": "CAJA PARA BAJO"
+    },
+    "239": {
+      "en": "100% COTTON SHIRT",
+      "es": "CAMISA 100% ALGODÓN"
+    },
+    "24": {
+      "en": "Photo Booth",
+      "es": "Cabina de fotos"
+    },
+    "240": {
+      "en": "BAG",
+      "es": "BOLSA"
+    },
+    "241": {
+      "en": "Handkerchief",
+      "es": "Pañuelo"
+    },
+    "242": {
+      "en": "Booth 3,00 X 2,00M",
+      "es": "Stand 3,00 X 2,00M"
+    },
+    "243": {
+      "en": "Sound Technician (SONOPLASTA)",
+      "es": "Técnico de sonido (SONOPLASTA)"
+    },
+    "244": {
+      "en": "PIRULITO Backpack",
+      "es": "Mochila PIRULITO"
+    },
+    "245": {
+      "en": "DRY SOFT Shirt",
+      "es": "Camisa DRY SOFT"
+    },
+    "246": {
+      "en": "Mime",
+      "es": "Mimo"
+    },
+    "247": {
+      "en": "Bistro Table SLIM",
+      "es": "Mesa Bistro SLIM"
+    },
+    "248": {
+      "en": "Armchair CONFORT",
+      "es": "Sillón CONFORT"
+    },
+    "249": {
+      "en": "Videoconference",
+      "es": "Videoconferencia"
+    },
+    "25": {
+      "en": "Green wall",
+      "es": "Muro verde"
+    },
+    "250": {
+      "en": "Bleachers",
+      "es": "Gradas"
+    },
+    "251": {
+      "en": "Bleacher Seats",
+      "es": "Asientos para gradas"
+    },
+    "252": {
+      "en": "Technical Assistant",
+      "es": "Asistente técnico"
+    },
+    "253": {
+      "en": "Pennants",
+      "es": "Banderines"
+    },
+    "254": {
+      "en": "Mobiles",
+      "es": "Móviles"
+    },
+    "255": {
+      "en": "Stain Cover",
+      "es": "Cubre manchas"
+    },
+    "256": {
+      "en": "Glass Vase",
+      "es": "Jarrón de vidrio"
+    },
+    "257": {
+      "en": "Tokens",
+      "es": "Fichas"
+    },
+    "258": {
+      "en": "Dismantling Extra",
+      "es": "Extra de desmontaje"
+    },
+    "259": {
+      "en": "Crate of water",
+      "es": "Caja de agua"
+    },
+    "26": {
+      "en": "Massage area (SPA)",
+      "es": "Área de masajes (SPA)"
+    },
+    "260": {
+      "en": "Cooler with ice",
+      "es": "Cooler con hielo"
+    },
+    "261": {
+      "en": "Roll-up Banner",
+      "es": "Banner roll-up"
+    },
+    "262": {
+      "en": "TOTEM MDF 0,68 X 1,70M",
+      "es": "TOTEM MDF 0,68 X 1,70M"
+    },
+    "263": {
+      "en": "Minibar",
+      "es": "Frigobar"
+    },
+    "264": {
+      "en": "Column Stickers",
+      "es": "Adhesivos para columna"
+    },
+    "265": {
+      "en": "BAR DECAL",
+      "es": "ADHESIVO PARA BAR"
+    },
+    "266": {
+      "en": "BANNER 1,00 X 1,50M FOR BANNER STAND",
+      "es": "BANNER 1,00 X 1,50M PARA SOPORTE DE BANNER"
+    },
+    "267": {
+      "en": "BANNER 1,50 X 1,80M FOR BANNER STAND",
+      "es": "BANNER 1,50 X 1,80M PARA SOPORTE DE BANNER"
+    },
+    "268": {
+      "en": "BANNER 1,50 X 1,80M FOR BANNER STAND (copy)",
+      "es": "BANNER 1,50 X 1,80M PARA SOPORTE DE BANNER (copia)"
+    },
+    "269": {
+      "en": "BANNER 2,00 X 1,80M FOR BOX TRUSS STRUCTURE",
+      "es": "BANNER 2,00 X 1,80M PARA ESTRUCTURA BOX TRUSS"
+    },
+    "27": {
+      "en": "Audio recording",
+      "es": "Grabación de audio"
+    },
+    "270": {
+      "en": "BANNER 3,00 X 1,80M FOR BOX TRUSS STRUCTURE",
+      "es": "BANNER 3,00 X 1,80M PARA ESTRUCTURA BOX TRUSS"
+    },
+    "271": {
+      "en": "SIDEBOARD",
+      "es": "APARADOR"
+    },
+    "272": {
+      "en": "COFFEE MACHINE",
+      "es": "MÁQUINA DE CAFÉ"
+    },
+    "273": {
+      "en": "EVENT INSURANCE",
+      "es": "SEGURO DEL EVENTO"
+    },
+    "274": {
+      "en": "FAN",
+      "es": "VENTILADOR"
+    },
+    "275": {
+      "en": "COFFEE BREAK",
+      "es": "PAUSA PARA CAFÉ"
+    },
+    "276": {
+      "en": "TABLETOP DISPLAY",
+      "es": "DISPLAY DE MESA"
+    },
+    "277": {
+      "en": "BLUE CARPET",
+      "es": "ALFOMBRA AZUL"
+    },
+    "278": {
+      "en": "WAITER",
+      "es": "MESERO"
+    },
+    "279": {
+      "en": "STAGE",
+      "es": "ESCENARIO"
+    },
+    "28": {
+      "en": "White armchairs",
+      "es": "Sillones blancos"
+    },
+    "280": {
+      "en": "CHAIR COVER \"FANTASMINHA\"",
+      "es": "FUNDA PARA SILLA \"FANTASMINHA\""
+    },
+    "281": {
+      "en": "LED SPHERE 40 CM",
+      "es": "ESFERA DE LED 40 CM"
+    },
+    "282": {
+      "en": "LED SPHERE 50 CM",
+      "es": "ESFERA DE LED 50 CM"
+    },
+    "283": {
+      "en": "LED SPHERE 80 CM",
+      "es": "ESFERA DE LED 80 CM"
+    },
+    "284": {
+      "en": "MICROPHONE SHURE SM 57",
+      "es": "MICRÓFONO SHURE SM 57"
+    },
+    "285": {
+      "en": "MICROPHONE SHURE SM 58",
+      "es": "MICRÓFONO SHURE SM 58"
+    },
+    "286": {
+      "en": "MICROPHONE SHURE BETA 52",
+      "es": "MICRÓFONO SHURE BETA 52"
+    },
+    "287": {
+      "en": "MICROPHONE SHURE SM 81",
+      "es": "MICRÓFONO SHURE SM 81"
+    },
+    "288": {
+      "en": "MICROPHONE SHURE SM 58 UR4 WIRELESS HANDHELD",
+      "es": "MICRÓFONO SHURE SM 58 UR4 INALÁMBRICO DE MANO"
+    },
+    "289": {
+      "en": "Shure drum microphone kit with 5 mics",
+      "es": "Kit de micrófonos para batería Shure con 5 micrófonos"
+    },
+    "29": {
+      "en": "Single-file queue",
+      "es": "Fila única"
+    },
+    "290": {
+      "en": "Midas M32 mixing console",
+      "es": "Consola de mezcla Midas M32"
+    },
+    "291": {
+      "en": "48-way split multicore cable",
+      "es": "Cable multicore dividido de 48 vías"
+    },
+    "292": {
+      "en": "BRUTE LED with 4 lamps",
+      "es": "BRUTE LED con 4 lámparas"
+    },
+    "293": {
+      "en": "Room divider",
+      "es": "Biombo"
+    },
+    "294": {
+      "en": "Container",
+      "es": "Contenedor"
+    },
+    "295": {
+      "en": "Operational expenses",
+      "es": "Gastos operativos"
+    },
+    "296": {
+      "en": "Cotton bag",
+      "es": "Bolsa de algodón"
+    },
+    "297": {
+      "en": "A5 single pad with 20 sheets",
+      "es": "Bloc simple A5 con 20 hojas"
+    },
+    "298": {
+      "en": "White pen",
+      "es": "Bolígrafo blanco"
+    },
+    "299": {
+      "en": "Silent lecture",
+      "es": "Conferencia silenciosa"
+    },
+    "3": {
+      "en": "Sound Technician",
+      "es": "Técnico de sonido"
+    },
+    "30": {
+      "en": "Translation",
+      "es": "Traducción"
+    },
+    "300": {
+      "en": "Finish with black lid",
+      "es": "Acabado con tapa negra"
+    },
+    "301": {
+      "en": "Comfort chair",
+      "es": "Silla confort"
+    },
+    "302": {
+      "en": "Eames table",
+      "es": "Mesa Eames"
+    },
+    "303": {
+      "en": "5000-lumen laser HD projector",
+      "es": "Proyector láser HD de 5000 lúmenes"
+    },
+    "304": {
+      "en": "7000-lumen laser Full HD projector",
+      "es": "Proyector láser Full HD de 7000 lúmenes"
+    },
+    "305": {
+      "en": "Confort Nude armchair",
+      "es": "Sillón Confort Nude"
+    },
+    "306": {
+      "en": "Armchair",
+      "es": "Sillón"
+    },
+    "307": {
+      "en": "3-seater pouf",
+      "es": "Puf 3 plazas"
+    },
+    "308": {
+      "en": "Guitar amplifier",
+      "es": "Amplificador de guitarra"
+    },
+    "309": {
+      "en": "Fabric",
+      "es": "Tela"
+    },
+    "31": {
+      "en": "House mix enclosure in Q15 and finish in black LYCRA",
+      "es": "Cierre de house mix en Q15 y acabado en LYCRA negra"
+    },
+    "310": {
+      "en": "Fern",
+      "es": "Helecho"
+    },
+    "311": {
+      "en": "Stand backdrop",
+      "es": "Fondo de stand"
+    },
+    "312": {
+      "en": "A/C cabling",
+      "es": "Cableado A/C"
+    },
+    "313": {
+      "en": "HDMI Cable",
+      "es": "Cable HDMI"
+    },
+    "314": {
+      "en": "Carpet",
+      "es": "Alfombra"
+    },
+    "315": {
+      "en": "Matte Blackout Adhesive",
+      "es": "Adhesivo blackout mate"
+    },
+    "316": {
+      "en": "Vinyl Floor Lamination",
+      "es": "Laminación de vinilo para piso"
+    },
+    "317": {
+      "en": "LED Panel P1",
+      "es": "Panel LED P1"
+    },
+    "318": {
+      "en": "Assembly and Draping",
+      "es": "Montaje y forrado"
+    },
+    "319": {
+      "en": "XLR/AC Cabling Kit",
+      "es": "Kit de cableado XLR/AC"
+    },
+    "32": {
+      "en": "Flip chart",
+      "es": "Rotafolios"
+    },
+    "320": {
+      "en": "LED Panel Side Closure",
+      "es": "Cierre lateral del panel LED"
+    },
+    "321": {
+      "en": "Stage Planter",
+      "es": "Jardinera para escenario"
+    },
+    "322": {
+      "en": "Technical Producer",
+      "es": "Productor técnico"
+    },
+    "323": {
+      "en": "PPT Technician",
+      "es": "Técnico de PPT"
+    },
+    "324": {
+      "en": "Technical Assistant",
+      "es": "Asistente técnico"
+    },
+    "325": {
+      "en": "Stage Assistant",
+      "es": "Asistente de escenario"
+    },
+    "326": {
+      "en": "Nursing Assistant",
+      "es": "Auxiliar de enfermería"
+    },
+    "327": {
+      "en": "Certificate",
+      "es": "Certificado"
+    },
+    "328": {
+      "en": "Curved Puff",
+      "es": "Puff curvo"
+    },
+    "329": {
+      "en": "Puff 40 X 40 CM",
+      "es": "Puff 40 X 40 CM"
+    },
+    "33": {
+      "en": "Q30 structure",
+      "es": "Estructura Q30"
+    },
+    "330": {
+      "en": "Pear-shaped Puff",
+      "es": "Puff pera"
+    },
+    "331": {
+      "en": "Target Kick",
+      "es": "Patada al blanco"
+    },
+    "332": {
+      "en": "Polaroid Photo",
+      "es": "Foto Polaroid"
+    },
+    "333": {
+      "en": "Filmmaker",
+      "es": "Cineasta"
+    },
+    "334": {
+      "en": "Splitter",
+      "es": "Splitter"
+    },
+    "335": {
+      "en": "Switch",
+      "es": "Switch"
+    },
+    "336": {
+      "en": "HDMI Extender",
+      "es": "Extensor HDMI"
+    },
+    "337": {
+      "en": "IPAD",
+      "es": "IPAD"
+    },
+    "338": {
+      "en": "MDF sheet",
+      "es": "Panel de MDF"
+    },
+    "339": {
+      "en": "Round instagrammable panel",
+      "es": "Panel redondo instagrameable"
+    },
+    "34": {
+      "en": "Generator",
+      "es": "Generador"
+    },
+    "340": {
+      "en": "Round stage",
+      "es": "Escenario redondo"
+    },
+    "341": {
+      "en": "Catering",
+      "es": "Servicio de catering"
+    },
+    "342": {
+      "en": "Photo strips",
+      "es": "Tiras fotográficas"
+    },
+    "343": {
+      "en": "Videographer",
+      "es": "Videógrafo"
+    },
+    "344": {
+      "en": "Stage",
+      "es": "Escenario"
+    },
+    "345": {
+      "en": "Flyer",
+      "es": "Folleto"
+    },
+    "346": {
+      "en": "Sennheiser E-614 microphone",
+      "es": "Micrófono Sennheiser E-614"
+    },
+    "347": {
+      "en": "Clamp pedestal",
+      "es": "Pedestal de garra"
+    },
+    "348": {
+      "en": "Small pedestal",
+      "es": "Pedestal pequeño"
+    },
+    "349": {
+      "en": "Hartle 1 x 15 speaker cabinet",
+      "es": "Caja Hartle 1 x 15"
+    },
+    "35": {
+      "en": "Lighting technician",
+      "es": "Técnico de iluminación"
+    },
+    "350": {
+      "en": "HARTkLE 4 x 10 speaker cabinet",
+      "es": "Caja HARTkLE 4 x 10"
+    },
+    "351": {
+      "en": "GK800 amplifier",
+      "es": "Amplificador GK800"
+    },
+    "352": {
+      "en": "DJ + Saxophone",
+      "es": "DJ + Saxofón"
+    },
+    "353": {
+      "en": "360 platform",
+      "es": "Plataforma 360"
+    },
+    "354": {
+      "en": "Table flags",
+      "es": "Banderines para mesa"
+    },
+    "355": {
+      "en": "Twister booth",
+      "es": "Cabina Twister"
+    },
+    "356": {
+      "en": "6500 lumens laser Full HD projector",
+      "es": "Proyector láser 6500 lúmenes Full HD"
+    },
+    "357": {
+      "en": "ECAD",
+      "es": "ECAD"
+    },
+    "358": {
+      "en": "Tag",
+      "es": "Tag"
+    },
+    "359": {
+      "en": "Pedestal",
+      "es": "Pedestal"
+    },
+    "36": {
+      "en": "Stage platforms",
+      "es": "Plataformas de escenario"
+    },
+    "360": {
+      "en": "Scaffolding",
+      "es": "Andamio"
+    },
+    "361": {
+      "en": "Folder holder",
+      "es": "Soporte para folders"
+    },
+    "362": {
+      "en": "JBL LINE speaker",
+      "es": "Altavoz JBL LINE"
+    },
+    "363": {
+      "en": "JBL subwoofer",
+      "es": "Subwoofer JBL"
+    },
+    "364": {
+      "en": "MIDAS M32 digital mixing console",
+      "es": "Consola de mezcla digital MIDAS M32"
+    },
+    "365": {
+      "en": "Moving spot",
+      "es": "Foco móvil tipo spot"
+    },
+    "366": {
+      "en": "Slim speaker",
+      "es": "Altavoz SLIM"
+    },
+    "367": {
+      "en": "Double CUE LUGHT",
+      "es": "CUE LUGHT doble"
+    },
+    "368": {
+      "en": "Garment rack",
+      "es": "Perchero"
+    },
+    "369": {
+      "en": "EAMS stool",
+      "es": "Taburete EAMS"
+    },
+    "37": {
+      "en": "Management",
+      "es": "Gestión"
+    },
+    "370": {
+      "en": "Navy blue damask tablecloth",
+      "es": "Mantel adamascado azul marino"
+    },
+    "371": {
+      "en": "Round pouf",
+      "es": "Puf redondo"
+    },
+    "372": {
+      "en": "LINHARES chair",
+      "es": "Silla LINHARES"
+    },
+    "373": {
+      "en": "Single-row gold stanchion with red rope",
+      "es": "Poste separador dorado de fila única con cuerda roja"
+    },
+    "374": {
+      "en": "Stand 16M² (4M X 4M)",
+      "es": "Stand 16M² (4M X 4M)"
+    },
+    "375": {
+      "en": "85\" LED TV",
+      "es": "TV LED 85\""
+    },
+    "376": {
+      "en": "Vintage sofa 2,20 X 0,86 X 0,80M",
+      "es": "Sofá vintage 2,20 X 0,86 X 0,80M"
+    },
+    "377": {
+      "en": "Manhattan armchair 0,78 X 0,72 X 0,78M",
+      "es": "Butaca Manhattan 0,78 X 0,72 X 0,78M"
+    },
+    "38": {
+      "en": "Brochure",
+      "es": "Folleto"
+    },
+    "39": {
+      "en": "Chair",
+      "es": "Silla"
+    },
+    "4": {
+      "en": "Panel Technician",
+      "es": "Técnico de panel"
+    },
+    "40": {
+      "en": "LYCRA PARC cover",
+      "es": "Funda LYCRA PARC"
+    },
+    "41": {
+      "en": "TRAINEL in wood",
+      "es": "TRAINEL de madera"
+    },
+    "42": {
+      "en": "ART - Technical registration",
+      "es": "ART - Registro técnico"
+    },
+    "43": {
+      "en": "DJ",
+      "es": "DJ"
+    },
+    "44": {
+      "en": "Stage floor covering",
+      "es": "Recubrimiento de escenario"
+    },
+    "45": {
+      "en": "Technical assistant",
+      "es": "Asistente técnico"
+    },
+    "46": {
+      "en": "Receptionist",
+      "es": "Recepcionista"
+    },
+    "47": {
+      "en": "Bilingual receptionist",
+      "es": "Recepcionista bilingüe"
+    },
+    "48": {
+      "en": "Trilingual receptionist",
+      "es": "Recepcionista trilingüe"
+    },
+    "49": {
+      "en": "Radios",
+      "es": "Radios"
+    },
+    "5": {
+      "en": "Producer",
+      "es": "Productor"
+    },
+    "50": {
+      "en": "English Interpreter",
+      "es": "Intérprete de inglés"
+    },
+    "51": {
+      "en": "PROMIC",
+      "es": "PROMIC"
+    },
+    "52": {
+      "en": "Commission",
+      "es": "Comisión"
+    },
+    "53": {
+      "en": "Master of Ceremonies",
+      "es": "Maestro de ceremonias"
+    },
+    "54": {
+      "en": "Stage side table",
+      "es": "Mesa lateral para escenario"
+    },
+    "55": {
+      "en": "MOVING MAC 2000",
+      "es": "MOVING MAC 2000"
+    },
+    "56": {
+      "en": "Gobo",
+      "es": "Gobo"
+    },
+    "57": {
+      "en": "Tablet with pedestal",
+      "es": "Tablet con pedestal"
+    },
+    "58": {
+      "en": "HOME CAST",
+      "es": "HOME CAST"
+    },
+    "59": {
+      "en": "Tablet",
+      "es": "Tablet"
+    },
+    "6": {
+      "en": "Technical Coordinator",
+      "es": "Coordinador técnico"
+    },
+    "60": {
+      "en": "Touch totem",
+      "es": "Tótem táctil"
+    },
+    "61": {
+      "en": "Sticker",
+      "es": "Adhesivo"
+    },
+    "62": {
+      "en": "IT Technician",
+      "es": "Técnico de informática"
+    },
+    "63": {
+      "en": "Hoists",
+      "es": "Polipastos"
+    },
+    "64": {
+      "en": "Strap",
+      "es": "Cinta"
+    },
+    "65": {
+      "en": "Cover",
+      "es": "Tapa"
+    },
+    "66": {
+      "en": "Freight",
+      "es": "Flete"
+    },
+    "67": {
+      "en": "Printing",
+      "es": "Impresión"
+    },
+    "68": {
+      "en": "Copies on A3 paper",
+      "es": "Copias en papel A3"
+    },
+    "69": {
+      "en": "Simultaneous translation",
+      "es": "Traducción simultánea"
+    },
+    "7": {
+      "en": "Production Package M",
+      "es": "Paquete de producción M"
+    },
+    "70": {
+      "en": "Interpreter",
+      "es": "Intérprete"
+    },
+    "71": {
+      "en": "Rectangular table with glass top",
+      "es": "Mesa rectangular con tablero de vidrio"
+    },
+    "72": {
+      "en": "Transformer",
+      "es": "Transformador"
+    },
+    "73": {
+      "en": "Credential Badge",
+      "es": "Credencial"
+    },
+    "74": {
+      "en": "Lanyard",
+      "es": "Cordón para credencial"
+    },
+    "75": {
+      "en": "Rubber Wristband",
+      "es": "Pulsera de goma"
+    },
+    "76": {
+      "en": "Banner - Pennant",
+      "es": "Bandera - Banderín"
+    },
+    "77": {
+      "en": "Production Fee",
+      "es": "Tarifa de producción"
+    },
+    "78": {
+      "en": "Bistro Table with Two Stools",
+      "es": "Mesa bistró con dos taburetes"
+    },
+    "79": {
+      "en": "JOSÉ - CHAUVIERE EQUIPAMENTOS AUDIVISUAIS",
+      "es": "JOSÉ - CHAUVIERE EQUIPAMENTOS AUDIVISUAIS"
+    },
+    "8": {
+      "en": "Production Package G",
+      "es": "Paquete de producción G"
+    },
+    "80": {
+      "en": "Counter 1,0 x 1,0 x 0,50M",
+      "es": "Mostrador 1,0 x 1,0 x 0,50M"
+    },
+    "81": {
+      "en": "Support",
+      "es": "Apoyo"
+    },
+    "82": {
+      "en": "Graphic Installation",
+      "es": "Instalación gráfica"
+    },
+    "83": {
+      "en": "Eco Bags",
+      "es": "Bolsas ecológicas"
+    },
+    "84": {
+      "en": "Thermal Bottles",
+      "es": "Botellas térmicas"
+    },
+    "85": {
+      "en": "Luminaires",
+      "es": "Luminarias"
+    },
+    "86": {
+      "en": "Power Bank",
+      "es": "Power Bank"
+    },
+    "87": {
+      "en": "Luggage Tag",
+      "es": "Etiqueta para maleta"
+    },
+    "88": {
+      "en": "Card Holder for Cell Phone",
+      "es": "Porta tarjetas para celular"
+    },
+    "89": {
+      "en": "Door Sign",
+      "es": "Aviso de puerta"
+    },
+    "9": {
+      "en": "3D Project",
+      "es": "Proyecto en 3D"
+    },
+    "90": {
+      "en": "Charger",
+      "es": "Cargador"
+    },
+    "91": {
+      "en": "Alma Carioca",
+      "es": "Alma Carioca"
+    },
+    "92": {
+      "en": "Backdrop wrapped with vinyl with the client's branding",
+      "es": "Backdrop envuelto con lona con la identidad del cliente"
+    },
+    "93": {
+      "en": "Booth 2,00 x 2,00M Model 1",
+      "es": "Stand 2,00 x 2,00M Modelo 1"
+    },
+    "94": {
+      "en": "Booth 2,00 x 2,00M Model 2",
+      "es": "Stand 2,00 x 2,00M Modelo 2"
+    },
+    "95": {
+      "en": "Entrance Archway",
+      "es": "Pórtico de entrada"
+    },
+    "96": {
+      "en": "Instagrammable Check-in",
+      "es": "Check-in instagramable"
+    },
+    "97": {
+      "en": "Instagrammable totem with arrow",
+      "es": "Tótem instagramable con flecha"
+    },
+    "98": {
+      "en": "LED information totem for TV",
+      "es": "Tótem informativo LED para TV"
+    },
+    "99": {
+      "en": "Meeting table",
+      "es": "Mesa de reuniones"
+    }
+  },
+  "origem": "Tradução técnica assistida para revisão comercial — gpt-5-mini"
+}
