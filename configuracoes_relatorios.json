@@ -1,0 +1,15 @@
+{
+  "lagune_barra_hotel": {
+    "nome": "Lagune Barra Hotel",
+    "busca_meeventos": [
+      "Lagune Barra Hotel",
+      "Lagune"
+    ],
+    "percentual_comissao": 0.15,
+    "deducao_1": 0.05,
+    "deducao_2": 0.12,
+    "status_elegivel": "Eventos Anteriores",
+    "tipo_equipamento": "7",
+    "tipo_desconto_geral": "5"
+  }
+}

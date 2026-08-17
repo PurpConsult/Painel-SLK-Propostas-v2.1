@@ -11,6 +11,7 @@ import zipfile
 from difflib import SequenceMatcher
 from xml.etree import ElementTree as ET
 from xml.sax.saxutils import escape as xml_escape
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 app = Flask(__name__)
 
@@ -868,6 +869,8 @@ PASTA_CACHE_IMAGENS_ITENS = os.path.join(BASE_DIR, "imagens_itens_aprovadas")
 ARQUIVO_IMAGENS_APROVADAS = os.path.join(BASE_DIR, "imagens_itens_aprovadas.json")
 ARQUIVO_APRENDIZADOS_CATALOGO = os.path.join(BASE_DIR, "aprendizados_catalogo.json")
 ARQUIVO_CORRECOES_TIPO_ITENS = os.path.join(BASE_DIR, "correcoes_tipo_itens.json")
+ARQUIVO_CONFIGURACOES_RELATORIOS = os.path.join(BASE_DIR, "configuracoes_relatorios.json")
+PASTA_RELATORIOS = os.path.join(BASE_DIR, "relatorios")
 EXTENSOES_IMAGEM_PERMITIDAS = {"jpg", "jpeg", "png", "webp"}
 EXTENSOES_BRIEFING_PERMITIDAS = {"txt", "pdf", "docx"}
 TAMANHO_MAXIMO_BRIEFING = 5 * 1024 * 1024
@@ -890,6 +893,605 @@ def _ler_json(arquivo, padrao):
         with open(arquivo, "r", encoding="utf-8") as f: return json.load(f)
     except:
         return padrao
+
+
+# ============================== #
+# RELATÓRIOS DE COMISSÃO          #
+# ============================== #
+CONFIGURACOES_RELATORIOS_PADRAO = {
+    "lagune_barra_hotel": {
+        "nome": "Lagune Barra Hotel",
+        "busca_meeventos": ["Lagune Barra Hotel", "Lagune"],
+        "percentual_comissao": 0.15,
+        "deducao_1": 0.05,
+        "deducao_2": 0.12,
+        "status_elegivel": "Eventos Anteriores",
+        "tipo_equipamento": "7",
+        "tipo_desconto_geral": "5",
+    }
+}
+
+
+def _configuracoes_relatorios():
+    """Carrega apenas configurações comerciais, sem guardar token ou dados de apuração."""
+    dados = _ler_json(ARQUIVO_CONFIGURACOES_RELATORIOS, CONFIGURACOES_RELATORIOS_PADRAO)
+    if not isinstance(dados, dict):
+        dados = CONFIGURACOES_RELATORIOS_PADRAO
+    resultado = {}
+    for chave, configuracao in dados.items():
+        if not isinstance(configuracao, dict):
+            continue
+        combinado = {
+            "nome": str(configuracao.get("nome") or chave),
+            "busca_meeventos": configuracao.get("busca_meeventos") or configuracao.get("busca_meeventos_local") or [],
+            "percentual_comissao": configuracao.get("percentual_comissao", 0.15),
+            "deducao_1": configuracao.get("deducao_1", 0.05),
+            "deducao_2": configuracao.get("deducao_2", 0.12),
+            "status_elegivel": configuracao.get("status_elegivel", "Eventos Anteriores"),
+            "tipo_equipamento": str(configuracao.get("tipo_equipamento", "7")),
+            "tipo_desconto_geral": str(configuracao.get("tipo_desconto_geral", "5")),
+        }
+        if isinstance(combinado["busca_meeventos"], str):
+            combinado["busca_meeventos"] = [combinado["busca_meeventos"]]
+        resultado[str(chave)] = combinado
+    return resultado or CONFIGURACOES_RELATORIOS_PADRAO
+
+
+def _decimal_relatorio(valor):
+    if isinstance(valor, Decimal):
+        return valor
+    if valor is None or valor == "":
+        return Decimal("0")
+    try:
+        texto = str(valor).strip().replace("R$", "").replace(" ", "")
+        if "," in texto:
+            texto = texto.replace(".", "").replace(",", ".")
+        return Decimal(texto)
+    except (InvalidOperation, ValueError):
+        return Decimal("0")
+
+
+def _centavos_relatorio(valor):
+    return _decimal_relatorio(valor).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def _moeda_relatorio(valor):
+    valor = _centavos_relatorio(valor)
+    texto = f"{valor:,.2f}"
+    return "R$ " + texto.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _texto_normalizado_relatorio(valor):
+    return _normalizar_texto_busca(valor)
+
+
+def _normalizar_exclusoes_relatorio(itens_excluidos):
+    """Aceita {evento:[item]} ou uma lista de chaves no padrão evento:item."""
+    exclusoes = {}
+    if isinstance(itens_excluidos, dict):
+        for id_evento, itens in itens_excluidos.items():
+            lista = itens if isinstance(itens, list) else [itens]
+            exclusoes[str(id_evento)] = {str(item) for item in lista if str(item).strip()}
+        return exclusoes
+    if not isinstance(itens_excluidos, list):
+        return exclusoes
+    for item in itens_excluidos:
+        if isinstance(item, dict):
+            id_evento = str(item.get("id_evento") or item.get("evento") or "").strip()
+            id_item = str(item.get("id") or item.get("id_item") or "").strip()
+        else:
+            texto = str(item or "").strip()
+            id_evento, separador, id_item = texto.partition(":")
+            if not separador:
+                continue
+        if id_evento and id_item:
+            exclusoes.setdefault(id_evento, set()).add(id_item)
+    return exclusoes
+
+
+def _buscar_paginado_com_parametros(endpoint, parametros=None, max_paginas=20):
+    """Consulta de leitura paginada, mantendo o token somente no servidor.
+
+    Nunca devolve uma lista incompleta: quando o período excede o teto seguro de
+    páginas, a equipe recebe uma orientação para reduzir o intervalo consultado.
+    """
+    if not TOKEN:
+        raise RuntimeError("O token do Meeventos não está configurado neste computador.")
+    todos = []
+    parametros = dict(parametros or {})
+    for pagina in range(1, max_paginas + 1):
+        consulta = {**parametros, "page": pagina, "limit": 200}
+        resposta = requests.get(f"{API_BASE}{endpoint}", headers=HEADERS, params=consulta, timeout=(5, 15))
+        resposta.raise_for_status()
+        corpo = resposta.json()
+        if isinstance(corpo, list):
+            todos.extend(corpo)
+            break
+        if not isinstance(corpo, dict):
+            break
+        itens = corpo.get("data", [])
+        if isinstance(itens, list):
+            todos.extend(itens)
+        paginacao = corpo.get("pagination") or {}
+        try:
+            total_paginas = int(paginacao.get("total_page", 1))
+        except (TypeError, ValueError):
+            total_paginas = 1
+        if pagina >= total_paginas:
+            break
+        if pagina >= max_paginas:
+            raise ValueError("O período escolhido retornou muitos registros para uma apuração segura. Reduza o intervalo de datas e tente novamente.")
+    return todos
+
+
+def _validar_periodo_relatorio(data_inicio, data_fim):
+    try:
+        inicio = datetime.strptime(str(data_inicio), "%Y-%m-%d").date()
+        fim = datetime.strptime(str(data_fim), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        raise ValueError("Informe as duas datas do período no formato válido.")
+    if inicio > fim:
+        raise ValueError("A data inicial não pode ser posterior à data final.")
+    return inicio.isoformat(), fim.isoformat()
+
+
+def consultar_eventos_relatorio(configuracao, data_inicio, data_fim):
+    """Consulta eventos realizados no período e filtra o local configurado, sem gravar nada no Meeventos."""
+    eventos = _buscar_paginado_com_parametros(
+        "/events",
+        {"start": data_inicio, "end": data_fim, "field_sort": "dataevento", "sort": "asc"},
+    )
+    localizadores = [_texto_normalizado_relatorio(texto) for texto in configuracao.get("busca_meeventos", [])]
+    status_esperado = _texto_normalizado_relatorio(configuracao.get("status_elegivel"))
+    selecionados = []
+    for evento in eventos:
+        if not isinstance(evento, dict):
+            continue
+        local = _texto_normalizado_relatorio(evento.get("localevento") or evento.get("local"))
+        status = _texto_normalizado_relatorio(evento.get("status"))
+        localizado = any(termo and termo in local for termo in localizadores)
+        if localizado and status == status_esperado:
+            selecionados.append(evento)
+    return selecionados
+
+
+def consultar_itens_evento_relatorio(id_evento):
+    return _buscar_paginado_com_parametros("/orders", {"idevento": str(id_evento), "field_sort": "ordem", "sort": "asc"})
+
+
+def _valor_total_evento_relatorio(evento, valor_calculado):
+    for campo in ("valor_total_evento", "valor_total", "valortotal", "total", "valor"):
+        if campo in evento and evento.get(campo) not in (None, ""):
+            valor = _centavos_relatorio(evento.get(campo))
+            if valor != 0:
+                return valor
+    return _centavos_relatorio(valor_calculado)
+
+
+def calcular_apuracao_comissao(configuracao, eventos, itens_por_evento, itens_excluidos=None):
+    """Aplica a regra padrão: equipamentos, rateio, 5%, 12% e comissão por evento."""
+    percentual_comissao = _decimal_relatorio(configuracao.get("percentual_comissao", 0.15))
+    deducao_1_percentual = _decimal_relatorio(configuracao.get("deducao_1", 0.05))
+    deducao_2_percentual = _decimal_relatorio(configuracao.get("deducao_2", 0.12))
+    tipo_equipamento = str(configuracao.get("tipo_equipamento", "7"))
+    tipo_desconto = str(configuracao.get("tipo_desconto_geral", "5"))
+    exclusoes = _normalizar_exclusoes_relatorio(itens_excluidos)
+    calculados = []
+
+    for evento in eventos:
+        id_evento = str(evento.get("id") or evento.get("id_evento") or "").strip()
+        if not id_evento:
+            continue
+        bruto_itens = Decimal("0")
+        desconto_geral = Decimal("0")
+        equipamentos_bruto = Decimal("0")
+        equipamentos_excluidos = Decimal("0")
+        qtd_equipamentos = 0
+        itens_excluidos_evento = []
+        equipamentos_consultados = []
+        for item in itens_por_evento.get(id_evento, []) or []:
+            if not isinstance(item, dict):
+                continue
+            tipo = str(item.get("tipo") or "")
+            valor = _decimal_relatorio(item.get("valor"))
+            id_item = str(item.get("id") or item.get("id_item") or item.get("id_produto") or "")
+            if tipo == tipo_desconto and valor < 0:
+                desconto_geral += -valor
+                continue
+            if tipo != tipo_desconto:
+                bruto_itens += valor
+            if tipo == tipo_equipamento:
+                equipamento = {
+                    "id": id_item,
+                    "nome": str(item.get("nome") or item.get("descricao") or "Item sem descrição"),
+                    "valor": _centavos_relatorio(valor),
+                }
+                if id_item and id_item in exclusoes.get(id_evento, set()):
+                    equipamentos_excluidos += valor
+                    equipamento["excluido"] = True
+                    itens_excluidos_evento.append(equipamento)
+                else:
+                    equipamentos_bruto += valor
+                    qtd_equipamentos += 1
+                    equipamento["excluido"] = False
+                equipamentos_consultados.append(equipamento)
+
+        participacao = equipamentos_bruto / bruto_itens if bruto_itens > 0 else Decimal("0")
+        desconto_rateado = _centavos_relatorio(desconto_geral * participacao)
+        equipamentos_apos_desconto = _centavos_relatorio(equipamentos_bruto - desconto_rateado)
+        deducao_1 = _centavos_relatorio(equipamentos_apos_desconto * deducao_1_percentual)
+        saldo_apos_deducao_1 = _centavos_relatorio(equipamentos_apos_desconto - deducao_1)
+        deducao_2 = _centavos_relatorio(saldo_apos_deducao_1 * deducao_2_percentual)
+        base_comissionavel = _centavos_relatorio(saldo_apos_deducao_1 - deducao_2)
+        comissao = _centavos_relatorio(base_comissionavel * percentual_comissao)
+        valor_total = _valor_total_evento_relatorio(evento, bruto_itens - desconto_geral)
+        alertas = []
+        if equipamentos_bruto == 0:
+            alertas.append("Sem equipamentos elegíveis retornados pela API.")
+        if desconto_geral > 0:
+            alertas.append(f"Desconto geral de {_moeda_relatorio(desconto_geral)} rateado proporcionalmente aos equipamentos.")
+        if itens_excluidos_evento:
+            alertas.append(f"{len(itens_excluidos_evento)} item(ns) terceirizado(s)/sublocado(s) excluído(s) por confirmação da equipe.")
+
+        calculados.append({
+            "id": id_evento,
+            "data": str(evento.get("dataevento") or evento.get("data_evento") or ""),
+            "nome": str(evento.get("nomeevento") or evento.get("nome_evento") or "Evento sem nome"),
+            "local": str(evento.get("localevento") or evento.get("local") or "-"),
+            "orcamento": str(evento.get("idorcamento") or evento.get("numero_orcamento") or "-"),
+            "status": str(evento.get("status") or "-"),
+            "valor_total": _centavos_relatorio(valor_total),
+            "bruto_itens": _centavos_relatorio(bruto_itens),
+            "desconto_geral": _centavos_relatorio(desconto_geral),
+            "equipamentos_bruto": _centavos_relatorio(equipamentos_bruto),
+            "equipamentos_excluidos": _centavos_relatorio(equipamentos_excluidos),
+            "desconto_rateado_equipamentos": desconto_rateado,
+            "equipamentos_apos_desconto": equipamentos_apos_desconto,
+            "deducao_1": deducao_1,
+            "deducao_2": deducao_2,
+            "deducoes_tributarias": _centavos_relatorio(deducao_1 + deducao_2),
+            "base_comissionavel": base_comissionavel,
+            "comissao": comissao,
+            "qtd_equipamentos": qtd_equipamentos,
+            "equipamentos_consultados": equipamentos_consultados,
+            "itens_excluidos": itens_excluidos_evento,
+            "alertas": alertas,
+        })
+
+    calculados.sort(key=lambda item: (item["data"], item["id"]))
+    campos = ["valor_total", "bruto_itens", "desconto_geral", "equipamentos_bruto", "equipamentos_excluidos", "desconto_rateado_equipamentos", "equipamentos_apos_desconto", "deducao_1", "deducao_2", "deducoes_tributarias", "base_comissionavel", "comissao"]
+    totais = {campo: _centavos_relatorio(sum((item[campo] for item in calculados), Decimal("0"))) for campo in campos}
+    return {
+        "hotel": configuracao.get("nome"),
+        "eventos": calculados,
+        "totais": totais,
+        "quantidade_eventos": len(calculados),
+        "quantidade_itens_excluidos": sum(len(item["itens_excluidos"]) for item in calculados),
+        "parametros": {
+            "percentual_comissao": percentual_comissao,
+            "deducao_1": deducao_1_percentual,
+            "deducao_2": deducao_2_percentual,
+            "base_elegivel": "Itens de equipamento (tipo 7)",
+        },
+    }
+
+
+def _serializar_relatorio(valor):
+    if isinstance(valor, Decimal):
+        return float(valor)
+    if isinstance(valor, dict):
+        return {chave: _serializar_relatorio(item) for chave, item in valor.items()}
+    if isinstance(valor, list):
+        return [_serializar_relatorio(item) for item in valor]
+    return valor
+
+
+def _salvar_apuracao_relatorio(apuracao, hotel_id, data_inicio, data_fim):
+    os.makedirs(PASTA_RELATORIOS, exist_ok=True)
+    identificador = "apuracao_{}_{}_{}_{}".format(
+        secure_filename(hotel_id) or "hotel",
+        data_inicio.replace("-", ""),
+        data_fim.replace("-", ""),
+        datetime.now().strftime("%Y%m%d%H%M%S%f"),
+    )
+    registro = {
+        "id_relatorio": identificador,
+        "gerado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "periodo": {"inicio": data_inicio, "fim": data_fim},
+        "apuracao": _serializar_relatorio(apuracao),
+    }
+    _salvar_json(os.path.join(PASTA_RELATORIOS, f"{identificador}.json"), registro)
+    return registro
+
+
+def _carregar_apuracao_relatorio(identificador):
+    identificador = secure_filename(str(identificador or ""))
+    if not identificador.startswith("apuracao_"):
+        return None
+    return _ler_json(os.path.join(PASTA_RELATORIOS, f"{identificador}.json"), None)
+
+
+def _estilo_tabela_relatorio(tabela, cor_cabecalho="#007D9F", cor_total="#D9EAF0"):
+    from reportlab.lib import colors
+    from reportlab.lib.colors import HexColor
+    from reportlab.platypus import TableStyle
+    estilo = [
+        ("BACKGROUND", (0, 0), (-1, 0), HexColor(cor_cabecalho)),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 8),
+        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("GRID", (0, 0), (-1, -1), 0.35, HexColor("#D8E5E8")),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, HexColor("#F5FAFB")]),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]
+    if len(tabela._cellvalues) > 2:
+        estilo.extend([("BACKGROUND", (0, -1), (-1, -1), HexColor(cor_total)), ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold")])
+    tabela.setStyle(TableStyle(estilo))
+    return tabela
+
+
+def gerar_pdf_relatorio_comissao(registro):
+    """Gera um PDF comercial baseado exatamente na apuração salva para revisão e apresentação."""
+    from reportlab.lib import colors
+    from reportlab.lib.colors import HexColor
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import cm
+    from reportlab.platypus import SimpleDocTemplate, Spacer, Paragraph, Table, PageBreak
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.graphics.charts.barcharts import VerticalBarChart
+
+    apuracao = registro["apuracao"]
+    buffer = io.BytesIO()
+    largura, altura = landscape(A4)
+    documento = SimpleDocTemplate(buffer, pagesize=landscape(A4), leftMargin=1.25*cm, rightMargin=1.25*cm, topMargin=2.2*cm, bottomMargin=1.5*cm)
+    estilos = getSampleStyleSheet()
+    titulo = ParagraphStyle("tituloRelatorio", parent=estilos["Heading1"], textColor=HexColor("#12333A"), fontName="Helvetica-Bold", fontSize=19, leading=22, spaceAfter=6)
+    subtitulo = ParagraphStyle("subtituloRelatorio", parent=estilos["Normal"], textColor=HexColor("#527378"), fontSize=9, leading=13, spaceAfter=12)
+    texto = ParagraphStyle("textoRelatorio", parent=estilos["Normal"], textColor=HexColor("#38565C"), fontSize=8.5, leading=12, spaceAfter=4)
+    destaques = []
+    historia = []
+    periodo = registro["periodo"]
+    historia.append(Paragraph("Relatório de Comissão", titulo))
+    historia.append(Paragraph(f"<b>{apuracao.get('hotel', 'Hotel')}</b> &nbsp;|&nbsp; Período analisado: {periodo['inicio'][8:10]}/{periodo['inicio'][5:7]}/{periodo['inicio'][:4]} a {periodo['fim'][8:10]}/{periodo['fim'][5:7]}/{periodo['fim'][:4]} &nbsp;|&nbsp; Gerado em {registro.get('gerado_em', '-')}", subtitulo))
+    historia.append(Paragraph("Esta apuração usa somente eventos realizados e itens de equipamento. A exclusão de itens terceirizados ou sublocados depende exclusivamente da confirmação manual da equipe.", texto))
+    historia.append(Spacer(1, 0.22*cm))
+
+    totais = apuracao["totais"]
+    parametros = apuracao["parametros"]
+    dados_resumo = [["Indicador", "Valor"],
+        ["Eventos realizados considerados", str(apuracao.get("quantidade_eventos", 0))],
+        ["Valor total dos eventos", _moeda_relatorio(totais["valor_total"])],
+        ["Equipamentos antes do desconto", _moeda_relatorio(totais["equipamentos_bruto"])],
+        ["Desconto geral rateado aos equipamentos", _moeda_relatorio(totais["desconto_rateado_equipamentos"])],
+        [f"Dedução de {float(parametros['deducao_1'])*100:.0f}%", _moeda_relatorio(totais["deducao_1"])],
+        [f"Dedução de {float(parametros['deducao_2'])*100:.0f}% sobre o saldo", _moeda_relatorio(totais["deducao_2"])],
+        ["Valor líquido comissionável", _moeda_relatorio(totais["base_comissionavel"])],
+        [f"COMISSÃO A PAGAR ({float(parametros['percentual_comissao'])*100:.0f}%)", _moeda_relatorio(totais["comissao"])]]
+    tabela_resumo = Table(dados_resumo, colWidths=[12.7*cm, 5.1*cm], repeatRows=1)
+    _estilo_tabela_relatorio(tabela_resumo, cor_cabecalho="#007D9F", cor_total="#CBEFF3")
+    tabela_resumo.setStyle(__import__("reportlab.platypus", fromlist=["TableStyle"]).TableStyle([("ALIGN", (1, 1), (1, -1), "RIGHT")]))
+    historia.append(tabela_resumo)
+    historia.append(Spacer(1, 0.4*cm))
+
+    mensal = {}
+    for evento in apuracao.get("eventos", []):
+        mes = str(evento.get("data") or "")[:7] or "Sem data"
+        mensal[mes] = mensal.get(mes, Decimal("0")) + _decimal_relatorio(evento.get("comissao"))
+    if mensal:
+        meses = list(sorted(mensal.keys()))
+        grafico = Drawing(700, 190)
+        barras = VerticalBarChart()
+        barras.x = 48
+        barras.y = 34
+        barras.width = 620
+        barras.height = 125
+        barras.data = [[float(mensal[mes]) for mes in meses]]
+        barras.categoryAxis.categoryNames = [f"{mes[5:7]}/{mes[:4]}" if len(mes) == 7 else mes for mes in meses]
+        barras.categoryAxis.labels.fontName = "Helvetica"
+        barras.categoryAxis.labels.fontSize = 7
+        barras.valueAxis.labels.fontName = "Helvetica"
+        barras.valueAxis.labels.fontSize = 7
+        barras.valueAxis.valueMin = 0
+        barras.valueAxis.valueMax = max(float(valor) for valor in mensal.values()) * 1.22 or 1
+        barras.valueAxis.valueStep = max(barras.valueAxis.valueMax / 4, 1)
+        barras.bars[0].fillColor = HexColor("#20B9C7")
+        barras.bars[0].strokeColor = HexColor("#0E8B98")
+        grafico.add(barras)
+        historia.append(Paragraph("Comissão a pagar por mês", ParagraphStyle("graficoTitulo", parent=titulo, fontSize=12, leading=14, spaceBefore=2, spaceAfter=5)))
+        historia.append(grafico)
+
+    historia.append(PageBreak())
+    historia.append(Paragraph("Demonstrativo por evento", titulo))
+    historia.append(Paragraph("Valores arredondados por evento para centavos. A planilha de apoio contém o detalhamento completo e a lista de exclusões confirmadas.", subtitulo))
+    linhas_eventos = [["Nº Evento", "Data", "Evento", "Orçamento", "Equipamentos\napós desconto", "Base\ncomissionável", "Comissão", "Conferência"]]
+    for evento in apuracao.get("eventos", []):
+        alerta = " ".join(evento.get("alertas") or []) or "—"
+        linhas_eventos.append([
+            evento.get("id", "-"),
+            str(evento.get("data") or "-")[:10],
+            Paragraph(str(evento.get("nome") or "-"), ParagraphStyle("eventoNome", parent=texto, fontSize=7.5, leading=9)),
+            evento.get("orcamento", "-"),
+            _moeda_relatorio(evento.get("equipamentos_apos_desconto")),
+            _moeda_relatorio(evento.get("base_comissionavel")),
+            _moeda_relatorio(evento.get("comissao")),
+            Paragraph(alerta, ParagraphStyle("alertaEvento", parent=texto, fontSize=7, leading=8.5)),
+        ])
+    linhas_eventos.append(["TOTAL", "", "", "", _moeda_relatorio(totais["equipamentos_apos_desconto"]), _moeda_relatorio(totais["base_comissionavel"]), _moeda_relatorio(totais["comissao"]), ""])
+    tabela_eventos = Table(linhas_eventos, colWidths=[1.55*cm, 1.65*cm, 7.2*cm, 1.8*cm, 3.1*cm, 3.0*cm, 2.55*cm, 6.0*cm], repeatRows=1)
+    _estilo_tabela_relatorio(tabela_eventos)
+    tabela_eventos.setStyle(__import__("reportlab.platypus", fromlist=["TableStyle"]).TableStyle([("ALIGN", (4, 1), (6, -1), "RIGHT"), ("FONTSIZE", (0, 1), (-1, -1), 7.2)]))
+    historia.append(tabela_eventos)
+    historia.append(Spacer(1, 0.35*cm))
+    historia.append(Paragraph("Metodologia aplicada", ParagraphStyle("metodoTitulo", parent=titulo, fontSize=12, leading=14, spaceAfter=5)))
+    metodologia = [
+        "Somente itens de equipamento (tipo 7) compõem a base elegível; serviços, técnicos, montagem, desmontagem, mobiliário e itens afins ficam fora da comissão.",
+        "Descontos gerais negativos do tipo 5 são rateados pela participação dos equipamentos no valor bruto de todos os itens do pedido.",
+        f"Sobre os equipamentos após desconto aplicam-se {float(parametros['deducao_1'])*100:.0f}% e, sobre o saldo resultante, mais {float(parametros['deducao_2'])*100:.0f}%.",
+        f"A comissão é de {float(parametros['percentual_comissao'])*100:.0f}% sobre a base líquida comissionável de cada evento.",
+        "A apuração é uma conferência comercial. Antes do pagamento, a equipe deve validar a lista de itens excluídos e o financeiro/contábil deve revisar o documento.",
+    ]
+    for item in metodologia:
+        historia.append(Paragraph(f"• {item}", texto))
+
+    def cabecalho_rodape(canvas, doc):
+        canvas.saveState()
+        canvas.setFillColor(HexColor("#0B0B14"))
+        canvas.rect(0, altura-1.55*cm, largura, 1.55*cm, stroke=0, fill=1)
+        canvas.setFillColor(HexColor("#20D0DD"))
+        canvas.rect(0, altura-1.55*cm, 1.05*cm, 1.55*cm, stroke=0, fill=1)
+        canvas.setFillColor(colors.white)
+        canvas.setFont("Helvetica-Bold", 8.6)
+        canvas.drawRightString(largura-1.25*cm, altura-0.92*cm, "SOULINK | APURAÇÃO COMERCIAL")
+        canvas.setFillColor(HexColor("#63787E"))
+        canvas.setFont("Helvetica", 7.2)
+        canvas.drawString(1.25*cm, 0.75*cm, "Desenvolvido por VendAI - AI & Sales Consulting")
+        canvas.drawRightString(largura-1.25*cm, 0.75*cm, f"Página {doc.page}")
+        canvas.restoreState()
+
+    documento.build(historia, onFirstPage=cabecalho_rodape, onLaterPages=cabecalho_rodape)
+    buffer.seek(0)
+    return buffer
+
+
+def gerar_planilha_relatorio_comissao(registro):
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+    from openpyxl.utils import get_column_letter
+
+    apuracao = registro["apuracao"]
+    totais = apuracao["totais"]
+    parametros = apuracao["parametros"]
+    wb = Workbook()
+    ws_resumo = wb.active
+    ws_resumo.title = "Resumo"
+    ws_eventos = wb.create_sheet("Eventos")
+    ws_metodo = wb.create_sheet("Metodologia")
+    azul = "007D9F"
+    ciano_claro = "D9EAF0"
+    amarelo = "FFF2CC"
+    borda = Border(left=Side(style="thin", color="D9E2F3"), right=Side(style="thin", color="D9E2F3"), top=Side(style="thin", color="D9E2F3"), bottom=Side(style="thin", color="D9E2F3"))
+
+    ws_resumo.merge_cells("A1:B1")
+    ws_resumo["A1"] = f"RELATÓRIO DE COMISSÃO — {apuracao.get('hotel', '').upper()}"
+    ws_resumo["A1"].fill = PatternFill("solid", fgColor=azul)
+    ws_resumo["A1"].font = Font(color="FFFFFF", bold=True, size=14)
+    ws_resumo["A1"].alignment = Alignment(horizontal="center")
+    ws_resumo["A3"] = "Período analisado"
+    ws_resumo["B3"] = f"{registro['periodo']['inicio']} a {registro['periodo']['fim']}"
+    ws_resumo["A4"] = "Eventos realizados considerados"
+    ws_resumo["B4"] = apuracao.get("quantidade_eventos", 0)
+    ws_resumo["A5"] = "Itens excluídos por confirmação humana"
+    ws_resumo["B5"] = apuracao.get("quantidade_itens_excluidos", 0)
+    ws_resumo["A7"] = "Indicador"
+    ws_resumo["B7"] = "Valor"
+    for referencia in ("A7", "B7"):
+        ws_resumo[referencia].fill = PatternFill("solid", fgColor=azul)
+        ws_resumo[referencia].font = Font(color="FFFFFF", bold=True)
+        ws_resumo[referencia].alignment = Alignment(horizontal="center")
+    resumo_linhas = [
+        ("Valor total dos eventos", totais["valor_total"]),
+        ("Equipamentos antes do desconto", totais["equipamentos_bruto"]),
+        ("Desconto geral rateado aos equipamentos", totais["desconto_rateado_equipamentos"]),
+        (f"Dedução de {float(parametros['deducao_1'])*100:.0f}%", totais["deducao_1"]),
+        (f"Dedução de {float(parametros['deducao_2'])*100:.0f}% sobre o saldo", totais["deducao_2"]),
+        ("Valor líquido comissionável", totais["base_comissionavel"]),
+        (f"COMISSÃO A PAGAR ({float(parametros['percentual_comissao'])*100:.0f}%)", totais["comissao"]),
+    ]
+    for linha, (titulo, valor) in enumerate(resumo_linhas, start=8):
+        ws_resumo.cell(linha, 1, titulo)
+        ws_resumo.cell(linha, 2, float(_decimal_relatorio(valor)))
+        for coluna in (1, 2):
+            ws_resumo.cell(linha, coluna).border = borda
+            ws_resumo.cell(linha, coluna).alignment = Alignment(vertical="center", wrap_text=True)
+        ws_resumo.cell(linha, 2).number_format = 'R$ #,##0.00'
+    for coluna in (1, 2):
+        ws_resumo.cell(14, coluna).fill = PatternFill("solid", fgColor=ciano_claro)
+        ws_resumo.cell(14, coluna).font = Font(bold=True)
+    ws_resumo["A17"] = "Regra aplicada"
+    ws_resumo["B17"] = "Desconto geral rateado proporcionalmente; equipamentos após desconto − primeira dedução; saldo − segunda dedução; base × comissão."
+    ws_resumo["A18"] = "Revisão humana"
+    ws_resumo["B18"] = "Itens terceirizados ou sublocados só são excluídos após confirmação explícita da equipe na tela de relatórios."
+    for linha in (17, 18):
+        for coluna in (1, 2):
+            ws_resumo.cell(linha, coluna).fill = PatternFill("solid", fgColor=amarelo)
+            ws_resumo.cell(linha, coluna).border = borda
+            ws_resumo.cell(linha, coluna).alignment = Alignment(vertical="top", wrap_text=True)
+    ws_resumo.column_dimensions["A"].width = 46
+    ws_resumo.column_dimensions["B"].width = 95
+
+    cabecalho = ["Nº Evento", "Data", "Evento", "Local", "Orçamento", "Valor total", "Todos os itens", "Desconto geral", "Equipamentos elegíveis", "Equipamentos excluídos", "Desconto rateado", "Equipamentos após desconto", "Dedução 1", "Dedução 2", "Base comissionável", "Comissão", "Itens excluídos", "Alertas"]
+    ws_eventos.append(cabecalho)
+    for celula in ws_eventos[1]:
+        celula.fill = PatternFill("solid", fgColor=azul)
+        celula.font = Font(color="FFFFFF", bold=True)
+        celula.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    for evento in apuracao.get("eventos", []):
+        excluidos = "; ".join(f"{item['nome']} ({_moeda_relatorio(item['valor'])})" for item in evento.get("itens_excluidos", [])) or "—"
+        ws_eventos.append([
+            evento.get("id"), evento.get("data"), evento.get("nome"), evento.get("local"), evento.get("orcamento"),
+            float(_decimal_relatorio(evento.get("valor_total"))), float(_decimal_relatorio(evento.get("bruto_itens"))), float(_decimal_relatorio(evento.get("desconto_geral"))),
+            float(_decimal_relatorio(evento.get("equipamentos_bruto"))), float(_decimal_relatorio(evento.get("equipamentos_excluidos"))), float(_decimal_relatorio(evento.get("desconto_rateado_equipamentos"))),
+            float(_decimal_relatorio(evento.get("equipamentos_apos_desconto"))), float(_decimal_relatorio(evento.get("deducao_1"))), float(_decimal_relatorio(evento.get("deducao_2"))),
+            float(_decimal_relatorio(evento.get("base_comissionavel"))), float(_decimal_relatorio(evento.get("comissao"))), excluidos, " | ".join(evento.get("alertas") or []),
+        ])
+    linha_total = ws_eventos.max_row + 1
+    ws_eventos.cell(linha_total, 1, "TOTAL GERAL")
+    campos_totais = ["valor_total", "bruto_itens", "desconto_geral", "equipamentos_bruto", "equipamentos_excluidos", "desconto_rateado_equipamentos", "equipamentos_apos_desconto", "deducao_1", "deducao_2", "base_comissionavel", "comissao"]
+    for coluna, campo in zip(range(6, 17), campos_totais):
+        ws_eventos.cell(linha_total, coluna, float(_decimal_relatorio(totais[campo])))
+    for linha in ws_eventos.iter_rows(min_row=2, max_row=linha_total):
+        for celula in linha:
+            celula.border = borda
+            celula.alignment = Alignment(vertical="top", wrap_text=True)
+    for linha in range(2, linha_total + 1):
+        for coluna in range(6, 17):
+            ws_eventos.cell(linha, coluna).number_format = 'R$ #,##0.00'
+    for coluna in range(1, len(cabecalho) + 1):
+        ws_eventos.cell(linha_total, coluna).fill = PatternFill("solid", fgColor=ciano_claro)
+        ws_eventos.cell(linha_total, coluna).font = Font(bold=True)
+    larguras = [12, 13, 38, 26, 14, 16, 16, 16, 19, 19, 17, 22, 14, 14, 19, 16, 42, 52]
+    for indice, largura in enumerate(larguras, start=1):
+        ws_eventos.column_dimensions[get_column_letter(indice)].width = largura
+    ws_eventos.freeze_panes = "A2"
+    ws_eventos.auto_filter.ref = f"A1:R{linha_total}"
+
+    ws_metodo.merge_cells("A1:B1")
+    ws_metodo["A1"] = "METODOLOGIA E CRITÉRIOS DE APURAÇÃO"
+    ws_metodo["A1"].fill = PatternFill("solid", fgColor=azul)
+    ws_metodo["A1"].font = Font(color="FFFFFF", bold=True, size=14)
+    ws_metodo["A1"].alignment = Alignment(horizontal="center")
+    criterios = [
+        ("Fonte", "Consulta de leitura à API do Meeventos: eventos realizados e itens de pedidos vinculados ao ID de cada evento."),
+        ("Base elegível", "Apenas itens do tipo 7 — equipamento. Serviços, técnicos, montagem, desmontagem, mobiliário e itens afins não entram na comissão."),
+        ("Rateio do desconto", "Lançamentos negativos do tipo 5 são tratados como desconto geral e rateados proporcionalmente pela participação dos equipamentos no valor bruto de todos os itens."),
+        ("Deduções", f"Primeira dedução de {float(parametros['deducao_1'])*100:.0f}% sobre equipamentos após desconto; segunda dedução de {float(parametros['deducao_2'])*100:.0f}% sobre o saldo."),
+        ("Comissão", f"{float(parametros['percentual_comissao'])*100:.0f}% sobre a base comissionável, após o rateio e as deduções sequenciais."),
+        ("Terceirização e sublocação", "A API não define essa condição de forma confiável. A exclusão é manual e precisa de confirmação da equipe em cada relatório."),
+    ]
+    for linha, (titulo_criterio, descricao) in enumerate(criterios, start=3):
+        ws_metodo.cell(linha, 1, titulo_criterio)
+        ws_metodo.cell(linha, 2, descricao)
+        ws_metodo.cell(linha, 1).fill = PatternFill("solid", fgColor="F2F2F2")
+        ws_metodo.cell(linha, 1).font = Font(bold=True)
+        for coluna in (1, 2):
+            ws_metodo.cell(linha, coluna).border = borda
+            ws_metodo.cell(linha, coluna).alignment = Alignment(vertical="top", wrap_text=True)
+    ws_metodo.column_dimensions["A"].width = 30
+    ws_metodo.column_dimensions["B"].width = 115
+    for ws in wb.worksheets:
+        ws.sheet_view.showGridLines = False
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToHeight = 0
+    buffer = io.BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    return buffer
 
 def _ler_correcoes_tipo_itens():
     dados = _ler_json(ARQUIVO_CORRECOES_TIPO_ITENS, {"version": 1, "itens": {}})
@@ -1731,6 +2333,80 @@ def api_financeiro():
         "dados": aprovadas,
     })
 
+
+@app.route("/api/relatorios/hoteis")
+def api_relatorios_hoteis():
+    """Expõe somente os parâmetros comerciais permitidos para a interface local."""
+    hoteis = []
+    for hotel_id, configuracao in _configuracoes_relatorios().items():
+        hoteis.append({
+            "id": hotel_id,
+            "nome": configuracao["nome"],
+            "percentual_comissao": float(_decimal_relatorio(configuracao["percentual_comissao"])),
+            "deducao_1": float(_decimal_relatorio(configuracao["deducao_1"])),
+            "deducao_2": float(_decimal_relatorio(configuracao["deducao_2"])),
+            "status_elegivel": configuracao["status_elegivel"],
+        })
+    return jsonify({"sucesso": True, "hoteis": hoteis})
+
+
+@app.route("/api/relatorio/comissao", methods=["POST"])
+def api_relatorio_comissao():
+    """Consulta eventos e pedidos em modo somente leitura, calcula e preserva a apuração para revisão."""
+    corpo = request.get_json(silent=True) or {}
+    hotel_id = str(corpo.get("hotel_id") or "").strip()
+    configuracoes = _configuracoes_relatorios()
+    configuracao = configuracoes.get(hotel_id)
+    if not configuracao:
+        return jsonify({"sucesso": False, "erro": "Hotel inválido ou ainda não configurado para apuração."}), 400
+    try:
+        data_inicio, data_fim = _validar_periodo_relatorio(corpo.get("data_inicio"), corpo.get("data_fim"))
+        eventos = consultar_eventos_relatorio(configuracao, data_inicio, data_fim)
+        itens_por_evento = {}
+        for evento in eventos:
+            id_evento = str(evento.get("id") or evento.get("id_evento") or "").strip()
+            if id_evento:
+                itens_por_evento[id_evento] = consultar_itens_evento_relatorio(id_evento)
+        apuracao = calcular_apuracao_comissao(configuracao, eventos, itens_por_evento, corpo.get("itens_excluidos", []))
+        registro = _salvar_apuracao_relatorio(apuracao, hotel_id, data_inicio, data_fim)
+        resposta = {
+            "sucesso": True,
+            "id_relatorio": registro["id_relatorio"],
+            "gerado_em": registro["gerado_em"],
+            "periodo": registro["periodo"],
+            **registro["apuracao"],
+        }
+        return jsonify(resposta)
+    except ValueError as erro:
+        return jsonify({"sucesso": False, "erro": str(erro)}), 400
+    except requests.exceptions.RequestException as erro:
+        detalhe = erro.response.text if getattr(erro, "response", None) is not None else ""
+        return jsonify({"sucesso": False, "erro": "Não foi possível consultar o Meeventos para esta apuração.", "detalhes": detalhe}), 502
+    except RuntimeError as erro:
+        return jsonify({"sucesso": False, "erro": str(erro)}), 503
+    except Exception as erro:
+        return jsonify({"sucesso": False, "erro": "Não foi possível calcular o relatório.", "detalhes": str(erro)}), 500
+
+
+@app.route("/api/relatorio/comissao/<identificador>/pdf")
+def api_baixar_relatorio_pdf(identificador):
+    registro = _carregar_apuracao_relatorio(identificador)
+    if not registro:
+        return jsonify({"sucesso": False, "erro": "Apuração não encontrada. Gere ou refaça o relatório antes de baixar."}), 404
+    arquivo = gerar_pdf_relatorio_comissao(registro)
+    nome = f"relatorio_comissao_{secure_filename(registro['apuracao'].get('hotel', 'hotel')).lower()}_{registro['periodo']['inicio']}_{registro['periodo']['fim']}.pdf"
+    return send_file(arquivo, mimetype="application/pdf", as_attachment=True, download_name=nome)
+
+
+@app.route("/api/relatorio/comissao/<identificador>/planilha")
+def api_baixar_relatorio_planilha(identificador):
+    registro = _carregar_apuracao_relatorio(identificador)
+    if not registro:
+        return jsonify({"sucesso": False, "erro": "Apuração não encontrada. Gere ou refaça o relatório antes de baixar."}), 404
+    arquivo = gerar_planilha_relatorio_comissao(registro)
+    nome = f"relatorio_comissao_{secure_filename(registro['apuracao'].get('hotel', 'hotel')).lower()}_{registro['periodo']['inicio']}_{registro['periodo']['fim']}.xlsx"
+    return send_file(arquivo, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", as_attachment=True, download_name=nome)
+
 @app.route("/api/propostas/<numero>/versoes/<int:versao>")
 def api_buscar_versao_proposta(numero, versao):
     """Retorna uma versão completa para preencher o formulário de edição."""
@@ -1811,6 +2487,11 @@ def meus_itens():
 @app.route("/financeiro")
 def pagina_financeiro():
     return render_template("financeiro.html")
+
+
+@app.route("/relatorios")
+def pagina_relatorios():
+    return render_template("relatorios.html")
 
 # ============================== #
 # INICIALIZAÇÃO                  #

@@ -49,12 +49,16 @@ aprendizados_catalogo.json
 correcoes_tipo_itens.json
 propostas.json
 pdfs/
+relatorios/
 *.pdf
 *.zip
 *.key
 *.pem
 ANTHROPIC_API_KEY
 MEEVENTOS_TOKEN
+app_corrigido.py
+app_backup_*.py
+app_local_*.txt
 
 # Coverage directory used by tools like istanbul
 coverage/

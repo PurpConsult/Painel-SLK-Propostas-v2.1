@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOULINK | Relatórios</title>
+<style>
+  :root { --cyan:#00bcd4; --teal:#007d8f; --navy:#12333a; --ink:#2c454a; --muted:#668087; --line:#dcebed; --pale:#f5fbfc; --warning:#76591b; --warning-bg:#fff8e6; --green:#137452; }
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; }
+  body { background:#f4f7f8; color:var(--ink); padding:15px; font-size:14px; line-height:1.45; }
+  .wrap { max-width:1240px; margin:0 auto; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 20px; border-radius:9px; margin-bottom:17px; color:#fff; background:linear-gradient(135deg,#00bcd4,#0097a7); box-shadow:0 3px 12px rgba(0,140,155,.14); }
+  header h1 { font-size:18px; font-weight:600; letter-spacing:.01em; }
+  header nav { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
+  header a { color:#fff; text-decoration:none; font-size:12px; padding:6px 10px; border:1px solid rgba(255,255,255,.55); border-radius:5px; transition:all .18s; }
+  header a:hover, header a:focus { background:#fff; color:var(--teal); outline:none; }
+  .intro { display:flex; gap:16px; align-items:flex-start; justify-content:space-between; padding:16px 18px; margin-bottom:13px; background:#fff; border:1px solid var(--line); border-radius:9px; box-shadow:0 1px 4px rgba(22,70,78,.04); }
+  .eyebrow { color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; }
+  h2 { color:var(--navy); font-size:20px; line-height:1.2; margin-bottom:5px; }
+  h3 { color:var(--teal); font-size:15px; margin-bottom:9px; }
+  .intro p, .method p { color:var(--muted); max-width:765px; font-size:13px; }
+  .chip { display:inline-flex; align-items:center; white-space:nowrap; padding:6px 9px; border-radius:20px; background:#e6f8fa; color:#057584; border:1px solid #bfe9ee; font-size:11px; font-weight:700; }
+  .grid-top { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(275px,.8fr); gap:13px; align-items:start; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:9px; padding:16px; box-shadow:0 1px 4px rgba(22,70,78,.04); }
+  .form-grid { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:10px; align-items:end; }
+  label { display:block; color:#49666c; font-size:12px; font-weight:650; margin-bottom:4px; }
+  input, select { width:100%; padding:9px 10px; background:#fff; border:1px solid #cfe0e3; border-radius:6px; color:var(--ink); font-size:13px; }
+  input:focus, select:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,188,212,.11); }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  button, .download { border:0; border-radius:6px; padding:9px 13px; font-size:12px; font-weight:750; cursor:pointer; text-decoration:none; transition:transform .12s, box-shadow .18s, background .18s; }
+  button:active, .download:active { transform:scale(.97); }
+  .primary { color:#fff; background:linear-gradient(135deg,#00bcd4,#008c9b); box-shadow:0 2px 7px rgba(0,157,171,.22); }
+  .primary:hover { box-shadow:0 4px 11px rgba(0,157,171,.29); }
+  .secondary { color:var(--teal); background:#fff; border:1px solid #9ed8df; }
+  .secondary:hover { background:#effcfd; }
+  .download { color:#fff; background:#16795b; display:none; }
+  .download:hover { background:#106546; }
+  button:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+  .method { background:#f7fcfc; border-left:4px solid var(--cyan); padding:13px 14px; border-radius:0 7px 7px 0; }
+  .method ul { padding-left:17px; margin-top:7px; color:#48666d; font-size:12px; }
+  .method li { margin:4px 0; }
+  .manual-note { margin:13px 0; padding:11px 13px; background:var(--warning-bg); border:1px solid #f0dca3; border-radius:7px; color:#684f18; font-size:12px; }
+  .manual-note strong { display:block; margin-bottom:2px; }
+  .feedback { display:none; margin:13px 0; padding:11px 13px; border-radius:7px; font-size:12px; }
+  .feedback.show { display:block; } .feedback.loading { color:#176270; background:#eafafb; border:1px solid #c8eaf0; } .feedback.error { color:#9f3131; background:#fff0f0; border:1px solid #f2c6c6; }
+  #results { display:none; margin-top:13px; } #results.show { display:block; }
+  .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:13px; }
+  .metric { min-height:101px; padding:14px; border:1px solid var(--line); border-radius:9px; background:#fff; box-shadow:0 1px 4px rgba(22,70,78,.04); }
+  .metric small { display:block; color:#607b81; font-size:10px; font-weight:750; text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+  .metric strong { display:block; color:#0d6975; font-size:20px; line-height:1.15; }.metric.commission { border-color:#9edee5; background:linear-gradient(135deg,#f2feff,#fff); }.metric.commission strong { color:var(--green); }
+  .summary-table, .events-table { overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  table { border-collapse:collapse; width:100%; min-width:740px; }
+  th { padding:10px; text-align:left; background:#007d8f; color:#fff; font-size:10px; letter-spacing:.04em; text-transform:uppercase; } td { padding:10px; vertical-align:top; border-bottom:1px solid #ebf1f2; color:#405f65; font-size:12px; } tr:last-child td { border-bottom:0; }.money { text-align:right; white-space:nowrap; font-weight:700; color:#195963; }.total-row td { font-weight:800; color:var(--navy); background:#e9f8fa; }
+  .section-title { display:flex; gap:12px; align-items:center; justify-content:space-between; margin:17px 0 8px; }.section-title p { color:var(--muted); font-size:12px; }.section-title h3 { margin:0; }
+  .event-list { display:grid; gap:9px; }.event-card { overflow:hidden; background:#fff; border:1px solid var(--line); border-radius:8px; }.event-summary { display:grid; grid-template-columns:1.7fr .7fr .85fr .85fr; gap:9px; align-items:center; padding:11px 12px; }.event-title strong { display:block; color:#254f57; font-size:13px; }.event-title span, .event-meta span { display:block; margin-top:2px; color:#738b90; font-size:11px; }.event-meta { text-align:right; }.event-meta small { display:block; color:#6c858a; font-size:9px; font-weight:750; text-transform:uppercase; letter-spacing:.04em; }.event-meta b { color:#246570; font-size:12px; }.event-meta.commission b { color:var(--green); }.equipment-review { border-top:1px solid var(--line); background:#fbfefe; padding:10px 12px; }.equipment-review summary { cursor:pointer; color:var(--teal); font-size:12px; font-weight:750; }.equipment-review summary span { color:#718a8f; font-weight:500; }.equipment-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:9px; }.equipment { display:flex; align-items:flex-start; gap:7px; padding:7px 8px; border:1px solid #e1eef0; border-radius:6px; background:#fff; color:#3d5d62; font-size:11px; cursor:pointer; }.equipment:hover { background:#f4fcfd; }.equipment input { width:auto; margin-top:2px; accent-color:#c38a11; }.equipment.excluded { background:#fff9ec; border-color:#edd694; color:#71591d; }.equipment-name { flex:1; line-height:1.3; }.equipment-value { white-space:nowrap; color:#35646b; font-weight:700; }.empty { padding:30px; border:1px dashed #bcdcdf; border-radius:8px; background:#fcffff; color:#637d82; text-align:center; }.footer { margin-top:24px; padding:16px; text-align:center; border-top:1px solid #dce6e8; color:#80959a; font-size:11px; }
+  @media (max-width:850px) { .grid-top { grid-template-columns:1fr; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.event-summary { grid-template-columns:1fr 1fr; }.event-title { grid-column:1/-1; }.equipment-list { grid-template-columns:1fr; } }
+  @media (max-width:600px) { body { padding:9px; } header { align-items:flex-start; flex-direction:column; padding:12px; }.form-grid { grid-template-columns:1fr; }.metrics { grid-template-columns:1fr 1fr; }.metric { min-height:87px; }.metric strong { font-size:16px; }.event-summary { grid-template-columns:1fr; }.event-meta { text-align:left; }.intro { flex-direction:column; }.chip { white-space:normal; } }
+  @media (prefers-reduced-motion:no-preference) { .card, .metric, .event-card { transition:transform .18s cubic-bezier(.23,1,.32,1), box-shadow .18s; }.event-card:hover { transform:translateY(-1px); box-shadow:0 5px 12px rgba(22,70,78,.06); } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>SOULINK | Relatórios</h1>
+    <nav><a href="/">Painel</a><a href="/propostas">Meus Orçamentos</a><a href="/financeiro">Financeiro</a><a href="/meus-itens">Meus Itens</a></nav>
+  </header>
+
+  <section class="intro">
+    <div><div class="eyebrow">Apuração comercial manual</div><h2>Comissão por período, com conferência antes da exportação.</h2><p>Consulte os eventos realizados no Meeventos, valide os equipamentos e somente então gere o PDF ou a planilha de apoio para apresentação ao hotel.</p></div>
+    <span class="chip">Consulta somente leitura</span>
+  </section>
+
+  <section class="grid-top">
+    <section class="card">
+      <h3>Gerar apuração</h3>
+      <div class="form-grid">
+        <div><label for="hotel">Hotel</label><select id="hotel" disabled><option>Carregando configuração...</option></select></div>
+        <div><label for="data-inicio">Data inicial</label><input id="data-inicio" type="date"></div>
+        <div><label for="data-fim">Data final</label><input id="data-fim" type="date"></div>
+      </div>
+      <div class="actions">
+        <button id="btn-gerar" class="primary" type="button">Gerar apuração</button>
+        <button id="btn-recalcular" class="secondary" type="button" disabled>Recalcular com exclusões confirmadas</button>
+        <a id="baixar-pdf" class="download" href="#">Baixar PDF</a>
+        <a id="baixar-planilha" class="download" href="#">Baixar planilha</a>
+      </div>
+    </section>
+    <aside class="method">
+      <h3>Regra padrão</h3>
+      <p>Os parâmetros comerciais do hotel ficam configurados no ambiente local. A base matemática segue o padrão já aprovado.</p>
+      <ul><li>Somente equipamentos entram na base.</li><li>O desconto geral é rateado proporcionalmente.</li><li>As deduções são aplicadas de forma sequencial.</li><li>A comissão incide sobre a base líquida de cada evento.</li></ul>
+    </aside>
+  </section>
+
+  <section class="manual-note"><strong>Revisão humana obrigatória.</strong> Marque apenas os equipamentos terceirizados ou sublocados que devem ser excluídos. A tela não faz essa exclusão automaticamente e a nova apuração fica registrada separadamente para auditoria.</section>
+  <section id="feedback" class="feedback" aria-live="polite"></section>
+
+  <section id="results">
+    <section class="metrics">
+      <div class="metric"><small>Eventos considerados</small><strong id="metric-eventos">—</strong></div>
+      <div class="metric"><small>Equipamentos após desconto</small><strong id="metric-equipamentos">—</strong></div>
+      <div class="metric"><small>Base comissionável</small><strong id="metric-base">—</strong></div>
+      <div class="metric commission"><small>Comissão a pagar</small><strong id="metric-comissao">—</strong></div>
+    </section>
+
+    <div class="section-title"><h3>Resumo da apuração</h3><p id="referencia-apuracao"></p></div>
+    <div class="summary-table"><table><thead><tr><th>Valor total dos eventos</th><th>Equipamentos elegíveis</th><th>Desconto rateado</th><th>Dedução 1</th><th>Dedução 2</th><th>Base comissionável</th><th>Comissão</th></tr></thead><tbody id="summary-body"></tbody></table></div>
+
+    <div class="section-title"><div><h3>Conferência por evento</h3><p>Abra cada evento para marcar somente os itens que a equipe confirmou como terceirizados ou sublocados.</p></div><span id="contador-exclusoes" class="chip">Nenhuma exclusão marcada</span></div>
+    <section id="events-content" class="event-list"></section>
+  </section>
+
+  <footer class="footer">Desenvolvido por VendAI — AI &amp; Sales Consulting</footer>
+</main>
+<script>
+  const state = { resultado: null, hoteis: [] };
+  const hotel = document.getElementById('hotel');
+  const inicio = document.getElementById('data-inicio');
+  const fim = document.getElementById('data-fim');
+  const feedback = document.getElementById('feedback');
+  const results = document.getElementById('results');
+  const btnGerar = document.getElementById('btn-gerar');
+  const btnRecalcular = document.getElementById('btn-recalcular');
+  const baixarPdf = document.getElementById('baixar-pdf');
+  const baixarPlanilha = document.getElementById('baixar-planilha');
+
+  function hojeISO() { return new Date().toISOString().slice(0, 10); }
+  function inicioAnoISO() { return `${new Date().getFullYear()}-01-01`; }
+  function dinheiro(valor) { return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(Number(valor || 0)); }
+  function esc(texto) { return String(texto ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function dataBr(data) { const p = String(data || '').slice(0,10).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : '—'; }
+  function mostrarFeedback(tipo, texto) { feedback.className = `feedback show ${tipo}`; feedback.textContent = texto; }
+  function esconderFeedback() { feedback.className = 'feedback'; feedback.textContent = ''; }
+  function setCarregando(ativo, texto) { btnGerar.disabled = ativo; btnRecalcular.disabled = ativo || !state.resultado; if (ativo) mostrarFeedback('loading', texto); }
+
+  async function carregarHoteis() {
+    inicio.value = inicioAnoISO(); fim.value = hojeISO();
+    try {
+      const resposta = await fetch('/api/relatorios/hoteis');
+      const dados = await resposta.json();
+      if (!dados.sucesso) throw new Error(dados.erro || 'Não foi possível carregar os hotéis configurados.');
+      state.hoteis = dados.hoteis || [];
+      hotel.innerHTML = state.hoteis.map(item => `<option value="${esc(item.id)}">${esc(item.nome)} — comissão ${Number(item.percentual_comissao * 100).toFixed(0)}%</option>`).join('') || '<option value="">Nenhum hotel configurado</option>';
+      hotel.disabled = !state.hoteis.length;
+    } catch (erro) { hotel.innerHTML = '<option value="">Erro ao carregar hotéis</option>'; mostrarFeedback('error', erro.message || 'Não foi possível carregar a configuração.'); }
+  }
+
+  function exclusoesSelecionadas() { return [...document.querySelectorAll('.excluir-equipamento:checked')].map(campo => `${campo.dataset.evento}:${campo.dataset.item}`); }
+  function atualizarContador() { const total = exclusoesSelecionadas().length; document.getElementById('contador-exclusoes').textContent = total ? `${total} exclusão(ões) marcada(s)` : 'Nenhuma exclusão marcada'; }
+
+  function renderizarResultado(dados) {
+    state.resultado = dados;
+    const totais = dados.totais || {};
+    document.getElementById('metric-eventos').textContent = dados.quantidade_eventos || 0;
+    document.getElementById('metric-equipamentos').textContent = dinheiro(totais.equipamentos_apos_desconto);
+    document.getElementById('metric-base').textContent = dinheiro(totais.base_comissionavel);
+    document.getElementById('metric-comissao').textContent = dinheiro(totais.comissao);
+    document.getElementById('referencia-apuracao').textContent = `Apuração ${dados.id_relatorio || ''} · ${dataBr(dados.periodo?.inicio)} a ${dataBr(dados.periodo?.fim)}`;
+    document.getElementById('summary-body').innerHTML = `<tr class="total-row"><td class="money">${dinheiro(totais.valor_total)}</td><td class="money">${dinheiro(totais.equipamentos_bruto)}</td><td class="money">${dinheiro(totais.desconto_rateado_equipamentos)}</td><td class="money">${dinheiro(totais.deducao_1)}</td><td class="money">${dinheiro(totais.deducao_2)}</td><td class="money">${dinheiro(totais.base_comissionavel)}</td><td class="money">${dinheiro(totais.comissao)}</td></tr>`;
+    const eventos = dados.eventos || [];
+    const conteudo = document.getElementById('events-content');
+    if (!eventos.length) { conteudo.innerHTML = '<div class="empty"><strong>Nenhum evento realizado foi encontrado para este hotel e período.</strong><br>Confira as datas e o cadastro do local no Meeventos antes de tentar novamente.</div>'; }
+    else {
+      conteudo.innerHTML = eventos.map(evento => {
+        const equipamentos = evento.equipamentos_consultados || [];
+        const lista = equipamentos.length ? equipamentos.map(item => `<label class="equipment ${item.excluido ? 'excluded' : ''}"><input class="excluir-equipamento" type="checkbox" data-evento="${esc(evento.id)}" data-item="${esc(item.id)}" ${item.excluido ? 'checked' : ''}><span class="equipment-name">Excluir: ${esc(item.nome)}</span><span class="equipment-value">${dinheiro(item.valor)}</span></label>`).join('') : '<p style="color:#70888d;font-size:12px">Nenhum equipamento retornado para conferência neste evento.</p>';
+        const alertas = (evento.alertas || []).length ? `<span>${esc(evento.alertas.join(' '))}</span>` : '<span>Sem alerta.</span>';
+        return `<article class="event-card"><div class="event-summary"><div class="event-title"><strong>${esc(evento.nome)}</strong><span>Evento ${esc(evento.id)} · ${dataBr(evento.data)} · Orçamento ${esc(evento.orcamento)}</span></div><div class="event-meta"><small>Equipamentos após desconto</small><b>${dinheiro(evento.equipamentos_apos_desconto)}</b></div><div class="event-meta"><small>Base comissionável</small><b>${dinheiro(evento.base_comissionavel)}</b></div><div class="event-meta commission"><small>Comissão</small><b>${dinheiro(evento.comissao)}</b></div></div><details class="equipment-review"><summary>Conferir equipamentos deste evento <span>(${equipamentos.length} item(ns) retornado(s))</span></summary><div class="equipment-list">${lista}</div><p style="margin-top:8px;color:#7b6a35;font-size:11px">${alertas}</p></details></article>`;
+      }).join('');
+    }
+    results.classList.add('show'); btnRecalcular.disabled = false;
+    if (dados.id_relatorio) { baixarPdf.href = `/api/relatorio/comissao/${encodeURIComponent(dados.id_relatorio)}/pdf`; baixarPlanilha.href = `/api/relatorio/comissao/${encodeURIComponent(dados.id_relatorio)}/planilha`; baixarPdf.style.display = 'inline-block'; baixarPlanilha.style.display = 'inline-block'; }
+    document.querySelectorAll('.excluir-equipamento').forEach(campo => campo.addEventListener('change', atualizarContador));
+    atualizarContador();
+  }
+
+  async function gerarApuracao(incluirExclusoes) {
+    esconderFeedback();
+    if (!hotel.value || !inicio.value || !fim.value) { mostrarFeedback('error', 'Selecione um hotel e informe as duas datas do período.'); return; }
+    setCarregando(true, incluirExclusoes ? 'Recalculando a comissão com as exclusões confirmadas...' : 'Consultando eventos e itens no Meeventos. Aguarde, pois a conferência é feita evento a evento.');
+    try {
+      const resposta = await fetch('/api/relatorio/comissao', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ hotel_id:hotel.value, data_inicio:inicio.value, data_fim:fim.value, itens_excluidos: incluirExclusoes ? exclusoesSelecionadas() : [] }) });
+      const dados = await resposta.json();
+      if (!resposta.ok || !dados.sucesso) throw new Error(dados.erro || 'Não foi possível gerar a apuração.');
+      renderizarResultado(dados);
+      mostrarFeedback('loading', `${dados.quantidade_eventos || 0} evento(s) consultado(s). Revise os equipamentos e use as exportações quando estiver satisfeita com a conferência.`);
+    } catch (erro) { mostrarFeedback('error', erro.message || 'Não foi possível gerar a apuração.'); }
+    finally { setCarregando(false); }
+  }
+  btnGerar.addEventListener('click', () => gerarApuracao(false));
+  btnRecalcular.addEventListener('click', () => gerarApuracao(true));
+  carregarHoteis();
+</script>
+</body>
+</html>
