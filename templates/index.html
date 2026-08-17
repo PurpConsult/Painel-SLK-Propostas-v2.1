@@ -73,7 +73,8 @@ input[readonly]{background:#f5f5f5;color:#666}
 .ia-explicacao{font-size:12px;color:#42666b;margin-bottom:9px;line-height:1.5}
 .ia-resultado{margin-top:10px;padding:11px;border:1px solid #cce9ed;background:#f4fcfd;border-radius:6px;font-size:12px}
 .ia-resultado h4{color:#007d8f;border:0;margin:9px 0 4px;padding:0}.ia-resultado h4:first-child{margin-top:0}
-	.ia-alerta{margin:5px 0;padding:7px 8px;border-radius:4px;background:#fff7df;color:#6d5419}.ia-candidato{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-top:1px solid #dceff1}.ia-candidato input{width:auto;margin-top:3px;accent-color:#0097a7}.ia-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ia-origem{display:inline-block;margin:3px 0 0 5px;padding:1px 5px;border-radius:10px;background:#dff5e8;color:#157047;font-size:10px;font-weight:700}.ia-ensinar{margin:8px 0 3px;padding:8px;border:1px dashed #9dd9df;border-radius:5px;background:#fff}.ia-ensinar-titulo{display:block;color:#27717a;font-size:11px;font-weight:700;margin-bottom:4px}.ia-ensinar small{display:block;color:#617b80;font-size:10px;line-height:1.35;margin:4px 0}.ia-ensinar input{padding:6px 7px;font-size:12px}.ia-busca-resultado{margin-top:4px;max-height:140px;overflow:auto}.ia-busca-item{display:flex;gap:6px;align-items:flex-start;padding:5px 2px;border-top:1px solid #edf5f6;font-size:11px}.ia-busca-item input{width:auto;margin-top:2px;accent-color:#0097a7}.ia-remover-aprendizado{display:inline;border:0;background:transparent;color:#b85b00;text-decoration:underline;cursor:pointer;font-size:10px;padding:0;margin-left:5px}
+		.ia-alerta{margin:5px 0;padding:7px 8px;border-radius:4px;background:#fff7df;color:#6d5419}.ia-candidato{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-top:1px solid #dceff1}.ia-candidato input{width:auto;margin-top:3px;accent-color:#0097a7}.ia-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ia-origem{display:inline-block;margin:3px 0 0 5px;padding:1px 5px;border-radius:10px;background:#dff5e8;color:#157047;font-size:10px;font-weight:700}.ia-ensinar{margin:8px 0 3px;padding:8px;border:1px dashed #9dd9df;border-radius:5px;background:#fff}.ia-ensinar-titulo{display:block;color:#27717a;font-size:11px;font-weight:700;margin-bottom:4px}.ia-ensinar small{display:block;color:#617b80;font-size:10px;line-height:1.35;margin:4px 0}.ia-ensinar input{padding:6px 7px;font-size:12px}.ia-busca-resultado{margin-top:4px;max-height:140px;overflow:auto}.ia-busca-item{display:flex;gap:6px;align-items:flex-start;padding:5px 2px;border-top:1px solid #edf5f6;font-size:11px}.ia-busca-item input{width:auto;margin-top:2px;accent-color:#0097a7}.ia-remover-aprendizado{display:inline;border:0;background:transparent;color:#b85b00;text-decoration:underline;cursor:pointer;font-size:10px;padding:0;margin-left:5px}
+		.ia-fluxo{margin:7px 0;padding:8px 9px;border-left:3px solid #00a7b7;border-radius:4px;background:#eafafb;color:#24606a}.ia-prioridade{padding:7px 0;border-top:1px solid #dceff1}.ia-prioridade strong{color:#1f4f57}.ia-detalhes{margin:4px 0 8px;color:#27717a}.ia-detalhes summary{cursor:pointer;font-size:11px;font-weight:600}.ia-nao-localizado{margin-top:8px;padding:8px;border-radius:5px;background:#fff7df;color:#6d5419}.ia-nao-localizado ul{margin:4px 0 0 18px}.ia-alertas-detalhes{margin-top:7px}.ia-alertas-detalhes summary{cursor:pointer;color:#86641a;font-size:11px}
 
 .msg-sucesso{background:#e8f5e9;color:#2e7d32;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #c8e6c9}
 .msg-erro{background:#ffebee;color:#c62828;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #ffcdd2}
@@ -494,22 +495,28 @@ function mostrarResultadoIA(html, tipo = "") {
 }
 
 function renderizarAnaliseIA(dados) {
-    const campos = dados.campos || {};
-    const nomesCampos = {nome_evento:"Evento",local_evento:"Local",data_evento:"Data",qtd_pessoas:"Pessoas",formato_evento:"Formato",data_montagem:"Montagem",horario_montagem:"Horário de montagem",horario_inicio_evento:"Início",horario_fim_evento:"Término",data_desmontagem:"Desmontagem",horario_desmontagem:"Horário de desmontagem",nome_cliente:"Cliente"};
-    const camposVisiveis = Object.entries(nomesCampos).filter(([chave]) => campos[chave]);
-    const resumoCampos = camposVisiveis.length ? camposVisiveis.map(([chave, nome]) => `<li><strong>${nome}:</strong> ${escaparHtmlIA(campos[chave])}</li>`).join("") : "<li>Nenhum dado operacional foi identificado com segurança.</li>";
-    const alertas = (dados.alertas || []).map(alerta => `<p class="ia-alerta">${escaparHtmlIA(alerta)}</p>`).join("");
-    const itens = (dados.sugestoes_itens || []).map((grupo, indiceGrupo) => {
-        const candidatos = (grupo.candidatos || []).map((item, indiceItem) => {
+    const gruposComCandidato = (dados.sugestoes_itens || []).filter(grupo => (grupo.candidatos || []).length);
+    const renderizarGrupoPrioritario = grupo => {
+        const indiceOriginal = (dados.sugestoes_itens || []).indexOf(grupo);
+        const principal = grupo.candidatos[0];
+        const alternativas = (grupo.candidatos || []).map((item, indiceItem) => {
             const ensinado = item.origem === "Ensinado pela equipe";
-            const origem = ensinado ? `<span class="ia-origem">Ensinado pela equipe</span><button type="button" class="ia-remover-aprendizado" data-ia-remover-grupo="${indiceGrupo}" data-ia-remover-item="${escaparHtmlIA(item.id)}">remover</button>` : "";
-            return `<label class="ia-candidato"><input type="checkbox" data-ia-grupo="${indiceGrupo}" data-ia-candidato="${indiceItem}"><span><strong>${escaparHtmlIA(item.nome)}</strong>${origem}<br><small>#${escaparHtmlIA(item.id)} · ${escaparHtmlIA(item.tipo_item)} · R$ ${Number(item.valor || 0).toFixed(2).replace(".", ",")} · aderência ${Math.round(Number(item.confianca || 0) * 100)}%</small></span></label>`;
-        }).join("") || "<small>Nenhum candidato confiável foi localizado no catálogo oficial.</small>";
-        const ensino = `<div class="ia-ensinar"><span class="ia-ensinar-titulo">Ensinar opções corretas para este pedido</span><small>Marque candidatos acima ou busque outros itens oficiais. É possível salvar várias alternativas e removê-las depois.</small><input type="search" data-ia-busca="${indiceGrupo}" placeholder="Buscar no catálogo oficial..."><div class="ia-busca-resultado" id="ia_busca_resultado_${indiceGrupo}"></div><div class="ia-acoes"><button type="button" class="btn btn-secundario" data-ia-salvar-grupo="${indiceGrupo}">Ensinar opções marcadas</button></div></div>`;
-        return `<div><h4>Pedido: ${escaparHtmlIA(grupo.pedido)} <small>(qtd. sugerida: ${escaparHtmlIA(grupo.quantidade_sugerida)})</small></h4>${candidatos}${ensino}</div>`;
-    }).join("") || "<p>Nenhum item foi identificado no briefing.</p>";
+            const origem = ensinado ? `<span class="ia-origem">Ensinado pela equipe</span><button type="button" class="ia-remover-aprendizado" data-ia-remover-grupo="${indiceOriginal}" data-ia-remover-item="${escaparHtmlIA(item.id)}">remover</button>` : "";
+            return `<label class="ia-candidato"><input type="checkbox" data-ia-grupo="${indiceOriginal}" data-ia-candidato="${indiceItem}"><span><strong>${escaparHtmlIA(item.nome)}</strong>${origem}<br><small>#${escaparHtmlIA(item.id)} · ${escaparHtmlIA(item.tipo_item)} · R$ ${Number(item.valor || 0).toFixed(2).replace(".", ",")}</small></span></label>`;
+        }).join("");
+        const ensino = `<div class="ia-ensinar"><span class="ia-ensinar-titulo">Ensinar alternativas para este pedido</span><small>Use apenas se a sugestão principal não for a opção correta. É possível salvar várias alternativas.</small><input type="search" data-ia-busca="${indiceOriginal}" placeholder="Buscar no catálogo oficial..."><div class="ia-busca-resultado" id="ia_busca_resultado_${indiceOriginal}"></div><div class="ia-acoes"><button type="button" class="btn btn-secundario" data-ia-salvar-grupo="${indiceOriginal}">Salvar alternativas marcadas</button></div></div>`;
+        return `<div class="ia-prioridade"><strong>${escaparHtmlIA(grupo.pedido)}</strong> <small>· qtd. ${escaparHtmlIA(grupo.quantidade_sugerida)}</small><br><span>Incluído no rascunho: <strong>${escaparHtmlIA(principal.nome)}</strong>${principal.origem === "Ensinado pela equipe" ? `<span class="ia-origem">Ensinado pela equipe</span>` : ""}</span><details class="ia-detalhes"><summary>Ver alternativas ou corrigir este item</summary>${alternativas}${ensino}</details></div>`;
+    };
+    const gruposEquipamentos = gruposComCandidato.filter(grupo => String(grupo.candidatos[0]?.tipo_item || "").toLowerCase() === "equipamento");
+    const gruposServicos = gruposComCandidato.filter(grupo => String(grupo.candidatos[0]?.tipo_item || "").toLowerCase() !== "equipamento");
+    const itensPrioritarios = gruposEquipamentos.map(renderizarGrupoPrioritario).join("") || "<p>Nenhum equipamento com relevância suficiente foi encontrado.</p>";
+    const blocoServicos = gruposServicos.length ? `<details class="ia-detalhes"><summary>Ver ${gruposServicos.length} serviço(s) identificado(s) e já incluído(s)</summary>${gruposServicos.map(renderizarGrupoPrioritario).join("")}</details>` : "";
+    const naoLocalizados = (dados.itens_nao_localizados || []).map(item => `<li>${escaparHtmlIA(item.pedido)} <small>(qtd. ${escaparHtmlIA(item.quantidade_sugerida)})</small></li>`).join("");
+    const blocoNaoLocalizados = naoLocalizados ? `<div class="ia-nao-localizado"><strong>Não localizamos no catálogo</strong><ul>${naoLocalizados}</ul></div>` : "";
+    const alertas = (dados.alertas || []).map(alerta => `<li>${escaparHtmlIA(alerta)}</li>`).join("");
+    const blocoAlertas = alertas ? `<details class="ia-alertas-detalhes"><summary>Ver observações do briefing</summary><ul>${alertas}</ul></details>` : "";
     const feedbackAprendizado = dados.mensagem_aprendizado ? `<p class="ia-alerta">${escaparHtmlIA(dados.mensagem_aprendizado)}</p>` : "";
-    mostrarResultadoIA(`<p><strong>Prévia para conferência</strong> — ${escaparHtmlIA(dados.aviso || "")}</p>${dados.resumo ? `<p>${escaparHtmlIA(dados.resumo)}</p>` : ""}${feedbackAprendizado}<h4>Dados identificados</h4><ul>${resumoCampos}</ul>${alertas}<h4>Itens candidatos do catálogo oficial</h4>${itens}<div class="ia-acoes"><button type="button" class="btn btn-secundario" id="aplicar_campos_ia">Preencher somente campos vazios</button><button type="button" class="btn btn-secundario" id="adicionar_itens_ia">Adicionar itens selecionados</button></div>`);
+    mostrarResultadoIA(`<p class="ia-fluxo"><strong>Rascunho preparado.</strong> ${escaparHtmlIA(dados.resumo_aplicacao || dados.aviso || "")}</p>${dados.resumo ? `<p>${escaparHtmlIA(dados.resumo)}</p>` : ""}${feedbackAprendizado}<h4>Equipamentos prioritários</h4>${itensPrioritarios}${blocoServicos}${blocoNaoLocalizados}${blocoAlertas}`);
 }
 
 async function lerArquivoBriefing() {
@@ -532,6 +539,9 @@ async function analisarBriefingIA() {
         const retorno = await resposta.json();
         if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível analisar o briefing.");
         analiseIACorrente = retorno.dados;
+        const camposPreenchidos = aplicarCamposIA();
+        const itensIncluidos = adicionarItensIA(true);
+        analiseIACorrente.resumo_aplicacao = `${camposPreenchidos} dado(s) preenchido(s) e ${itensIncluidos} item(ns) prioritário(s) incluído(s). Revise o rascunho à direita antes de gerar.`;
         renderizarAnaliseIA(retorno.dados);
     } catch (erro) {
         mostrarResultadoIA(`<p class="ia-alerta"><strong>Não foi possível criar a prévia:</strong> ${escaparHtmlIA(erro.message || "Tente novamente.")}</p>`);
@@ -539,30 +549,35 @@ async function analisarBriefingIA() {
 }
 
 function aplicarCamposIA() {
-    if (!analiseIACorrente) return;
+    if (!analiseIACorrente) return 0;
     const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento",qtd_pessoas:"qtd_pessoas",formato_evento:"formato_evento",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
     const campos = analiseIACorrente.campos || {};
-    const confirmados = window.confirm("Preencher somente os campos que estão vazios com os dados sugeridos? Campos já preenchidos não serão alterados.");
-    if (!confirmados) return;
-    Object.entries(mapa).forEach(([chave, id]) => { const campo = document.getElementById(id); if (campos[chave] && !String(campo.value || "").trim()) campo.value = campos[chave]; });
+    const clienteEstavaVazio = !String(document.getElementById("busca_cliente").value || "").trim();
+    let preenchidos = 0;
+    Object.entries(mapa).forEach(([chave, id]) => { const campo = document.getElementById(id); if (campos[chave] && !String(campo.value || "").trim()) { campo.value = campos[chave]; preenchidos += 1; } });
+    const nomeCliente = String(campos.nome_cliente || "").trim();
+    const clienteCadastrado = lista_clientes.find(item => normalizarBuscaIA(item.nome || item.razaosocial) === normalizarBuscaIA(nomeCliente));
+    if (clienteEstavaVazio && clienteCadastrado) selecionar_da_lista(clienteCadastrado, "nome", "lista_clientes");
     atualizar_previa_completa();
+    return preenchidos;
 }
 
-function adicionarItensIA() {
-    if (!analiseIACorrente) return;
-    const marcados = Array.from(document.querySelectorAll("#resultado_ia input[data-ia-grupo]:checked"));
-    if (!marcados.length) { alert("Selecione pelo menos um item candidato para adicionar."); return; }
-    if (!window.confirm("Adicionar somente os itens selecionados à prévia? Os valores serão os do catálogo oficial.")) return;
-    marcados.forEach(marcado => {
-        const grupo = analiseIACorrente.sugestoes_itens?.[Number(marcado.dataset.iaGrupo)];
-        const item = grupo?.candidatos?.[Number(marcado.dataset.iaCandidato)];
+function adicionarItensIA(prioritarios = false) {
+    if (!analiseIACorrente) return 0;
+    const escolhas = prioritarios
+        ? (analiseIACorrente.sugestoes_itens || []).map(grupo => ({grupo, item:grupo.candidatos?.[0]}))
+        : Array.from(document.querySelectorAll("#resultado_ia input[data-ia-grupo]:checked")).map(marcado => ({grupo:analiseIACorrente.sugestoes_itens?.[Number(marcado.dataset.iaGrupo)], item:analiseIACorrente.sugestoes_itens?.[Number(marcado.dataset.iaGrupo)]?.candidatos?.[Number(marcado.dataset.iaCandidato)]}));
+    let adicionados = 0;
+    escolhas.forEach(({grupo, item}) => {
         if (!item) return;
         const quantidade = Number(grupo.quantidade_sugerida || 1);
         const existente = selecionados.find(selecionado => String(selecionado.id) === String(item.id));
-        if (existente) { existente.quantidade += quantidade; return; }
+        if (existente) return;
         selecionados.push({id:item.id,nome:item.nome,valor:Number(item.valor || 0),valor_padrao:Number(item.valor || 0),valor_manual:"",quantidade,tipo_item:item.tipo_item || "Equipamento",categoria:item.categoria || "",imagem_url:item.imagem_aprovada?.image_url || "",imagem_fonte:item.imagem_aprovada?.source || "",externo:false,fornecedor_externo:"",custo_externo:0});
+        adicionados += 1;
     });
     atualizar_previa_completa();
+    return adicionados;
 }
 
 function normalizarBuscaIA(texto) {
@@ -624,8 +639,6 @@ document.getElementById("resultado_ia").addEventListener("click", evento => {
     if (remover) { evento.preventDefault(); removerAprendizadoIA(Number(remover.dataset.iaRemoverGrupo), remover.dataset.iaRemoverItem); return; }
     const ensinar = evento.target.closest("[data-ia-salvar-grupo]");
     if (ensinar) { salvarAprendizadoIA(Number(ensinar.dataset.iaSalvarGrupo)); return; }
-    if (evento.target.closest("#aplicar_campos_ia")) aplicarCamposIA();
-    if (evento.target.closest("#adicionar_itens_ia")) adicionarItensIA();
 });
 document.getElementById("resultado_ia").addEventListener("input", evento => {
     if (evento.target.matches("[data-ia-busca]")) mostrarBuscaParaEnsinar(evento.target);

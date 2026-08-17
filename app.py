@@ -1085,8 +1085,8 @@ def _normalizar_analise_briefing(resultado):
     }
 
 
-def _sugerir_itens_catalogo(itens_solicitados, catalogo):
-    """Exibe somente candidatos do catálogo com evidência textual suficiente no pedido."""
+def _sugerir_itens_catalogo(itens_solicitados, catalogo, retornar_nao_localizados=False):
+    """Exibe somente candidatos com evidência textual e informa, opcionalmente, os pedidos sem candidato."""
     palavras_ignoradas = {
         "de", "da", "do", "para", "com", "e", "ou", "em", "a", "o", "os", "as",
         "kit", "evento", "apresentacao", "durante", "necessario", "necessaria", "solicitado",
@@ -1108,6 +1108,7 @@ def _sugerir_itens_catalogo(itens_solicitados, catalogo):
         return encontrados
 
     sugestoes = []
+    nao_localizados = []
     for pedido in itens_solicitados if isinstance(itens_solicitados, list) else []:
         descricao = str(pedido.get("descricao") or "").strip() if isinstance(pedido, dict) else ""
         if not descricao:
@@ -1133,13 +1134,18 @@ def _sugerir_itens_catalogo(itens_solicitados, catalogo):
                 candidatos.append((pontuacao, item))
         melhores = [entrada for entrada in sorted(candidatos, key=lambda entrada: entrada[0], reverse=True) if str(entrada[1].get("id")) not in ids_aprendidos][:3]
         quantidade = max(1, min(999, int(pedido.get("quantidade") or 1))) if isinstance(pedido, dict) else 1
-        sugestoes.append({
+        grupo = {
             "pedido": descricao,
             "quantidade_sugerida": quantidade,
             "candidatos": candidatos_aprendidos + [
                 _candidato_catalogo(item, pontuacao, "Catálogo por similaridade") for pontuacao, item in melhores
             ]
-        })
+        }
+        sugestoes.append(grupo)
+        if not grupo["candidatos"]:
+            nao_localizados.append({"pedido": descricao, "quantidade_sugerida": quantidade})
+    if retornar_nao_localizados:
+        return sugestoes, nao_localizados
     return sugestoes
 
 def _analisar_briefing_com_ia(texto_briefing):
@@ -1301,12 +1307,15 @@ def analisar_briefing_ia():
             item["categoria"] = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
             item["tipo_item"] = "Serviço" if item["categoria"] in SERVICO_CATS else "Equipamento"
             item["imagem_aprovada"] = _imagem_aprovada_para_item(item, catalogo_revisado)
-        sugestoes = _sugerir_itens_catalogo(analise.get("itens_solicitados", []), catalogo)
+        sugestoes, itens_nao_localizados = _sugerir_itens_catalogo(
+            analise.get("itens_solicitados", []), catalogo, retornar_nao_localizados=True
+        )
         return jsonify({
             "sucesso": True, "modelo": modelo, "dados": {
                 "resumo": str(analise.get("resumo") or ""), "campos": analise.get("campos") or {},
                 "alertas": analise.get("alertas") or [], "sugestoes_itens": sugestoes,
-                "aviso": "Esta é apenas uma prévia. Revise e escolha manualmente quais dados e itens deseja aplicar; nenhum orçamento foi alterado ou enviado ao Meeventos."
+                "itens_nao_localizados": itens_nao_localizados,
+                "aviso": "Os dados estruturados e os equipamentos mais relevantes foram preparados no rascunho. Confira antes de gerar; nenhum orçamento foi alterado ou enviado ao Meeventos."
             }
         })
     except requests.RequestException as erro:

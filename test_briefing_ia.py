@@ -57,7 +57,8 @@ def main():
     candidato = corpo["dados"]["sugestoes_itens"][0]["candidatos"][0]
     assert candidato["id"] == 45
     assert candidato["valor"] == 1050.0
-    assert "nenhum orçamento foi alterado" in corpo["dados"]["aviso"].lower()
+    assert corpo["dados"]["itens_nao_localizados"] == []
+    assert "rascunho" in corpo["dados"]["aviso"].lower()
 
     catalogo_relevancia = [
         {"id": 1, "nome": "NOTEBOOK I5", "valor": "250", "id_cat": "196"},
@@ -74,6 +75,11 @@ def main():
     ], catalogo_relevancia)
     assert [item["id"] for item in sugestoes_relevantes[0]["candidatos"]] == [1]
     assert [item["id"] for item in sugestoes_relevantes[1]["candidatos"]] == [2]
+    sugestoes_ausentes, ausentes = appmod._sugerir_itens_catalogo([
+        {"descricao": "Cabo de rede blindado", "quantidade": 3},
+    ], catalogo_relevancia, retornar_nao_localizados=True)
+    assert sugestoes_ausentes[0]["candidatos"] == []
+    assert ausentes == [{"pedido": "Cabo de rede blindado", "quantidade_sugerida": 3}]
 
     catalogo_aprendizado = [
         {"id": 1, "nome": "NOTEBOOK I5", "valor": "250", "id_cat": "196"},
@@ -138,9 +144,14 @@ def main():
 
     with open("templates/index.html", encoding="utf-8") as arquivo_html:
         pagina = arquivo_html.read()
-    assert "Preencher somente os campos que estão vazios" in pagina
-    assert "Os valores serão os do catálogo oficial" in pagina
-    assert "Ensinar opções corretas para este pedido" in pagina
+    assert "Rascunho preparado." in pagina
+    assert "Equipamentos prioritários" in pagina
+    assert "Não localizamos no catálogo" in pagina
+    assert "adicionarItensIA(true)" in pagina
+    assert "Ensinar alternativas para este pedido" in pagina
+    assert "const gruposEquipamentos" in pagina
+    assert "const gruposServicos" in pagina
+    assert "Ver ${gruposServicos.length} serviço(s) identificado(s) e já incluído(s)" in pagina
     assert "/ia/aprendizados/remover" in pagina
     print("OK: briefing, catálogo, filtro de relevância e aprendizado supervisionado validados.")
 
