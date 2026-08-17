@@ -15,3 +15,7 @@ Em 17/08/2026, a página local `/relatorios` foi aberta no navegador. A interfac
 ## Regras de validação
 
 Os testes automatizados cobrem o cálculo sequencial, a exclusão humana, a persistência temporária, as rotas de apuração e as exportações em PDF e XLSX. No navegador, os botões permaneceram bloqueados enquanto a requisição estava aberta, confirmando que a tela impede duplicidade de apuração. A consulta real deve finalizar antes de se validar o volume de eventos retornado pelo Meeventos para o período selecionado.
+
+## Tentativa de integração externa
+
+Uma consulta isolada de um dia foi executada em modo somente leitura e o serviço remoto retornou uma falha HTTP, sem corpo explicativo. O fluxo passou a converter esse cenário em uma orientação objetiva, sem exibir tokens ou conteúdo técnico do Meeventos. A autenticação, a disponibilidade da API e o volume real de eventos devem ser conferidos no computador local que possui a variável `MEEVENTOS_TOKEN` configurada.

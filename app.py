@@ -2380,8 +2380,14 @@ def api_relatorio_comissao():
     except ValueError as erro:
         return jsonify({"sucesso": False, "erro": str(erro)}), 400
     except requests.exceptions.RequestException as erro:
-        detalhe = erro.response.text if getattr(erro, "response", None) is not None else ""
-        return jsonify({"sucesso": False, "erro": "Não foi possível consultar o Meeventos para esta apuração.", "detalhes": detalhe}), 502
+        resposta = getattr(erro, "response", None)
+        codigo_http = getattr(resposta, "status_code", None)
+        orientacao = "Verifique a conexão e tente novamente em alguns instantes."
+        if codigo_http in (401, 403):
+            orientacao = "A credencial de integração foi recusada. Confirme a variável MEEVENTOS_TOKEN e reinicie a aplicação."
+        elif codigo_http:
+            orientacao = f"O Meeventos respondeu com o código HTTP {codigo_http}. Tente novamente e, se persistir, registre este código para suporte."
+        return jsonify({"sucesso": False, "erro": "Não foi possível consultar o Meeventos para esta apuração.", "detalhes": orientacao}), 502
     except RuntimeError as erro:
         return jsonify({"sucesso": False, "erro": str(erro)}), 503
     except Exception as erro:

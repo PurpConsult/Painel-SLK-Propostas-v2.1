@@ -1,6 +1,8 @@
 import os
 import tempfile
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+
+import requests
 
 import app as sistema
 
@@ -62,6 +64,17 @@ def executar():
                 planilha = cliente.get(f"/api/relatorio/comissao/{identificador}/planilha")
                 assert planilha.status_code == 200
                 assert planilha.data[:2] == b"PK"
+
+            resposta_http = Mock(status_code=401)
+            erro_http = requests.exceptions.HTTPError(response=resposta_http)
+            with patch.object(sistema, "consultar_eventos_relatorio", side_effect=erro_http):
+                falha = cliente.post("/api/relatorio/comissao", json={
+                    "hotel_id": "lagune_barra_hotel",
+                    "data_inicio": "2026-08-01",
+                    "data_fim": "2026-08-31",
+                })
+            assert falha.status_code == 502
+            assert "MEEVENTOS_TOKEN" in falha.get_json()["detalhes"]
         finally:
             sistema.PASTA_RELATORIOS = pasta_original
 
