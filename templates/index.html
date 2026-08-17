@@ -73,7 +73,7 @@ input[readonly]{background:#f5f5f5;color:#666}
 .ia-explicacao{font-size:12px;color:#42666b;margin-bottom:9px;line-height:1.5}
 .ia-resultado{margin-top:10px;padding:11px;border:1px solid #cce9ed;background:#f4fcfd;border-radius:6px;font-size:12px}
 .ia-resultado h4{color:#007d8f;border:0;margin:9px 0 4px;padding:0}.ia-resultado h4:first-child{margin-top:0}
-.ia-alerta{margin:5px 0;padding:7px 8px;border-radius:4px;background:#fff7df;color:#6d5419}.ia-candidato{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-top:1px solid #dceff1}.ia-candidato input{width:auto;margin-top:3px;accent-color:#0097a7}.ia-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+	.ia-alerta{margin:5px 0;padding:7px 8px;border-radius:4px;background:#fff7df;color:#6d5419}.ia-candidato{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-top:1px solid #dceff1}.ia-candidato input{width:auto;margin-top:3px;accent-color:#0097a7}.ia-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ia-origem{display:inline-block;margin:3px 0 0 5px;padding:1px 5px;border-radius:10px;background:#dff5e8;color:#157047;font-size:10px;font-weight:700}.ia-ensinar{margin:8px 0 3px;padding:8px;border:1px dashed #9dd9df;border-radius:5px;background:#fff}.ia-ensinar-titulo{display:block;color:#27717a;font-size:11px;font-weight:700;margin-bottom:4px}.ia-ensinar small{display:block;color:#617b80;font-size:10px;line-height:1.35;margin:4px 0}.ia-ensinar input{padding:6px 7px;font-size:12px}.ia-busca-resultado{margin-top:4px;max-height:140px;overflow:auto}.ia-busca-item{display:flex;gap:6px;align-items:flex-start;padding:5px 2px;border-top:1px solid #edf5f6;font-size:11px}.ia-busca-item input{width:auto;margin-top:2px;accent-color:#0097a7}.ia-remover-aprendizado{display:inline;border:0;background:transparent;color:#b85b00;text-decoration:underline;cursor:pointer;font-size:10px;padding:0;margin-left:5px}
 
 .msg-sucesso{background:#e8f5e9;color:#2e7d32;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #c8e6c9}
 .msg-erro{background:#ffebee;color:#c62828;padding:12px;border-radius:6px;margin-top:10px;text-align:center;border:1px solid #ffcdd2}
@@ -109,7 +109,7 @@ input[readonly]{background:#f5f5f5;color:#666}
     <div>
         <div class="bloco-form" id="bloco_ia">
             <h3>Prévia assistida por IA</h3>
-            <p class="ia-explicacao">A IA apenas organiza uma sugestão para conferência. Ela não altera esta proposta, não cria orçamento e não envia nada ao Meeventos sem sua confirmação.</p>
+			<p class="ia-explicacao">A IA apenas organiza uma sugestão para conferência. Ela não altera esta proposta, não cria orçamento e não envia nada ao Meeventos sem sua confirmação. Ao encontrar o item correto manualmente, a equipe também pode ensiná-lo para briefings futuros.</p>
             <label for="briefing_ia">Briefing do cliente</label>
             <textarea id="briefing_ia" rows="5" placeholder="Cole aqui o pedido do cliente, dados do evento e itens desejados..."></textarea>
             <div style="margin-top:9px">
@@ -308,7 +308,8 @@ input[readonly]{background:#f5f5f5;color:#666}
             <div id="lista_servicos"></div>
             <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
         </div>
-		<div id="desconto_total" class="linha-desconto">Desconto: - R$ 0,00</div>
+		<div id="total_bruto" class="subtotal-bloco">Total antes do desconto: R$ 0,00</div>
+		<div id="desconto_total" class="linha-desconto">Desconto concedido: - R$ 0,00</div>
 		<div id="total_geral" class="total-geral">Investimento Total: R$ 0,00</div>
 		<div id="resumo_externo" class="resumo-externo" aria-live="polite"></div>
     </div>
@@ -499,10 +500,16 @@ function renderizarAnaliseIA(dados) {
     const resumoCampos = camposVisiveis.length ? camposVisiveis.map(([chave, nome]) => `<li><strong>${nome}:</strong> ${escaparHtmlIA(campos[chave])}</li>`).join("") : "<li>Nenhum dado operacional foi identificado com segurança.</li>";
     const alertas = (dados.alertas || []).map(alerta => `<p class="ia-alerta">${escaparHtmlIA(alerta)}</p>`).join("");
     const itens = (dados.sugestoes_itens || []).map((grupo, indiceGrupo) => {
-        const candidatos = (grupo.candidatos || []).map((item, indiceItem) => `<label class="ia-candidato"><input type="checkbox" data-ia-grupo="${indiceGrupo}" data-ia-candidato="${indiceItem}"><span><strong>${escaparHtmlIA(item.nome)}</strong><br><small>#${escaparHtmlIA(item.id)} · ${escaparHtmlIA(item.tipo_item)} · R$ ${Number(item.valor || 0).toFixed(2).replace(".", ",")} · aderência ${Math.round(Number(item.confianca || 0) * 100)}%</small></span></label>`).join("") || "<small>Nenhum candidato confiável foi localizado no catálogo oficial.</small>";
-        return `<div><h4>Pedido: ${escaparHtmlIA(grupo.pedido)} <small>(qtd. sugerida: ${escaparHtmlIA(grupo.quantidade_sugerida)})</small></h4>${candidatos}</div>`;
+        const candidatos = (grupo.candidatos || []).map((item, indiceItem) => {
+            const ensinado = item.origem === "Ensinado pela equipe";
+            const origem = ensinado ? `<span class="ia-origem">Ensinado pela equipe</span><button type="button" class="ia-remover-aprendizado" data-ia-remover-grupo="${indiceGrupo}" data-ia-remover-item="${escaparHtmlIA(item.id)}">remover</button>` : "";
+            return `<label class="ia-candidato"><input type="checkbox" data-ia-grupo="${indiceGrupo}" data-ia-candidato="${indiceItem}"><span><strong>${escaparHtmlIA(item.nome)}</strong>${origem}<br><small>#${escaparHtmlIA(item.id)} · ${escaparHtmlIA(item.tipo_item)} · R$ ${Number(item.valor || 0).toFixed(2).replace(".", ",")} · aderência ${Math.round(Number(item.confianca || 0) * 100)}%</small></span></label>`;
+        }).join("") || "<small>Nenhum candidato confiável foi localizado no catálogo oficial.</small>";
+        const ensino = `<div class="ia-ensinar"><span class="ia-ensinar-titulo">Ensinar opções corretas para este pedido</span><small>Marque candidatos acima ou busque outros itens oficiais. É possível salvar várias alternativas e removê-las depois.</small><input type="search" data-ia-busca="${indiceGrupo}" placeholder="Buscar no catálogo oficial..."><div class="ia-busca-resultado" id="ia_busca_resultado_${indiceGrupo}"></div><div class="ia-acoes"><button type="button" class="btn btn-secundario" data-ia-salvar-grupo="${indiceGrupo}">Ensinar opções marcadas</button></div></div>`;
+        return `<div><h4>Pedido: ${escaparHtmlIA(grupo.pedido)} <small>(qtd. sugerida: ${escaparHtmlIA(grupo.quantidade_sugerida)})</small></h4>${candidatos}${ensino}</div>`;
     }).join("") || "<p>Nenhum item foi identificado no briefing.</p>";
-    mostrarResultadoIA(`<p><strong>Prévia para conferência</strong> — ${escaparHtmlIA(dados.aviso || "")}</p>${dados.resumo ? `<p>${escaparHtmlIA(dados.resumo)}</p>` : ""}<h4>Dados identificados</h4><ul>${resumoCampos}</ul>${alertas}<h4>Itens candidatos do catálogo oficial</h4>${itens}<div class="ia-acoes"><button type="button" class="btn btn-secundario" id="aplicar_campos_ia">Preencher somente campos vazios</button><button type="button" class="btn btn-secundario" id="adicionar_itens_ia">Adicionar itens selecionados</button></div>`);
+    const feedbackAprendizado = dados.mensagem_aprendizado ? `<p class="ia-alerta">${escaparHtmlIA(dados.mensagem_aprendizado)}</p>` : "";
+    mostrarResultadoIA(`<p><strong>Prévia para conferência</strong> — ${escaparHtmlIA(dados.aviso || "")}</p>${dados.resumo ? `<p>${escaparHtmlIA(dados.resumo)}</p>` : ""}${feedbackAprendizado}<h4>Dados identificados</h4><ul>${resumoCampos}</ul>${alertas}<h4>Itens candidatos do catálogo oficial</h4>${itens}<div class="ia-acoes"><button type="button" class="btn btn-secundario" id="aplicar_campos_ia">Preencher somente campos vazios</button><button type="button" class="btn btn-secundario" id="adicionar_itens_ia">Adicionar itens selecionados</button></div>`);
 }
 
 async function lerArquivoBriefing() {
@@ -558,10 +565,70 @@ function adicionarItensIA() {
     atualizar_previa_completa();
 }
 
+function normalizarBuscaIA(texto) {
+    return String(texto || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function mostrarBuscaParaEnsinar(campo) {
+    const indiceGrupo = Number(campo.dataset.iaBusca);
+    const destino = document.getElementById(`ia_busca_resultado_${indiceGrupo}`);
+    const termo = normalizarBuscaIA(campo.value);
+    if (termo.length < 2) { destino.innerHTML = ""; return; }
+    const palavras = termo.split(/\s+/).filter(Boolean);
+    const encontrados = todos_itens.filter(item => {
+        const nome = normalizarBuscaIA(item.nome || item.descricao);
+        return palavras.every(palavra => nome.includes(palavra));
+    }).slice(0, 12);
+    destino.innerHTML = encontrados.length ? encontrados.map(item => `<label class="ia-busca-item"><input type="checkbox" data-ia-ensinar-grupo="${indiceGrupo}" data-ia-ensinar-id="${escaparHtmlIA(item.id)}"><span><strong>${escaparHtmlIA(item.nome || item.descricao)}</strong><br><small>#${escaparHtmlIA(item.id)} · ${escaparHtmlIA(item.tipo_item || "Item")}</small></span></label>`).join("") : "<small>Nenhum item oficial encontrado com esta busca.</small>";
+}
+
+async function salvarAprendizadoIA(indiceGrupo) {
+    const grupo = analiseIACorrente?.sugestoes_itens?.[indiceGrupo];
+    if (!grupo) return;
+    const marcadosDaPrevia = Array.from(document.querySelectorAll(`#resultado_ia input[data-ia-grupo="${indiceGrupo}"]:checked`)).map(campo => grupo.candidatos?.[Number(campo.dataset.iaCandidato)]).filter(Boolean);
+    const marcadosDaBusca = Array.from(document.querySelectorAll(`#resultado_ia input[data-ia-ensinar-grupo="${indiceGrupo}"]:checked`)).map(campo => todos_itens.find(item => String(item.id) === String(campo.dataset.iaEnsinarId))).filter(Boolean);
+    const itens = [...marcadosDaPrevia, ...marcadosDaBusca];
+    const ids = [...new Set(itens.map(item => String(item.id)).filter(Boolean))];
+    if (!ids.length) { alert("Marque pelo menos uma opção correta para ensinar a equipe."); return; }
+    if (!window.confirm(`Salvar ${ids.length} alternativa(s) oficial(is) para o pedido “${grupo.pedido}”?`)) return;
+    try {
+        const resposta = await fetch(`${API_BASE_URL}/ia/aprendizados`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({pedido:grupo.pedido, itens:ids})});
+        const retorno = await resposta.json();
+        if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível salvar o aprendizado.");
+        const novos = retorno.itens || [];
+        const porId = new Map((grupo.candidatos || []).map(item => [String(item.id), item]));
+        novos.forEach(item => porId.set(String(item.id), item));
+        const idsNovos = new Set(novos.map(item => String(item.id)));
+        grupo.candidatos = [...novos, ...(grupo.candidatos || []).filter(item => !idsNovos.has(String(item.id)))];
+        analiseIACorrente.mensagem_aprendizado = retorno.mensagem || "Alternativas salvas para briefings semelhantes.";
+        renderizarAnaliseIA(analiseIACorrente);
+    } catch (erro) { alert(erro.message || "Não foi possível salvar o aprendizado."); }
+}
+
+async function removerAprendizadoIA(indiceGrupo, itemId) {
+    const grupo = analiseIACorrente?.sugestoes_itens?.[indiceGrupo];
+    if (!grupo || !window.confirm("Remover esta alternativa ensinada? Ela deixará de ser priorizada em briefings futuros.")) return;
+    try {
+        const resposta = await fetch(`${API_BASE_URL}/ia/aprendizados/remover`, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({pedido:grupo.pedido, item_id:itemId})});
+        const retorno = await resposta.json();
+        if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível remover a alternativa.");
+        grupo.candidatos = (grupo.candidatos || []).filter(item => !(item.origem === "Ensinado pela equipe" && String(item.id) === String(itemId)));
+        analiseIACorrente.mensagem_aprendizado = retorno.mensagem || "Alternativa removida do aprendizado.";
+        renderizarAnaliseIA(analiseIACorrente);
+    } catch (erro) { alert(erro.message || "Não foi possível remover a alternativa."); }
+}
+
 document.getElementById("btn_analisar_ia").addEventListener("click", analisarBriefingIA);
 document.getElementById("resultado_ia").addEventListener("click", evento => {
+    const remover = evento.target.closest("[data-ia-remover-grupo]");
+    if (remover) { evento.preventDefault(); removerAprendizadoIA(Number(remover.dataset.iaRemoverGrupo), remover.dataset.iaRemoverItem); return; }
+    const ensinar = evento.target.closest("[data-ia-salvar-grupo]");
+    if (ensinar) { salvarAprendizadoIA(Number(ensinar.dataset.iaSalvarGrupo)); return; }
     if (evento.target.closest("#aplicar_campos_ia")) aplicarCamposIA();
     if (evento.target.closest("#adicionar_itens_ia")) adicionarItensIA();
+});
+document.getElementById("resultado_ia").addEventListener("input", evento => {
+    if (evento.target.matches("[data-ia-busca]")) mostrarBuscaParaEnsinar(evento.target);
 });
 
 // ===== BUSCA FILTRADA GENÉRICA =====
@@ -712,7 +779,7 @@ function atualizar_previa_completa() {
 	selecionados.forEach((item, idx) => {
 		const sub = item.quantidade * item.valor;
 			const imagemItem = item.imagem_url
-				? `<a class="foto-item-previa" href="${escaparHtml(item.imagem_url)}" target="_blank" rel="noopener" title="Abrir imagem do item"><img src="${escaparHtml(item.imagem_url)}" alt="Imagem de ${escaparHtml(item.nome)}" onerror="this.closest('a').remove()"></a>`
+				? `<a class="foto-item-previa" href="${escaparHtml(item.imagem_url)}" target="_blank" rel="noopener noreferrer" title="Abrir imagem do item em nova guia"><img src="${escaparHtml(item.imagem_url)}" alt="Imagem de ${escaparHtml(item.nome)}" onerror="this.closest('a').remove()"></a>`
 				: "";
 			const linha = `<div class="item-com-locacao"><div class="item-previa">
 				<span>
@@ -741,10 +808,11 @@ function atualizar_previa_completa() {
     document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
 	const totalBruto = subtotal_prod + subtotal_serv;
     const desconto = Math.min(totalBruto, Math.max(0, Number(document.getElementById("desconto_proposta").value || 0)));
+	document.getElementById("total_bruto").innerText = `Total antes do desconto: R$ ${totalBruto.toFixed(2).replace(".",",")}`;
     const descontoEl = document.getElementById("desconto_total");
     descontoEl.classList.toggle("ativo", desconto > 0);
     descontoEl.innerText = `Desconto: - R$ ${desconto.toFixed(2).replace(".",",")}`;
-	document.getElementById("total_geral").innerText = `Investimento Total: R$ ${(totalBruto - desconto).toFixed(2).replace(".",",")}`;
+	document.getElementById("total_geral").innerText = `Investimento Total após desconto: R$ ${(totalBruto - desconto).toFixed(2).replace(".",",")}`;
 	atualizarResumoLocacaoExterna();
 }
 

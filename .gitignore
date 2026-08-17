@@ -23,3 +23,6 @@ propostas_backup_*.json
 app_backup_*.py
 app_local_*.txt
 templates_backup_*/
+
+# Memória local de associações ensinadas pela equipe
+aprendizados_catalogo.json
