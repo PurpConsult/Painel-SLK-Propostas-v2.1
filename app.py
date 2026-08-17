@@ -136,7 +136,9 @@ def normalizar_dados_proposta(bruto):
 
     evento = {
         "nome_evento": _primeiro_valor(evento_bruto.get("nome_evento"), bruto.get("nome_evento"), padrao="-"),
-        "data_evento": _primeiro_valor(evento_bruto.get("data_evento"), bruto.get("data_evento"), padrao="-"),
+        "data_evento_inicio": _primeiro_valor(evento_bruto.get("data_evento_inicio"), bruto.get("data_evento_inicio"), evento_bruto.get("data_evento"), bruto.get("data_evento"), padrao=""),
+        "data_evento_final": _primeiro_valor(evento_bruto.get("data_evento_final"), bruto.get("data_evento_final"), evento_bruto.get("data_evento"), bruto.get("data_evento"), padrao=""),
+        "data_evento": _primeiro_valor(evento_bruto.get("data_evento_inicio"), bruto.get("data_evento_inicio"), evento_bruto.get("data_evento"), bruto.get("data_evento"), evento_bruto.get("data_evento_final"), bruto.get("data_evento_final"), padrao="-"),
         "evento_sem_data": bool(evento_bruto.get("evento_sem_data", bruto.get("evento_sem_data", False))),
         "data_montagem": _primeiro_valor(evento_bruto.get("data_montagem"), bruto.get("data_montagem"), padrao=""),
         "horario_montagem": _primeiro_valor(evento_bruto.get("horario_montagem"), bruto.get("horario_montagem"), padrao=""),
@@ -257,12 +259,10 @@ def api_produtos_catalogo():
         )
         imagens_candidatas = _ler_json(caminho_imagens, {}).get("candidates", {})
         imagens_revisadas = _ler_json(ARQUIVO_IMAGENS_APROVADAS, {})
+        correcoes_tipo = _ler_correcoes_tipo_itens()
         # Enriquecer com nome da categoria e tipo (Equipamento/Serviço)
         for p in produtos:
-            cat_id = p.get("id_cat", "")
-            cat_nome = CAT_ID_TO_NAME.get(str(cat_id), "OUTROS")
-            p["categoria"] = cat_nome
-            p["tipo_item"] = "Serviço" if cat_nome in SERVICO_CATS else "Equipamento"
+            _aplicar_tipo_item_catalogo(p, correcoes_tipo)
             candidato = imagens_candidatas.get(str(p.get("id")), {})
             revisao = imagens_revisadas.get(str(p.get("id")), {})
             p["imagem_candidata"] = candidato
@@ -281,7 +281,7 @@ def api_produtos_catalogo():
 TEXTOS_PDF = {
     "pt": {
         "orcamento": "ORÇAMENTO Nº", "versao": "VERSÃO", "gerado_em": "Gerado em:",
-        "dados_evento": "DADOS DO EVENTO", "evento": "Evento:", "data_evento": "Data do evento:",
+        "dados_evento": "DADOS DO EVENTO", "evento": "Evento:", "data_evento": "Data do evento:", "data_evento_inicio": "Data do Evento | Início:", "data_evento_final": "Data do Evento | Final:",
         "montagem": "Montagem:", "desmontagem": "Desmontagem:", "horario_evento": "Horário do evento:",
         "formato": "Formato:", "local": "Local:", "pessoas": "Pessoas:", "vendedor": "Vendedor:",
         "dados_cliente": "DADOS DO CLIENTE", "razao_social": "Razão Social / Nome:", "documento": "CNPJ / CPF:",
@@ -304,7 +304,7 @@ TEXTOS_PDF = {
     },
     "en": {
         "orcamento": "PROPOSAL No.", "versao": "VERSION", "gerado_em": "Generated on:",
-        "dados_evento": "EVENT DETAILS", "evento": "Event:", "data_evento": "Event date:",
+        "dados_evento": "EVENT DETAILS", "evento": "Event:", "data_evento": "Event date:", "data_evento_inicio": "Event Date | Start:", "data_evento_final": "Event Date | End:",
         "montagem": "Setup:", "desmontagem": "Dismantling:", "horario_evento": "Event time:",
         "formato": "Format:", "local": "Venue:", "pessoas": "Attendees:", "vendedor": "Sales representative:",
         "dados_cliente": "CLIENT DETAILS", "razao_social": "Legal name / Client:", "documento": "Tax ID:",
@@ -327,7 +327,7 @@ TEXTOS_PDF = {
     },
     "es": {
         "orcamento": "COTIZACIÓN N.º", "versao": "VERSIÓN", "gerado_em": "Generado el:",
-        "dados_evento": "DATOS DEL EVENTO", "evento": "Evento:", "data_evento": "Fecha del evento:",
+        "dados_evento": "DATOS DEL EVENTO", "evento": "Evento:", "data_evento": "Fecha del evento:", "data_evento_inicio": "Fecha del Evento | Inicio:", "data_evento_final": "Fecha del Evento | Final:",
         "montagem": "Montaje:", "desmontagem": "Desmontaje:", "horario_evento": "Horario del evento:",
         "formato": "Formato:", "local": "Lugar:", "pessoas": "Asistentes:", "vendedor": "Responsable comercial:",
         "dados_cliente": "DATOS DEL CLIENTE", "razao_social": "Razón social / Cliente:", "documento": "Identificación fiscal:",
@@ -542,18 +542,20 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
 
     # 📌 DADOS DO EVENTO
     evento_sem_data = str(campo_evento("evento_sem_data", "")).lower() in {"true", "1", "sim"}
-    data_evento_pdf = texto("data_a_definir") if evento_sem_data else formatar_data_pdf(campo_evento("data_evento"))
+    data_inicio_pdf = texto("data_a_definir") if evento_sem_data else formatar_data_pdf(campo_evento("data_evento_inicio", campo_evento("data_evento")))
+    data_final_pdf = texto("data_a_definir") if evento_sem_data else formatar_data_pdf(campo_evento("data_evento_final", campo_evento("data_evento")))
     elementos.append(Paragraph(f"<b>📌 {texto('dados_evento')}</b>", H2))
     tev = Table([
         [Paragraph(f"<b>{texto('evento')}</b>",ROT), Paragraph(pegar("nome_evento","nome"),NE),
-         Paragraph(f"<b>{texto('data_evento')}</b>",ROT), Paragraph(data_evento_pdf,NE)],
-        [Paragraph(f"<b>{texto('montagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_montagem'))} {campo_evento('horario_montagem', '')}".strip(),NE),
-         Paragraph(f"<b>{texto('desmontagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_desmontagem'))} {campo_evento('horario_desmontagem', '')}".strip(),NE)],
-        [Paragraph(f"<b>{texto('horario_evento')}</b>",ROT), Paragraph(f"{campo_evento('horario_inicio_evento', '-')} às {campo_evento('horario_fim_evento', '-')}",NE),
-         Paragraph(f"<b>{texto('formato')}</b>",ROT), Paragraph(campo_evento("formato_evento"),NE)],
-        [Paragraph(f"<b>{texto('local')}</b>",ROT),  Paragraph(pegar("local_evento","local"),NE),
-         Paragraph(f"<b>{texto('pessoas')}</b>",ROT),Paragraph(pegar("qtd_pessoas","quantidade_pessoas"),NE)],
-        [Paragraph(f"<b>{texto('vendedor')}</b>",ROT),Paragraph(pegar("vendedor","nome_vendedor"),NE),"",""],
+         Paragraph(f"<b>{texto('data_evento_inicio')}</b>",ROT), Paragraph(data_inicio_pdf,NE)],
+        [Paragraph(f"<b>{texto('data_evento_final')}</b>",ROT), Paragraph(data_final_pdf,NE),
+         Paragraph(f"<b>{texto('montagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_montagem'))} {campo_evento('horario_montagem', '')}".strip(),NE)],
+        [Paragraph(f"<b>{texto('desmontagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_desmontagem'))} {campo_evento('horario_desmontagem', '')}".strip(),NE),
+         Paragraph(f"<b>{texto('horario_evento')}</b>",ROT), Paragraph(f"{campo_evento('horario_inicio_evento', '-')} às {campo_evento('horario_fim_evento', '-')}",NE)],
+        [Paragraph(f"<b>{texto('formato')}</b>",ROT), Paragraph(campo_evento("formato_evento"),NE),
+         Paragraph(f"<b>{texto('local')}</b>",ROT),  Paragraph(pegar("local_evento","local"),NE)],
+        [Paragraph(f"<b>{texto('pessoas')}</b>",ROT),Paragraph(pegar("qtd_pessoas","quantidade_pessoas"),NE),
+         Paragraph(f"<b>{texto('vendedor')}</b>",ROT),Paragraph(pegar("vendedor","nome_vendedor"),NE)],
     ], colWidths=[2.2*cm,6.3*cm,2.2*cm,6.3*cm])
     tev.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#f8f9fa")),
         ('BOX',(0,0),(-1,-1),.5,colors.HexColor("#dee2e6")),('INNERGRID',(0,0),(-1,-1),.3,colors.HexColor("#e9ecef")),
@@ -830,6 +832,7 @@ PASTA_IMAGENS_PROPOSTA = os.path.join(BASE_DIR, "imagens_propostas")
 PASTA_CACHE_IMAGENS_ITENS = os.path.join(BASE_DIR, "imagens_itens_aprovadas")
 ARQUIVO_IMAGENS_APROVADAS = os.path.join(BASE_DIR, "imagens_itens_aprovadas.json")
 ARQUIVO_APRENDIZADOS_CATALOGO = os.path.join(BASE_DIR, "aprendizados_catalogo.json")
+ARQUIVO_CORRECOES_TIPO_ITENS = os.path.join(BASE_DIR, "correcoes_tipo_itens.json")
 EXTENSOES_IMAGEM_PERMITIDAS = {"jpg", "jpeg", "png", "webp"}
 EXTENSOES_BRIEFING_PERMITIDAS = {"txt", "pdf", "docx"}
 TAMANHO_MAXIMO_BRIEFING = 5 * 1024 * 1024
@@ -852,6 +855,28 @@ def _ler_json(arquivo, padrao):
         with open(arquivo, "r", encoding="utf-8") as f: return json.load(f)
     except:
         return padrao
+
+def _ler_correcoes_tipo_itens():
+    dados = _ler_json(ARQUIVO_CORRECOES_TIPO_ITENS, {"version": 1, "itens": {}})
+    if not isinstance(dados, dict):
+        dados = {"version": 1, "itens": {}}
+    if not isinstance(dados.get("itens"), dict):
+        dados["itens"] = {}
+    dados["version"] = 1
+    return dados
+
+def _aplicar_tipo_item_catalogo(item, correcoes=None):
+    """Aplica ao item a classificação original ou a correção supervisionada pela equipe."""
+    categoria = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
+    tipo_original = "Serviço" if categoria in SERVICO_CATS else "Equipamento"
+    dados = correcoes if isinstance(correcoes, dict) else _ler_correcoes_tipo_itens()
+    registro = dados.get("itens", {}).get(str(item.get("id")), {})
+    tipo_corrigido = registro.get("tipo_item") if isinstance(registro, dict) else None
+    item["categoria"] = categoria
+    item["tipo_item"] = tipo_corrigido if tipo_corrigido in {"Equipamento", "Serviço"} else tipo_original
+    item["tipo_item_original"] = tipo_original
+    item["tipo_corrigido_pela_equipe"] = bool(tipo_corrigido in {"Equipamento", "Serviço"} and tipo_corrigido != tipo_original)
+    return item
 
 def _normalizar_texto_busca(texto):
     texto = unicodedata.normalize("NFKD", str(texto or ""))
@@ -1304,8 +1329,7 @@ def analisar_briefing_ia():
         catalogo = buscar_paginado("/products-services")
         catalogo_revisado = _ler_json(ARQUIVO_IMAGENS_APROVADAS, {})
         for item in catalogo:
-            item["categoria"] = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
-            item["tipo_item"] = "Serviço" if item["categoria"] in SERVICO_CATS else "Equipamento"
+            _aplicar_tipo_item_catalogo(item)
             item["imagem_aprovada"] = _imagem_aprovada_para_item(item, catalogo_revisado)
         sugestoes, itens_nao_localizados = _sugerir_itens_catalogo(
             analise.get("itens_solicitados", []), catalogo, retornar_nao_localizados=True
@@ -1381,8 +1405,7 @@ def salvar_aprendizado_catalogo():
     }
     _salvar_json(ARQUIVO_APRENDIZADOS_CATALOGO, dados)
     for item in itens_validos:
-        item["categoria"] = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
-        item["tipo_item"] = "Serviço" if item["categoria"] in SERVICO_CATS else "Equipamento"
+        _aplicar_tipo_item_catalogo(item)
     return jsonify({
         "sucesso": True,
         "pedido": pedido,
@@ -1413,6 +1436,37 @@ def remover_aprendizado_catalogo():
         dados["associacoes"].pop(chave, None)
     _salvar_json(ARQUIVO_APRENDIZADOS_CATALOGO, dados)
     return jsonify({"sucesso": True, "mensagem": "Alternativa removida do aprendizado da equipe."})
+
+@app.route("/api/catalogo/tipo-item", methods=["POST"])
+def corrigir_tipo_item_catalogo():
+    """Salva uma correção local de categoria; não altera o cadastro original no Meeventos."""
+    corpo = request.get_json(silent=True) or {}
+    item_id = str(corpo.get("item_id") or "").strip()
+    tipo_item = str(corpo.get("tipo_item") or "").strip()
+    if not item_id or tipo_item not in {"Equipamento", "Serviço"}:
+        return jsonify({"sucesso": False, "erro": "Informe um item oficial e uma categoria válida."}), 400
+
+    catalogo = buscar_paginado("/products-services")
+    item = next((registro for registro in catalogo if str(registro.get("id")) == item_id), None)
+    if not item:
+        return jsonify({"sucesso": False, "erro": "O item não foi encontrado no catálogo oficial."}), 404
+
+    dados = _ler_correcoes_tipo_itens()
+    categoria = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
+    tipo_original = "Serviço" if categoria in SERVICO_CATS else "Equipamento"
+    if tipo_item == tipo_original:
+        dados["itens"].pop(item_id, None)
+        mensagem = "O item voltou à classificação original do catálogo."
+    else:
+        dados["itens"][item_id] = {
+            "tipo_item": tipo_item,
+            "nome": item.get("nome") or item.get("descricao") or "Item sem descrição",
+            "atualizado_em": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        }
+        mensagem = f"Item classificado como {tipo_item} pela equipe."
+    _salvar_json(ARQUIVO_CORRECOES_TIPO_ITENS, dados)
+    _aplicar_tipo_item_catalogo(item, dados)
+    return jsonify({"sucesso": True, "item": _candidato_catalogo(item, 1.0, "Classificado pela equipe"), "mensagem": mensagem})
 
 @app.route("/api/calcular", methods=["POST"])
 def api_calcular():

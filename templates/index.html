@@ -13,10 +13,8 @@ header h1{font-size:18px;font-weight:600}
 header nav a{color:white;text-decoration:none;font-size:13px;margin-left:15px;padding:6px 12px;border:1px solid rgba(255,255,255,0.5);border-radius:5px;transition:all 0.2s}
 header nav a:hover{background:white;color:#00bcd4}
 
-.linha-colunas{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:15px}
-
 .bloco-form{background:#fff;padding:14px 18px;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
-.bloco-previa{background:#fff;padding:14px 18px;border:1px solid #e8e8e8;border-radius:8px;position:sticky;top:15px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+	.formulario-duas-colunas{display:grid;grid-template-columns:minmax(0,.93fr) minmax(0,1.07fr);gap:14px;align-items:start}.coluna-form{min-width:0}.coluna-form .bloco-form:last-child{margin-bottom:0}.bloco-observacoes textarea{min-height:104px;resize:vertical}.opcoes-pdf{padding:12px 14px}.opcoes-pdf h3{margin-bottom:7px}.opcao-pdf{display:flex;align-items:center;gap:8px;padding:7px 0;margin:0;border-bottom:1px solid #edf3f4;font-size:12px;font-weight:600;color:#41666c;cursor:pointer}.opcao-pdf:last-child{border-bottom:0}.opcao-pdf input{width:auto;accent-color:#0097a7}.comercial-extra{margin-bottom:12px;border:1px solid #dfecef;border-radius:8px;background:#fff;overflow:hidden}.comercial-extra-conteudo{padding:12px 14px}.comercial-extra .grid-2{gap:9px}
 
 h3{font-size:15px;margin-bottom:10px;color:#00838f;font-weight:600}
 h4{font-size:13px;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid #e0e0e0;color:#555}
@@ -43,12 +41,14 @@ input[readonly]{background:#f5f5f5;color:#666}
 .item-linha{padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-size:13px;transition:background 0.1s}
 .item-linha:hover{background:#e0f7fa}
 
-	.item-previa{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-bottom:1px solid #f5f5f5}
-	.foto-item-previa{width:38px;height:30px;border-radius:5px;overflow:hidden;display:inline-flex;vertical-align:middle;margin-right:7px;border:1px solid #b9dbe1}
-	.foto-item-previa img{width:100%;height:100%;object-fit:cover}
-	.item-com-locacao{border-bottom:1px solid #f5f5f5;padding-bottom:7px;margin-bottom:5px}
-	.item-com-locacao .item-previa{border-bottom:0}
-	.locacao-externa{margin:2px 8px 0;padding:8px;border-radius:5px;background:#fff8e7;border:1px solid #f2d38a;color:#644d18}
+		.item-previa{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;font-size:13px;border-bottom:1px solid #f5f5f5}
+		.foto-item-previa{width:38px;height:30px;border-radius:5px;overflow:hidden;display:inline-flex;vertical-align:middle;margin-right:7px;border:1px solid #b9dbe1}
+		.foto-item-previa img{width:100%;height:100%;object-fit:cover}
+		.item-com-locacao{border-bottom:1px solid #e8f0f1;padding:7px 4px 8px;margin:0}.item-com-locacao:last-child{border-bottom:0}
+		.item-com-locacao .item-previa{border-bottom:0}
+			.item-cartao{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identidade remover" "operacao operacao";gap:7px 8px;align-items:start;padding:7px 4px 5px}.item-identidade{grid-area:identidade;display:flex;flex-wrap:wrap;align-items:flex-start;min-width:0;gap:6px}.item-nome{min-width:0;flex:1 1 150px;padding-top:1px}.item-nome strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#284e55;font-size:12px;line-height:1.3}.item-operacao{grid-area:operacao;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;padding:6px 7px;border-radius:7px;background:#f8fbfb;border:1px solid #e4eff0}.item-quantidade{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.qtd-acoes{display:flex;align-items:center;gap:4px;min-height:29px}.mini-label,.item-total .rotulo-total{display:block;margin:0;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual{width:118px;flex:0 0 118px}.item-valor-manual label{display:block;margin:0 0 2px;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual input{width:100%;box-sizing:border-box;padding:5px 6px;font-size:12px;text-align:right}.item-total{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;white-space:nowrap;color:#135d67;font-size:12px}.item-total strong{font-size:12px}.item-cartao > .remover{grid-area:remover;justify-self:end;display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin:0;padding:0;border:1px solid #f0c8c8;border-radius:6px;background:#fff7f7;color:#d53030;cursor:pointer;font-weight:700;font-size:14px;line-height:1}.item-cartao > .remover:hover{background:#ffe8e8;color:#b71c1c}.item-contexto{display:flex;align-items:center;gap:5px;margin-top:3px}.item-contexto .tipo-item-toggle{margin:0}.valor-padronizado{display:block;color:#778f93;font-size:9px;margin-top:2px;text-align:right;white-space:nowrap}
+		.locacao-detalhes{margin:1px 4px 0;border-radius:7px;background:#fffdf8;border:1px solid #f2d38a;color:#644d18}.locacao-detalhes summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;cursor:pointer;font-size:11px;font-weight:700;list-style:none}.locacao-detalhes summary::-webkit-details-marker{display:none}.locacao-detalhes summary::before{content:'▸';display:inline-block;margin-right:5px}.locacao-detalhes[open] summary::before{content:'▾'}.locacao-detalhes summary .locacao-titulo{margin-right:auto}.locacao-detalhes summary .locacao-status{padding:2px 6px;border-radius:10px;background:#fff2ca;color:#826313;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}.locacao-detalhes[open] summary{border-bottom:1px solid #f6e3af}.locacao-detalhes[open] summary .locacao-status{background:#ffe5a2}
+		.locacao-externa{padding:7px 8px 8px;color:#644d18}
 	.locacao-cab{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer}
 	.locacao-cab input{width:auto;accent-color:#d79b00}
 	.locacao-campos{display:grid;grid-template-columns:1.45fr 0.8fr;gap:7px;margin-top:7px}
@@ -70,7 +70,10 @@ input[readonly]{background:#f5f5f5;color:#666}
 .btn:active{transform:scale(0.97)}
 .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .btn-secundario{background:#fff;color:#007d8f;border:1px solid #0097a7;box-shadow:none;padding:8px 13px;font-size:12px}
-.ia-explicacao{font-size:12px;color:#42666b;margin-bottom:9px;line-height:1.5}
+			.ia-explicacao{font-size:12px;color:#42666b;margin-bottom:9px;line-height:1.5}.ia-explicacao-rodape{margin:6px 0 0;padding-top:6px;border-top:1px dashed #d8e7e9;font-size:11px;color:#648085}
+			.selecao-financeiro{margin:9px 0 7px;padding:9px 10px;border:1px solid #d8e8ea;border-radius:8px;background:#fbfefe}.desconto-inline{display:flex;align-items:end;justify-content:flex-end;gap:8px}.desconto-inline label{display:block;margin:0;color:#527378;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.desconto-inline input{width:120px;box-sizing:border-box;padding:5px 7px;text-align:right;font-size:12px}.linha-desconto{display:none;margin-top:6px;color:#a75c16;font-size:12px;font-weight:700;text-align:right}.linha-desconto.ativo{display:block}.total-geral{margin-top:5px;padding-top:7px;border-top:1px solid #c9e0e3;color:#076b77;font-size:15px;font-weight:800;text-align:right}
+	.catalogo-rapido{border-color:#bde7ec;background:linear-gradient(135deg,#f3fdfe,#fff)}.catalogo-rapido h3{display:flex;align-items:center;gap:7px}.catalogo-rapido p{font-size:12px;color:#527378;margin:2px 0 9px}.catalogo-grupo-titulo{padding:6px 10px;background:#effafb;color:#007d8f;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid #d7eef0}.item-linha .tipo-badge{display:inline-block;padding:1px 6px;margin-left:5px;border-radius:10px;background:#e3f7f9;color:#087480;font-size:10px;font-style:normal;font-weight:700}.item-linha .tipo-badge.servico{background:#f2ebff;color:#6d3aad}
+		.selecao-escolhida{margin:0 0 14px;padding:12px;border:1px solid #bde7ec;border-radius:8px;background:linear-gradient(135deg,#f3fdfe,#fff)}.selecao-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}.selecao-cab h3{margin:0;color:#007d8f}.selecao-cab p{margin:2px 0 0;color:#527378;font-size:11px}.contador-itens{display:inline-block;padding:3px 7px;border-radius:12px;background:#d9f4f7;color:#067381;font-size:11px;font-weight:700;white-space:nowrap}.selecao-grid{display:grid;grid-template-columns:1fr;gap:10px;align-items:start}.quadro-selecao{overflow:hidden;border:1px solid #dfecef;border-radius:7px;background:#fff}.quadro-selecao.equipamentos{border-top:3px solid #00bcd4}.quadro-selecao.servicos{border-top:3px solid #8b5cf6}.quadro-selecao-cab{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:#fafdfd;border-bottom:1px solid #e5f0f2;font-size:12px;font-weight:700;color:#21646e}.quadro-selecao.servicos .quadro-selecao-cab{background:#fcfaff;color:#684290}.quadro-selecao .subtotal-bloco{margin:0 8px}.quadro-selecao .item-com-locacao{padding:0 4px}.tipo-item-toggle{display:inline-flex;align-items:center;gap:3px;margin:2px 0 0 5px;padding:2px 6px;border:1px solid #a9dfe5;border-radius:11px;background:#effbfc;color:#087480;font-size:10px;font-weight:700;cursor:pointer;vertical-align:middle}.tipo-item-toggle:hover{background:#d9f4f7}.tipo-item-toggle.servico{border-color:#d4c0fb;background:#f6f1ff;color:#6d3aad}.tipo-item-toggle.servico:hover{background:#ede3ff}.tipo-item-toggle:focus{outline:2px solid #00bcd4;outline-offset:1px}.tipo-item-ajuda{display:block;margin:7px 1px 0;color:#597a80;font-size:10px}.locacao-caixinha{display:inline-flex;align-items:center;gap:7px;margin:3px 0 9px;padding:6px 9px;border:1px solid #cfe7ea;border-radius:6px;background:#f8fcfc;color:#2e6570;font-size:11px;font-weight:700;cursor:pointer}.locacao-caixinha input{width:auto;margin:0;accent-color:#0097a7}.locacao-caixinha:has(input:checked){border-color:#77cbd3;background:#e8f8f9;color:#007d8f}
 .ia-resultado{margin-top:10px;padding:11px;border:1px solid #cce9ed;background:#f4fcfd;border-radius:6px;font-size:12px}
 .ia-resultado h4{color:#007d8f;border:0;margin:9px 0 4px;padding:0}.ia-resultado h4:first-child{margin-top:0}
 		.ia-alerta{margin:5px 0;padding:7px 8px;border-radius:4px;background:#fff7df;color:#6d5419}.ia-candidato{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-top:1px solid #dceff1}.ia-candidato input{width:auto;margin-top:3px;accent-color:#0097a7}.ia-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ia-origem{display:inline-block;margin:3px 0 0 5px;padding:1px 5px;border-radius:10px;background:#dff5e8;color:#157047;font-size:10px;font-weight:700}.ia-ensinar{margin:8px 0 3px;padding:8px;border:1px dashed #9dd9df;border-radius:5px;background:#fff}.ia-ensinar-titulo{display:block;color:#27717a;font-size:11px;font-weight:700;margin-bottom:4px}.ia-ensinar small{display:block;color:#617b80;font-size:10px;line-height:1.35;margin:4px 0}.ia-ensinar input{padding:6px 7px;font-size:12px}.ia-busca-resultado{margin-top:4px;max-height:140px;overflow:auto}.ia-busca-item{display:flex;gap:6px;align-items:flex-start;padding:5px 2px;border-top:1px solid #edf5f6;font-size:11px}.ia-busca-item input{width:auto;margin-top:2px;accent-color:#0097a7}.ia-remover-aprendizado{display:inline;border:0;background:transparent;color:#b85b00;text-decoration:underline;cursor:pointer;font-size:10px;padding:0;margin-left:5px}
@@ -86,10 +89,10 @@ input[readonly]{background:#f5f5f5;color:#666}
 .qtd-btn{width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#f9f9f9;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#555}
 .qtd-btn:hover{background:#e0f7fa;border-color:#00bcd4}
 
-@media(max-width:768px){
-    .linha-colunas{grid-template-columns:1fr}
-    .grid-3{grid-template-columns:1fr}
-    .bloco-previa{position:static}
+			@media(max-width:768px){
+			    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
+			    .grid-3{grid-template-columns:1fr}
+		    .item-operacao{grid-template-columns:auto minmax(0,1fr) auto;gap:6px;padding:6px}.item-nome strong{white-space:normal}.item-total strong{font-size:11px}
     header{flex-direction:column;gap:10px}
 }
 </style>
@@ -105,216 +108,138 @@ input[readonly]{background:#f5f5f5;color:#666}
 </header>
 
 <form id="form">
-<div class="linha-colunas">
-    <!-- COLUNA ESQUERDA: FORMULÁRIO -->
-    <div>
-        <div class="bloco-form" id="bloco_ia">
-            <h3>Prévia assistida por IA</h3>
-			<p class="ia-explicacao">A IA apenas organiza uma sugestão para conferência. Ela não altera esta proposta, não cria orçamento e não envia nada ao Meeventos sem sua confirmação. Ao encontrar o item correto manualmente, a equipe também pode ensiná-lo para briefings futuros.</p>
-            <label for="briefing_ia">Briefing do cliente</label>
-            <textarea id="briefing_ia" rows="5" placeholder="Cole aqui o pedido do cliente, dados do evento e itens desejados..."></textarea>
-            <div style="margin-top:9px">
-                <label for="arquivo_briefing">Arquivo de briefing (opcional)</label>
-                <input type="file" id="arquivo_briefing" accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                <small style="color:#718085">Aceita TXT, PDF com texto selecionável ou DOCX, até 5 MB. O arquivo é lido e não fica salvo.</small>
-            </div>
-            <div class="ia-acoes"><button class="btn" type="button" id="btn_analisar_ia">Gerar prévia para conferência</button></div>
-            <div id="resultado_ia" aria-live="polite"></div>
-        </div>
-        <!-- VENDEDOR -->
-        <div class="bloco-form">
-            <label>Vendedor:</label>
-            <div class="grupo-busca">
-                <input type="text" id="busca_vendedor" placeholder="Digite o nome do vendedor..." autocomplete="off">
-                <div id="lista_vendedores"></div>
-            </div>
-            <input type="hidden" id="id_vendedor" value="">
-        </div>
-
-        <!-- DADOS DO EVENTO -->
-        <div class="bloco-form">
-            <h3>📌 Dados do Evento</h3>
-            <div class="grid-2">
-                <div class="grid-full">
-                    <label>Nome do Evento *</label>
-                    <input type="text" id="nome_evento" required>
+    <div class="formulario-duas-colunas">
+        <div class="coluna-form coluna-esquerda">
+            <div class="bloco-form" id="bloco_ia">
+				<label for="briefing_ia">✨ Conte comigo: Cole aqui o briefing do cliente!</label>
+				<textarea id="briefing_ia" rows="5" placeholder="Cole aqui o pedido do cliente, dados do evento e itens desejados..."></textarea>
+				<p class="ia-explicacao ia-explicacao-rodape">A IA organiza uma sugestão para conferência. Ela não envia nada ao Meeventos sem a confirmação da equipe.</p>
+                <div style="margin-top:9px">
+                    <label for="arquivo_briefing">Ou anexe o briefing aqui:</label>
+                    <input type="file" id="arquivo_briefing" accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <small style="color:#718085">Aceita TXT, PDF com texto selecionável ou DOCX, até 5 MB. O arquivo é lido e não fica salvo.</small>
                 </div>
-                <div class="grid-full">
-                    <label>Local *</label>
-                    <div class="grupo-busca">
-                        <input type="text" id="busca_local" placeholder="Digite o nome do local..." required autocomplete="off">
-                        <div id="lista_locais"></div>
+                <div class="ia-acoes"><button class="btn" type="button" id="btn_analisar_ia">Gerar prévia para conferência</button></div>
+                <div id="resultado_ia" aria-live="polite"></div>
+            </div>
+
+            <div class="bloco-form">
+                <h3>📌 Dados do Evento</h3>
+                <div class="grid-2">
+                    <div class="grid-full">
+                        <label>Vendedor</label>
+                        <div class="grupo-busca">
+                            <input type="text" id="busca_vendedor" placeholder="Digite o nome do vendedor..." autocomplete="off">
+                            <div id="lista_vendedores"></div>
+                        </div>
+                        <input type="hidden" id="id_vendedor" value="">
                     </div>
-                </div>
-                <div>
-                    <label>Data do Evento</label>
-                    <input type="date" id="data_evento">
-                    <label class="check-inline"><input type="checkbox" id="evento_sem_data"> Evento sem data definida</label>
-                </div>
-                <div>
-                    <label>Quantidade de Pessoas *</label>
-                    <input type="number" id="qtd_pessoas" min="1" required>
-                </div>
-                <div>
-                    <label>Data de Montagem</label>
-                    <input type="date" id="data_montagem">
-                </div>
-                <div>
-                    <label>Horário de Montagem</label>
-                    <input type="time" id="horario_montagem">
-                </div>
-                <div>
-                    <label>Horário de Início do Evento</label>
-                    <input type="time" id="horario_inicio_evento">
-                </div>
-                <div>
-                    <label>Horário de Término do Evento</label>
-                    <input type="time" id="horario_fim_evento">
-                </div>
-                <div>
-                    <label>Data de Desmontagem</label>
-                    <input type="date" id="data_desmontagem">
-                </div>
-                <div>
-                    <label>Horário de Desmontagem</label>
-                    <input type="time" id="horario_desmontagem">
-                </div>
-                <div class="grid-full">
-                    <label>Formato do Evento</label>
-                    <input type="text" id="formato_evento" placeholder="Ex.: Auditório, coquetel, plenária, workshop...">
-                </div>
-            </div>
-        </div>
-
-        <!-- DADOS DO CLIENTE -->
-        <div class="bloco-form">
-            <h3>👤 Dados do Cliente</h3>
-            <div class="grid-2">
-                <div class="grid-full">
-                    <label>Razão Social / Nome do Cliente *</label>
-                    <div class="grupo-busca">
-                        <input type="text" id="busca_cliente" placeholder="Digite a razão social ou nome..." required autocomplete="off">
-                        <div id="lista_clientes"></div>
+                    <div class="grid-full">
+                        <label>Nome do Evento *</label>
+                        <input type="text" id="nome_evento" required>
                     </div>
+                    <div class="grid-full">
+                        <label>Local *</label>
+                        <div class="grupo-busca">
+                            <input type="text" id="busca_local" placeholder="Digite o nome do local..." required autocomplete="off">
+                            <div id="lista_locais"></div>
+                        </div>
+                    </div>
+					<div><label>Data do Evento | Início</label><input type="date" id="data_evento_inicio"></div>
+					<div><label>Data do Evento | Final</label><input type="date" id="data_evento_final"></div>
+					<label class="check-inline grid-full"><input type="checkbox" id="evento_sem_data"> Evento sem data definida</label>
+                    <div>
+                        <label>Quantidade de Pessoas *</label>
+                        <input type="number" id="qtd_pessoas" min="1" required>
+                    </div>
+                    <div><label>Data de Montagem</label><input type="date" id="data_montagem"></div>
+                    <div><label>Horário de Montagem</label><input type="time" id="horario_montagem"></div>
+                    <div><label>Horário de Início do Evento</label><input type="time" id="horario_inicio_evento"></div>
+                    <div><label>Horário de Término do Evento</label><input type="time" id="horario_fim_evento"></div>
+                    <div><label>Data de Desmontagem</label><input type="date" id="data_desmontagem"></div>
+                    <div><label>Horário de Desmontagem</label><input type="time" id="horario_desmontagem"></div>
+                    <div class="grid-full"><label>Formato do Evento</label><input type="text" id="formato_evento" placeholder="Ex.: Auditório, coquetel, plenária, workshop..."></div>
                 </div>
-                <div>
-                    <label>CNPJ</label>
-                    <input type="text" id="cliente_cnpj" readonly>
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input type="text" id="cliente_email" readonly>
-                </div>
-                <div>
-                    <label>Telefone</label>
-                    <input type="text" id="cliente_telefone" readonly>
-                </div>
-                <div>
-                    <label>Contato / Responsável</label>
-                    <input type="text" id="cliente_contato" readonly>
+            </div>
+
+            <div class="bloco-form">
+                <h3>👤 Dados do Cliente</h3>
+                <div class="grid-2">
+                    <div class="grid-full">
+                        <label>Razão Social / Nome do Cliente *</label>
+                        <div class="grupo-busca">
+                            <input type="text" id="busca_cliente" placeholder="Digite a razão social ou nome..." required autocomplete="off">
+                            <div id="lista_clientes"></div>
+                        </div>
+                    </div>
+                    <div><label>CNPJ</label><input type="text" id="cliente_cnpj" readonly></div>
+                    <div><label>Email</label><input type="text" id="cliente_email" readonly></div>
+                    <div><label>Telefone</label><input type="text" id="cliente_telefone" readonly></div>
+                    <div><label>Contato / Responsável</label><input type="text" id="cliente_contato" readonly></div>
                 </div>
             </div>
         </div>
 
-        <!-- CONTROLES COMERCIAIS -->
-        <div class="bloco-form">
-            <h3>💼 Dados Comerciais</h3>
-            <div class="grid-2">
-                <div>
-                    <label>Validade da Proposta</label>
-                    <input type="date" id="validade_proposta">
-                    <small style="color:#718085">Padrão: 7 dias a partir da geração.</small>
-                </div>
-                <div>
-                    <label>Desconto da Proposta (R$)</label>
-                    <input type="number" id="desconto_proposta" min="0" step="0.01" inputmode="decimal" placeholder="0,00">
-                </div>
-                <div>
-                    <label>Idioma da cópia comercial do PDF</label>
-                    <select id="idioma_pdf">
-                        <option value="pt">Português</option>
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                    </select>
-                    <small style="color:#718085">Apenas o PDF é traduzido. O catálogo, os IDs e o Meeventos continuam em português.</small>
-                </div>
-                <div class="grid-full">
-                    <label>Link do Projeto / Referência</label>
-                    <input type="url" id="link_projeto" placeholder="https://...">
-                </div>
-                <div class="grid-full">
-                    <label>Foto de Referência da Proposta</label>
-                    <input type="file" id="foto_proposta" accept="image/png,image/jpeg,image/webp">
-                    <input type="hidden" id="foto_proposta_atual" value="">
-                    <small style="color:#718085">A imagem aparecerá após os dados do cliente no PDF.</small>
-                </div>
-                <div class="grid-full">
-                    <label>Observações Gerais do Evento</label>
-                    <textarea id="observacoes_gerais" rows="3" placeholder="Informações relevantes para a equipe e para a proposta..."></textarea>
-                </div>
-                <div class="grid-full">
-                    <label>Opções de exibição no PDF</label>
-                    <label class="check-inline"><input type="checkbox" id="mostrar_valor_unitario" checked> Mostrar valores unitários por item</label>
-                    <label class="check-inline"><input type="checkbox" id="mostrar_condicoes_gerais" checked> Mostrar condições gerais</label>
+        <div class="coluna-form coluna-direita">
+            <div class="bloco-form catalogo-rapido">
+                <h3>📦 Seleção de Itens</h3>
+                <p>Busque pelo nome ou código para adicionar equipamentos e serviços à proposta.</p>
+                <label for="busca_item">Buscar no catálogo oficial</label>
+                <div class="grupo-busca">
+                    <input type="text" id="busca_item" placeholder="Ex.: projetor, notebook, técnico..." autocomplete="off">
+                    <div id="lista_itens"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- BUSCA DE ITENS -->
-        <div class="bloco-form">
-            <h3>📦 Adicionar Itens à Proposta</h3>
-            <label>Buscar Equipamento ou Serviço:</label>
-            <div class="grupo-busca">
-                <input type="text" id="busca_item" placeholder="Digite o nome do item (375 disponíveis)..." autocomplete="off">
-                <div id="lista_itens"></div>
+            <section class="selecao-escolhida" aria-live="polite">
+                <div class="selecao-cab">
+                    <div><h3>Itens selecionados</h3><p>Equipamentos ficam acima dos serviços.</p></div>
+                    <span class="contador-itens" id="contador_itens">0 itens</span>
+                </div>
+                <div class="selecao-grid">
+                    <section class="quadro-selecao equipamentos">
+                        <div class="quadro-selecao-cab"><span>📦 Equipamentos</span><span id="contador_equipamentos">0</span></div>
+                        <div id="lista_produtos"></div>
+                        <div id="subtotal_produtos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+                    </section>
+                    <section class="quadro-selecao servicos">
+                        <div class="quadro-selecao-cab"><span>🛠 Serviços</span><span id="contador_servicos">0</span></div>
+                        <div id="lista_servicos"></div>
+                        <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+                    </section>
+				</div>
+				<div class="selecao-financeiro">
+					<div class="desconto-inline"><div><label for="desconto_proposta">Desconto da proposta (R$)</label><input type="number" id="desconto_proposta" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>
+					<div id="linha_desconto" class="linha-desconto"></div>
+					<div id="total_geral" class="total-geral">Valor total da proposta: R$ 0,00</div>
+				</div>
+				<small class="tipo-item-ajuda">Clique na etiqueta <strong>Equipamento</strong> ou <strong>Serviço</strong> para mover o item de quadro e registrar a correção local.</small>
+            </section>
+
+            <div class="bloco-form bloco-observacoes">
+                <h3>📝 Observações Gerais</h3>
+                <label for="observacoes_gerais">Informações adicionais do evento</label>
+                <textarea id="observacoes_gerais" rows="4" placeholder="Informações relevantes para a equipe e para a proposta..."></textarea>
             </div>
-            <p style="font-size:11px;color:#999;margin-top:5px">Clique no item para adicioná-lo. Use + e - na prévia para ajustar quantidade.</p>
+
+            <div class="bloco-form opcoes-pdf">
+                <h3>📄 Opções do PDF</h3>
+                <label class="opcao-pdf"><input type="checkbox" id="mostrar_valor_unitario" checked> Deve aparecer o preço individual de cada item</label>
+                <label class="opcao-pdf"><input type="checkbox" id="mostrar_condicoes_gerais" checked> Deve aparecer as condições gerais</label>
+            </div>
+
+				<div class="comercial-extra">
+					<div class="comercial-extra-conteudo">
+                    <div class="grid-2">
+                        <div><label>Validade da Proposta</label><input type="date" id="validade_proposta"><small style="color:#718085">Padrão: 7 dias a partir da geração.</small></div>
+	                        <div><label>Idioma da cópia comercial do PDF</label><select id="idioma_pdf"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
+                        <div class="grid-full"><label>Link do Projeto / Referência</label><input type="url" id="link_projeto" placeholder="https://..."></div>
+                        <div class="grid-full"><label>Foto de Referência da Proposta</label><input type="file" id="foto_proposta" accept="image/png,image/jpeg,image/webp"><input type="hidden" id="foto_proposta_atual" value=""><small style="color:#718085">A imagem aparecerá após os dados do cliente no PDF.</small></div>
+                    </div>
+					</div>
+				</div>
         </div>
     </div>
-
-    <!-- COLUNA DIREITA: PRÉVIA -->
-    <div class="bloco-previa">
-        <h3>📋 Prévia do Orçamento</h3>
-        <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e0e0e0">
-            <h4>📌 Dados Gerais</h4>
-            <div style="font-size:13px;line-height:1.7">
-                <strong>Vendedor:</strong> <span id="prev_vendedor">—</span><br>
-                <strong>Evento:</strong> <span id="prev_evento">—</span><br>
-                <strong>Local:</strong> <span id="prev_local">—</span><br>
-                <strong>Data:</strong> <span id="prev_data">—</span><br>
-                <strong>Montagem:</strong> <span id="prev_montagem">—</span><br>
-                <strong>Desmontagem:</strong> <span id="prev_desmontagem">—</span><br>
-                <strong>Horário do Evento:</strong> <span id="prev_horario_evento">—</span><br>
-                <strong>Formato:</strong> <span id="prev_formato">—</span><br>
-                <strong>Pessoas:</strong> <span id="prev_pessoas">—</span>
-            </div>
-        </div>
-        <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #e0e0e0">
-            <h4>👤 Dados do Cliente</h4>
-            <div style="font-size:13px;line-height:1.7">
-                <strong>Nome:</strong> <span id="prev_cliente">—</span><br>
-                <strong>CNPJ:</strong> <span id="prev_cliente_cnpj">—</span><br>
-                <strong>Email:</strong> <span id="prev_cliente_email">—</span><br>
-                <strong>Telefone:</strong> <span id="prev_cliente_telefone">—</span><br>
-                <strong>Contato:</strong> <span id="prev_cliente_contato">—</span>
-            </div>
-        </div>
-        <div style="margin-bottom:10px">
-            <h4>📦 Equipamentos</h4>
-            <div id="lista_produtos"></div>
-            <div id="subtotal_produtos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
-        </div>
-        <div style="margin-bottom:10px">
-            <h4>🛠 Serviços</h4>
-            <div id="lista_servicos"></div>
-            <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
-        </div>
-		<div id="total_bruto" class="subtotal-bloco">Total antes do desconto: R$ 0,00</div>
-		<div id="desconto_total" class="linha-desconto">Desconto concedido: - R$ 0,00</div>
-		<div id="total_geral" class="total-geral">Investimento Total: R$ 0,00</div>
-		<div id="resumo_externo" class="resumo-externo" aria-live="polite"></div>
-    </div>
-</div>
 
 <div class="area-botao">
     <button type="submit" class="btn" id="btnSubmit">📄 Gerar Orçamento e Enviar ao Meeventos</button>
@@ -403,7 +328,8 @@ function preencherFormularioDeEdicao() {
         document.getElementById("id_vendedor").value = evento.id_vendedor || "";
         document.getElementById("nome_evento").value = evento.nome_evento || "";
         document.getElementById("busca_local").value = evento.local_evento || evento.local || "";
-        document.getElementById("data_evento").value = evento.data_evento || "";
+		document.getElementById("data_evento_inicio").value = evento.data_evento_inicio || evento.data_evento || "";
+		document.getElementById("data_evento_final").value = evento.data_evento_final || evento.data_evento || "";
         document.getElementById("evento_sem_data").checked = Boolean(evento.evento_sem_data);
         document.getElementById("data_montagem").value = evento.data_montagem || "";
         document.getElementById("horario_montagem").value = evento.horario_montagem || "";
@@ -463,9 +389,11 @@ function adicionarDias(data, dias) {
 
 function atualizarEstadoDataEvento() {
     const semData = document.getElementById("evento_sem_data").checked;
-    const campoData = document.getElementById("data_evento");
-    campoData.disabled = semData;
-    if (semData) campoData.value = "";
+		["data_evento_inicio", "data_evento_final"].forEach(id => {
+			const campoData = document.getElementById(id);
+			campoData.disabled = semData;
+			if (semData) campoData.value = "";
+		});
     atualizar_previa_completa();
 }
 
@@ -474,7 +402,7 @@ carregar_tudo().finally(() => {
     const validade = document.getElementById("validade_proposta");
     if (!validade.value) validade.value = adicionarDias(new Date(), 7);
     atualizarEstadoDataEvento();
-    ["nome_evento", "busca_local", "data_evento", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "formato_evento", "desconto_proposta"].forEach(id => {
+		["nome_evento", "busca_local", "data_evento_inicio", "data_evento_final", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "formato_evento", "desconto_proposta"].forEach(id => {
         document.getElementById(id).addEventListener("input", atualizar_previa_completa);
         document.getElementById(id).addEventListener("change", atualizar_previa_completa);
     });
@@ -550,7 +478,7 @@ async function analisarBriefingIA() {
 
 function aplicarCamposIA() {
     if (!analiseIACorrente) return 0;
-    const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento",qtd_pessoas:"qtd_pessoas",formato_evento:"formato_evento",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
+		const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento_inicio",qtd_pessoas:"qtd_pessoas",formato_evento:"formato_evento",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
     const campos = analiseIACorrente.campos || {};
     const clienteEstavaVazio = !String(document.getElementById("busca_cliente").value || "").trim();
     let preenchidos = 0;
@@ -701,7 +629,8 @@ document.getElementById("busca_cliente").addEventListener("input", e => {
 });
 
 document.getElementById("nome_evento").addEventListener("input", atualizar_previa_completa);
-document.getElementById("data_evento").addEventListener("change", atualizar_previa_completa);
+document.getElementById("data_evento_inicio").addEventListener("change", atualizar_previa_completa);
+document.getElementById("data_evento_final").addEventListener("change", atualizar_previa_completa);
 document.getElementById("qtd_pessoas").addEventListener("input", atualizar_previa_completa);
 
 // FECHAR LISTAS AO CLICAR FORA
@@ -721,16 +650,19 @@ function mostrar_filtrado_produto(texto) {
         (i.nome || "").toLowerCase().includes(termo) || String(i.id || "").includes(termo)
     ).slice(0, 30);
 
-    if (filtrados.length === 0) {
-        lista_el.innerHTML = '<div class="aviso">Nenhum item encontrado no catálogo</div>';
-    } else {
-        lista_el.innerHTML = filtrados.map(item => {
-            const tipo_badge = item.tipo_item === "Serviço" ? "🛠" : "📦";
-            return `<div class="item-linha" data-id="${item.id}">
-                ${tipo_badge} <strong>#${item.id}</strong> | ${item.nome} | R$ ${Number(item.valor||0).toFixed(2).replace(".",",")} | <em>${item.categoria||""}</em>
-            </div>`;
-        }).join("");
-    }
+	    if (filtrados.length === 0) {
+	        lista_el.innerHTML = '<div class="aviso">Nenhum item encontrado no catálogo</div>';
+	    } else {
+	        const grupos = {"Equipamento": [], "Serviço": []};
+	        filtrados.forEach(item => grupos[item.tipo_item === "Serviço" ? "Serviço" : "Equipamento"].push(item));
+	        lista_el.innerHTML = Object.entries(grupos).filter(([, itens]) => itens.length).map(([tipo, itens]) => {
+	            const icone = tipo === "Serviço" ? "🛠" : "📦";
+	            const classe = tipo === "Serviço" ? "servico" : "";
+	            return `<div class="catalogo-grupo-titulo">${icone} ${tipo}s</div>${itens.map(item => `<div class="item-linha" data-id="${item.id}">
+	                <strong>#${item.id}</strong> · ${escaparHtml(item.nome)} <em class="tipo-badge ${classe}">${tipo}</em><br><small>R$ ${Number(item.valor||0).toFixed(2).replace(".",",")} · ${escaparHtml(item.categoria||"Sem categoria")}</small>
+	            </div>`).join("")}`;
+	        }).join("");
+	    }
 }
 
 document.getElementById("busca_item").addEventListener("input", e => {
@@ -767,45 +699,28 @@ document.addEventListener("click", e => {
     document.getElementById("lista_itens").style.display = "none";
 });
 
-// ===== ATUALIZAR PRÉVIA =====
+// ===== ATUALIZAR ITENS SELECIONADOS =====
 function atualizar_previa_completa() {
-    document.getElementById("prev_vendedor").innerText = document.getElementById("busca_vendedor").value || "—";
-    document.getElementById("prev_evento").innerText = document.getElementById("nome_evento").value.trim() || "—";
-    document.getElementById("prev_local").innerText = document.getElementById("busca_local").value || "—";
-    document.getElementById("prev_data").innerText = document.getElementById("evento_sem_data").checked ? "Data a definir" : (document.getElementById("data_evento").value || "—");
-    document.getElementById("prev_montagem").innerText = [document.getElementById("data_montagem").value, document.getElementById("horario_montagem").value].filter(Boolean).join(" · ") || "—";
-    document.getElementById("prev_desmontagem").innerText = [document.getElementById("data_desmontagem").value, document.getElementById("horario_desmontagem").value].filter(Boolean).join(" · ") || "—";
-    document.getElementById("prev_horario_evento").innerText = [document.getElementById("horario_inicio_evento").value, document.getElementById("horario_fim_evento").value].filter(Boolean).join(" às ") || "—";
-    document.getElementById("prev_formato").innerText = document.getElementById("formato_evento").value.trim() || "—";
-    document.getElementById("prev_pessoas").innerText = document.getElementById("qtd_pessoas").value || "—";
-    document.getElementById("prev_cliente").innerText = document.getElementById("busca_cliente").value || "—";
-    document.getElementById("prev_cliente_cnpj").innerText = document.getElementById("cliente_cnpj").value || "—";
-    document.getElementById("prev_cliente_email").innerText = document.getElementById("cliente_email").value || "—";
-    document.getElementById("prev_cliente_telefone").innerText = document.getElementById("cliente_telefone").value || "—";
-    document.getElementById("prev_cliente_contato").innerText = document.getElementById("cliente_contato").value || "—";
-
     const lista_prod_el = document.getElementById("lista_produtos");
     const lista_serv_el = document.getElementById("lista_servicos");
     let html_prod = "", html_serv = "";
     let subtotal_prod = 0, subtotal_serv = 0;
 
-	selecionados.forEach((item, idx) => {
-		const sub = item.quantidade * item.valor;
+		selecionados.forEach((item, idx) => {
+			const manual = item.valor_manual !== "" && item.valor_manual !== null && item.valor_manual !== undefined;
+			const valorExibido = manual ? Number(item.valor_manual) : Number(item.valor_padrao ?? item.valor ?? 0);
+			const sub = Number(item.quantidade || 0) * valorExibido;
+				const ehServico = item.tipo_item === "Serviço";
+			const tipoAtual = ehServico ? "Serviço" : "Equipamento";
+			const tipoDestino = ehServico ? "Equipamento" : "Serviço";
 			const imagemItem = item.imagem_url
 				? `<a class="foto-item-previa" href="${escaparHtml(item.imagem_url)}" target="_blank" rel="noopener noreferrer" title="Abrir imagem do item em nova guia"><img src="${escaparHtml(item.imagem_url)}" alt="Imagem de ${escaparHtml(item.nome)}" onerror="this.closest('a').remove()"></a>`
 				: "";
-			const linha = `<div class="item-com-locacao"><div class="item-previa">
-				<span>
-					${imagemItem}
-					<span class="qtd-control">
-                    <span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span>
-                    <strong>${item.quantidade}</strong>
-                    <span class="qtd-btn" data-action="plus" data-idx="${idx}">+</span>
-                </span>
-                ${item.nome}
-            </span>
-			<span>R$ ${sub.toFixed(2).replace(".",",")} <span class="remover" data-idx="${idx}">✕</span></span>
-		</div>${renderizarAjusteComercial(item, idx)}${renderizarLocacaoExterna(item, idx)}</div>`;
+				const linha = `<div class="item-com-locacao"><div class="item-cartao">
+					<div class="item-identidade">${imagemItem}<div class="item-nome"><strong title="${escaparHtml(item.nome)}">${escaparHtml(item.nome)}</strong><div class="item-contexto"><button type="button" class="tipo-item-toggle ${ehServico ? "servico" : ""}" data-tipo-toggle data-idx="${idx}" title="Clique para mover este item para ${tipoDestino}">${ehServico ? "🛠" : "📦"} ${tipoAtual} ↔</button></div></div><div class="item-valor-manual"><label>Valor manual</label><input type="number" min="0" step="0.01" inputmode="decimal" data-comercial-campo="valor_manual" data-idx="${idx}" value="${manual ? valorExibido : ""}" placeholder="${dinheiro(item.valor_padrao ?? item.valor)}"><span class="valor-padronizado">${manual ? `Padrão: ${dinheiro(item.valor_padrao ?? 0)}` : "Opcional"}</span></div></div>
+					<button type="button" class="remover" data-idx="${idx}" title="Remover item" aria-label="Remover ${escaparHtml(item.nome)}">✕</button>
+					<div class="item-operacao"><div class="item-quantidade" aria-label="Quantidade"><span class="mini-label">Qtd.</span><div class="qtd-acoes"><span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span><strong>${item.quantidade}</strong><span class="qtd-btn" data-action="plus" data-idx="${idx}">+</span></div></div><div class="item-total"><span class="rotulo-total">Total</span><strong>${dinheiro(sub)}</strong></div></div>
+			</div>${renderizarLocacaoExterna(item, idx)}</div>`;
         if (item.tipo_item === "Serviço") {
             html_serv += linha;
             subtotal_serv += sub;
@@ -815,18 +730,21 @@ function atualizar_previa_completa() {
         }
     });
 
-    lista_prod_el.innerHTML = html_prod || '<div class="aviso">Nenhum equipamento adicionado</div>';
-    lista_serv_el.innerHTML = html_serv || '<div class="aviso">Nenhum serviço adicionado</div>';
-    document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${subtotal_prod.toFixed(2).replace(".",",")}`;
-    document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
-	const totalBruto = subtotal_prod + subtotal_serv;
-    const desconto = Math.min(totalBruto, Math.max(0, Number(document.getElementById("desconto_proposta").value || 0)));
-	document.getElementById("total_bruto").innerText = `Total antes do desconto: R$ ${totalBruto.toFixed(2).replace(".",",")}`;
-    const descontoEl = document.getElementById("desconto_total");
-    descontoEl.classList.toggle("ativo", desconto > 0);
-    descontoEl.innerText = `Desconto: - R$ ${desconto.toFixed(2).replace(".",",")}`;
-	document.getElementById("total_geral").innerText = `Investimento Total após desconto: R$ ${(totalBruto - desconto).toFixed(2).replace(".",",")}`;
-	atualizarResumoLocacaoExterna();
+	    lista_prod_el.innerHTML = html_prod || '<div class="aviso">Nenhum equipamento adicionado</div>';
+	    lista_serv_el.innerHTML = html_serv || '<div class="aviso">Nenhum serviço adicionado</div>';
+	    document.getElementById("contador_equipamentos").innerText = selecionados.filter(item => item.tipo_item !== "Serviço").length;
+	    document.getElementById("contador_servicos").innerText = selecionados.filter(item => item.tipo_item === "Serviço").length;
+	    document.getElementById("contador_itens").innerText = `${selecionados.length} ${selecionados.length === 1 ? "item" : "itens"}`;
+		 document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${subtotal_prod.toFixed(2).replace(".",",")}`;
+		 document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
+		 const desconto = Math.max(0, Number(document.getElementById("desconto_proposta")?.value || 0));
+		 const totalBruto = subtotal_prod + subtotal_serv;
+		 const totalFinal = Math.max(0, totalBruto - desconto);
+		 const linhaDesconto = document.getElementById("linha_desconto");
+		 linhaDesconto.classList.toggle("ativo", desconto > 0);
+		 linhaDesconto.textContent = desconto > 0 ? `Desconto: - ${dinheiro(desconto)}` : "";
+		 document.getElementById("total_geral").textContent = `Valor total da proposta: ${dinheiro(totalFinal)}`;
+		 atualizarResumoLocacaoExterna();
 }
 
 function escaparHtml(valor) {
@@ -849,20 +767,14 @@ function renderizarAjusteComercial(item, idx) {
     </div>`;
 }
 
-function renderizarLocacaoExterna(item, idx) {
-    const externo = item.externo === true;
-    const custo = Number(item.custo_externo || 0);
-    return `<div class="locacao-externa">
-        <label class="locacao-cab"><input type="checkbox" data-externo-campo="externo" data-idx="${idx}" ${externo ? "checked" : ""}> Locação externa? <span>Controle interno</span></label>
-        ${externo ? `<div class="locacao-campos">
-            <div><label>Fornecedor</label><input type="text" data-externo-campo="fornecedor_externo" data-idx="${idx}" value="${escaparHtml(item.fornecedor_externo)}" placeholder="Nome do fornecedor"></div>
-            <div><label>Custo unitário</label><input type="number" min="0" step="0.01" inputmode="decimal" data-externo-campo="custo_externo" data-idx="${idx}" value="${custo || ""}" placeholder="0,00"></div>
-        </div>` : ""}
-    </div>`;
-}
+	function renderizarLocacaoExterna(item, idx) {
+	    const externo = item.externo === true;
+		return `<details class="locacao-detalhes" ${externo ? "open" : ""}><summary><span class="locacao-titulo"><label class="locacao-caixinha"><input type="checkbox" data-externo-campo="externo" data-idx="${idx}" ${externo ? "checked" : ""}> Locação externa</label></span><span class="locacao-status">${externo ? "ativa" : "opcional"}</span></summary>${externo ? `<div class="locacao-externa"><div class="locacao-campos"><div><label>Fornecedor</label><input type="text" data-externo-campo="fornecedor_externo" data-idx="${idx}" value="${escaparHtml(item.fornecedor_externo || "")}" placeholder="Nome do fornecedor"></div><div><label>Valor do custo</label><input type="number" min="0" step="0.01" inputmode="decimal" data-externo-campo="custo_externo" data-idx="${idx}" value="${Number(item.custo_externo || 0) || ""}" placeholder="R$ 0,00"></div></div></div>` : ""}</details>`;
+	}
 
 function atualizarResumoLocacaoExterna() {
     const resumo = document.getElementById("resumo_externo");
+	if (!resumo) return;
     const itensExternos = selecionados.filter(item => item.externo === true);
     if (!itensExternos.length) {
         resumo.classList.remove("ativo");
@@ -883,7 +795,9 @@ document.addEventListener("change", e => {
     if (!campo && !campoComercial) return;
     const item = selecionados[Number(e.target.dataset.idx)];
     if (!item) return;
-    if (campo === "externo") item.externo = e.target.checked;
+    if (campo === "externo") {
+        item.externo = e.target.checked;
+    }
     if (campo === "fornecedor_externo") item.fornecedor_externo = e.target.value.trim();
     if (campo === "custo_externo") item.custo_externo = Math.max(0, Number(e.target.value || 0));
     if (campoComercial === "valor_manual") {
@@ -904,6 +818,11 @@ document.addEventListener("input", e => {
 
 // CONTROLES DE QUANTIDADE E REMOVER
 document.addEventListener("click", e => {
+	const etiquetaTipo = e.target.closest("[data-tipo-toggle]");
+	if (etiquetaTipo) {
+		alternarTipoItem(Number(etiquetaTipo.dataset.idx));
+		return;
+	}
     if (e.target.classList.contains("remover")) {
         selecionados.splice(parseInt(e.target.dataset.idx), 1);
         atualizar_previa_completa();
@@ -920,8 +839,38 @@ document.addEventListener("click", e => {
             selecionados.splice(idx, 1);
         }
         atualizar_previa_completa();
-    }
+	}
 });
+
+async function alternarTipoItem(idx) {
+	const item = selecionados[idx];
+	if (!item) return;
+	const tipoAnterior = item.tipo_item === "Serviço" ? "Serviço" : "Equipamento";
+	const tipoNovo = tipoAnterior === "Serviço" ? "Equipamento" : "Serviço";
+	item.tipo_item = tipoNovo;
+	atualizar_previa_completa();
+	try {
+		const resposta = await fetch(`${API_BASE_URL}/catalogo/tipo-item`, {
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({item_id: item.id, tipo_item: tipoNovo})
+		});
+		const retorno = await resposta.json();
+		if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível salvar a categoria.");
+		const itemCorrigido = retorno.item || {};
+		todos_itens.forEach(catalogoItem => {
+			if (String(catalogoItem.id) === String(item.id)) catalogoItem.tipo_item = itemCorrigido.tipo_item || tipoNovo;
+		});
+		selecionados.forEach(selecionado => {
+			if (String(selecionado.id) === String(item.id)) selecionado.tipo_item = itemCorrigido.tipo_item || tipoNovo;
+		});
+		atualizar_previa_completa();
+	} catch (erro) {
+		item.tipo_item = tipoAnterior;
+		atualizar_previa_completa();
+		alert(erro.message || "Não foi possível salvar a correção de categoria.");
+	}
+}
 
 // ===== ENVIAR FORMULÁRIO =====
 document.getElementById("form").addEventListener("submit", async e => {
@@ -943,7 +892,9 @@ document.getElementById("form").addEventListener("submit", async e => {
         id_vendedor: document.getElementById("id_vendedor").value || "51",
         nome_evento: document.getElementById("nome_evento").value,
         local_nome: document.getElementById("busca_local").value,
-        data_evento: document.getElementById("data_evento").value,
+		data_evento_inicio: document.getElementById("data_evento_inicio").value,
+		data_evento_final: document.getElementById("data_evento_final").value,
+		data_evento: document.getElementById("data_evento_inicio").value || document.getElementById("data_evento_final").value,
         evento_sem_data: document.getElementById("evento_sem_data").checked,
         data_montagem: document.getElementById("data_montagem").value,
         horario_montagem: document.getElementById("horario_montagem").value,
@@ -969,7 +920,7 @@ document.getElementById("form").addEventListener("submit", async e => {
             mostrar_condicoes_gerais: document.getElementById("mostrar_condicoes_gerais").checked,
             idioma: document.getElementById("idioma_pdf").value
         },
-        total_proposta: Math.max(0, selecionados.reduce((acc, it) => acc + (it.quantidade * it.valor), 0) - Math.max(0, Number(document.getElementById("desconto_proposta").value || 0))),
+		total_proposta: Math.max(0, selecionados.reduce((acc, it) => { const valor = it.valor_manual !== "" && it.valor_manual !== null && it.valor_manual !== undefined ? Number(it.valor_manual) : Number(it.valor_padrao ?? it.valor ?? 0); return acc + (Number(it.quantidade || 0) * valor); }, 0) - Math.max(0, Number(document.getElementById("desconto_proposta").value || 0))),
         numero_original: localStorage.getItem("editar_numero") || "",
         versao_origem: localStorage.getItem("editar_versao") || ""
     };

@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const pagina = fs.readFileSync('templates/index.html', 'utf8');
+const buscaCatalogo = pagina.indexOf('id="busca_item"');
+const blocoIa = pagina.indexOf('id="bloco_ia"');
+const resumoEscolhidos = pagina.indexOf('class="selecao-escolhida"');
+const tituloPrevia = pagina.indexOf('<h3>📋 Prévia do Orçamento</h3>');
+const dadosEvento = pagina.indexOf('📌 Dados do Evento');
+const dadosCliente = pagina.indexOf('👤 Dados do Cliente');
+const observacoes = pagina.indexOf('id="observacoes_gerais"');
+const precosIndividuais = pagina.indexOf('id="mostrar_valor_unitario"');
+const condicoesGerais = pagina.indexOf('id="mostrar_condicoes_gerais"');
+
+assert.ok(pagina.includes('class="formulario-duas-colunas"'), 'O formulário deve ser organizado em duas colunas.');
+assert.ok(pagina.includes('class="coluna-form coluna-esquerda"') && pagina.includes('class="coluna-form coluna-direita"'), 'As duas colunas precisam estar identificadas para manter a hierarquia visual.');
+assert.ok(pagina.includes('@media(max-width:768px){\n\t\t\t    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}'), 'Em tela estreita, as duas colunas devem ficar empilhadas sem perder os campos.');
+assert.ok(blocoIa >= 0 && blocoIa < dadosEvento && dadosEvento < dadosCliente, 'A coluna esquerda deve seguir a ordem: IA, dados do evento e dados do cliente.');
+assert.ok(buscaCatalogo >= 0 && buscaCatalogo < resumoEscolhidos && resumoEscolhidos < observacoes && observacoes < precosIndividuais && precosIndividuais < condicoesGerais, 'A coluna direita deve seguir a ordem: seleção, itens, observações e opções do PDF.');
+assert.ok(pagina.includes('✨ Conte comigo: Cole aqui o briefing do cliente!'), 'A chamada de briefing deve usar a frase acolhedora solicitada.');
+assert.ok(!pagina.includes('Prévia por IA'), 'O título técnico da prévia deve ser removido da chamada de briefing.');
+assert.ok(pagina.includes('ia-explicacao ia-explicacao-rodape'), 'A explicação sobre conferência deve aparecer abaixo da caixa de briefing.');
+assert.ok(pagina.includes('Ou anexe o briefing aqui:'), 'O anexo de briefing deve ter a chamada solicitada.');
+assert.equal(tituloPrevia, -1, 'A prévia repetitiva do orçamento não deve permanecer na tela principal.');
+assert.ok(pagina.includes('id="lista_produtos"') && pagina.includes('id="lista_servicos"'), 'Equipamentos e serviços devem ter quadros separados.');
+assert.ok(pagina.includes('.selecao-grid{display:grid;grid-template-columns:1fr;'), 'Equipamentos e serviços devem ficar em uma sequência vertical.');
+assert.ok(pagina.includes('data-tipo-toggle'), 'Cada item deve oferecer uma etiqueta de categoria clicável.');
+assert.ok(pagina.includes('function alternarTipoItem'), 'A página deve conter a ação de migração de categoria.');
+assert.ok(pagina.includes('/catalogo/tipo-item'), 'A migração de categoria deve persistir no backend local.');
+assert.ok(pagina.includes('class="item-cartao"'), 'Cada item deve usar um cartão compacto.');
+assert.ok(pagina.includes('class="item-valor-manual"'), 'O valor manual deve permanecer visível no cartão.');
+assert.ok(pagina.includes('class="locacao-caixinha"'), 'A locação externa deve ser exibida como uma caixinha compacta.');
+assert.ok(pagina.includes('class="locacao-detalhes"') && pagina.includes('fornecedor_externo') && pagina.includes('custo_externo'), 'A caixinha de locação externa deve abrir fornecedor e valor de custo quando ativada.');
+assert.ok(pagina.includes('class="item-identidade"') && pagina.includes('class="item-valor-manual"'), 'O valor manual deve ficar ao lado da identificação do item.');
+assert.ok(pagina.includes('id="data_evento_inicio"') && pagina.includes('id="data_evento_final"'), 'O formulário deve separar a data inicial e final do evento.');
+assert.ok(pagina.includes('id="total_geral"') && pagina.includes('id="linha_desconto"'), 'O fechamento deve mostrar desconto e valor total abaixo dos subtotais.');
+assert.ok(pagina.includes('data-externo-campo="externo"'), 'A caixinha deve preservar a marcação de locação externa por item.');
+assert.ok(!pagina.includes('id="resumo_externo"'), 'O resumo financeiro repetitivo de locações externas não deve aparecer na tela principal.');
+
+console.log('OK: a tela mantém duas colunas, seleção vertical e controles comerciais organizados.');
