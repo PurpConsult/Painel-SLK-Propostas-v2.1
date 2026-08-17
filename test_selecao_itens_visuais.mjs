@@ -14,10 +14,10 @@ const condicoesGerais = pagina.indexOf('id="mostrar_condicoes_gerais"');
 
 assert.ok(pagina.includes('class="formulario-duas-colunas"'), 'O formulário deve ser organizado em duas colunas.');
 assert.ok(pagina.includes('class="coluna-form coluna-esquerda"') && pagina.includes('class="coluna-form coluna-direita"'), 'As duas colunas precisam estar identificadas para manter a hierarquia visual.');
-assert.ok(pagina.includes('@media(max-width:768px){\n\t\t\t    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}'), 'Em tela estreita, as duas colunas devem ficar empilhadas sem perder os campos.');
+assert.match(pagina, /@media\(max-width:768px\)\{[\s\S]*?\.formulario-duas-colunas\{grid-template-columns:1fr;gap:0\}/, 'Em tela estreita, as duas colunas devem ficar empilhadas sem perder os campos.');
 assert.ok(blocoIa >= 0 && blocoIa < dadosEvento && dadosEvento < dadosCliente, 'A coluna esquerda deve seguir a ordem: IA, dados do evento e dados do cliente.');
 assert.ok(buscaCatalogo >= 0 && buscaCatalogo < resumoEscolhidos && resumoEscolhidos < observacoes && observacoes < precosIndividuais && precosIndividuais < condicoesGerais, 'A coluna direita deve seguir a ordem: seleção, itens, observações e opções do PDF.');
-assert.ok(pagina.includes('✨ Conte comigo: Cole aqui o briefing do cliente!'), 'A chamada de briefing deve usar a frase acolhedora solicitada.');
+assert.ok(pagina.includes('<h3 id="titulo_briefing_ia">✨ Conte comigo: Cole aqui o briefing do cliente!</h3>'), 'A chamada de briefing deve usar a mesma hierarquia visual do cabeçalho de dados.');
 assert.ok(!pagina.includes('Prévia por IA'), 'O título técnico da prévia deve ser removido da chamada de briefing.');
 assert.ok(pagina.includes('ia-explicacao ia-explicacao-rodape'), 'A explicação sobre conferência deve aparecer abaixo da caixa de briefing.');
 assert.ok(pagina.includes('Ou anexe o briefing aqui:'), 'O anexo de briefing deve ter a chamada solicitada.');
@@ -33,6 +33,9 @@ assert.ok(pagina.includes('class="locacao-caixinha"'), 'A locação externa deve
 assert.ok(pagina.includes('class="locacao-detalhes"') && pagina.includes('fornecedor_externo') && pagina.includes('custo_externo'), 'A caixinha de locação externa deve abrir fornecedor e valor de custo quando ativada.');
 assert.ok(pagina.includes('class="item-identidade"') && pagina.includes('class="item-valor-manual"'), 'O valor manual deve ficar ao lado da identificação do item.');
 assert.ok(pagina.includes('id="data_evento_inicio"') && pagina.includes('id="data_evento_final"'), 'O formulário deve separar a data inicial e final do evento.');
+assert.ok(pagina.includes('id="horario_montagem_final"') && pagina.includes('id="horario_desmontagem_final"'), 'Montagem e desmontagem devem registrar os horários de e até.');
+assert.ok(pagina.includes('class="evento-sem-data-caixa"'), 'A caixinha de evento sem data deve ficar abaixo das datas do evento.');
+assert.ok(pagina.includes('id="formato_evento"') && pagina.includes('/tipos-evento'), 'O formato do evento deve ser uma seleção alimentada pelo backend seguro.');
 assert.ok(pagina.includes('id="total_geral"') && pagina.includes('id="linha_desconto"'), 'O fechamento deve mostrar desconto e valor total abaixo dos subtotais.');
 assert.ok(pagina.includes('data-externo-campo="externo"'), 'A caixinha deve preservar a marcação de locação externa por item.');
 assert.ok(!pagina.includes('id="resumo_externo"'), 'O resumo financeiro repetitivo de locações externas não deve aparecer na tela principal.');

@@ -23,10 +23,11 @@ label{display:block;margin-bottom:3px;font-size:13px;color:#555;font-weight:500}
 input,select,textarea{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:5px;font-size:14px;background:#fff;transition:border 0.2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#00bcd4;box-shadow:0 0 0 2px rgba(0,188,212,0.1)}
 input[readonly]{background:#f5f5f5;color:#666}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.grid-full{grid-column:1/-1}
-.check-inline{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;font-weight:400;cursor:pointer}
+	.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+	.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+	.grid-full{grid-column:1/-1}
+	.agenda-evento{display:grid;gap:10px}.agenda-linha{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:10px;align-items:end}.agenda-linha-evento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:end}.periodo-horario{display:grid;grid-template-columns:1fr 1fr;gap:8px}.periodo-horario label{font-size:11px;color:#617a7f}.evento-sem-data-caixa{display:flex;align-items:center;gap:7px;margin:0;padding:8px 10px;border:1px dashed #9dd8df;border-radius:6px;background:#f6fcfc;color:#2e6570;font-size:12px;font-weight:600;cursor:pointer}.evento-sem-data-caixa input{width:auto;margin:0;accent-color:#0097a7}.evento-sem-data-caixa:has(input:checked){border-style:solid;border-color:#77cbd3;background:#e9f8f9;color:#006f7d}
+	.check-inline{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;font-weight:400;cursor:pointer}
 .check-inline input{width:auto;accent-color:#0097a7}
 .ajuste-comercial{margin-top:7px;padding:7px 8px;border:1px solid #d8edf0;border-radius:5px;background:#f7fcfc}
 .ajuste-comercial label{font-size:11px;color:#27717a;margin-bottom:2px}
@@ -89,10 +90,11 @@ input[readonly]{background:#f5f5f5;color:#666}
 .qtd-btn{width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#f9f9f9;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#555}
 .qtd-btn:hover{background:#e0f7fa;border-color:#00bcd4}
 
-			@media(max-width:768px){
-			    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
-			    .grid-3{grid-template-columns:1fr}
-		    .item-operacao{grid-template-columns:auto minmax(0,1fr) auto;gap:6px;padding:6px}.item-nome strong{white-space:normal}.item-total strong{font-size:11px}
+				@media(max-width:768px){
+				    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
+				    .grid-3{grid-template-columns:1fr}
+				    .agenda-linha{grid-template-columns:1fr}.agenda-linha-evento{grid-template-columns:1fr 1fr}
+			    .item-operacao{grid-template-columns:auto minmax(0,1fr) auto;gap:6px;padding:6px}.item-nome strong{white-space:normal}.item-total strong{font-size:11px}
     header{flex-direction:column;gap:10px}
 }
 </style>
@@ -111,7 +113,7 @@ input[readonly]{background:#f5f5f5;color:#666}
     <div class="formulario-duas-colunas">
         <div class="coluna-form coluna-esquerda">
             <div class="bloco-form" id="bloco_ia">
-				<label for="briefing_ia">✨ Conte comigo: Cole aqui o briefing do cliente!</label>
+				<h3 id="titulo_briefing_ia">✨ Conte comigo: Cole aqui o briefing do cliente!</h3>
 				<textarea id="briefing_ia" rows="5" placeholder="Cole aqui o pedido do cliente, dados do evento e itens desejados..."></textarea>
 				<p class="ia-explicacao ia-explicacao-rodape">A IA organiza uma sugestão para conferência. Ela não envia nada ao Meeventos sem a confirmação da equipe.</p>
                 <div style="margin-top:9px">
@@ -134,32 +136,40 @@ input[readonly]{background:#f5f5f5;color:#666}
                         </div>
                         <input type="hidden" id="id_vendedor" value="">
                     </div>
-                    <div class="grid-full">
-                        <label>Nome do Evento *</label>
-                        <input type="text" id="nome_evento" required>
-                    </div>
-                    <div class="grid-full">
-                        <label>Local *</label>
-                        <div class="grupo-busca">
-                            <input type="text" id="busca_local" placeholder="Digite o nome do local..." required autocomplete="off">
-                            <div id="lista_locais"></div>
-                        </div>
-                    </div>
-					<div><label>Data do Evento | Início</label><input type="date" id="data_evento_inicio"></div>
-					<div><label>Data do Evento | Final</label><input type="date" id="data_evento_final"></div>
-					<label class="check-inline grid-full"><input type="checkbox" id="evento_sem_data"> Evento sem data definida</label>
-                    <div>
-                        <label>Quantidade de Pessoas *</label>
-                        <input type="number" id="qtd_pessoas" min="1" required>
-                    </div>
-                    <div><label>Data de Montagem</label><input type="date" id="data_montagem"></div>
-                    <div><label>Horário de Montagem</label><input type="time" id="horario_montagem"></div>
-                    <div><label>Horário de Início do Evento</label><input type="time" id="horario_inicio_evento"></div>
-                    <div><label>Horário de Término do Evento</label><input type="time" id="horario_fim_evento"></div>
-                    <div><label>Data de Desmontagem</label><input type="date" id="data_desmontagem"></div>
-                    <div><label>Horário de Desmontagem</label><input type="time" id="horario_desmontagem"></div>
-                    <div class="grid-full"><label>Formato do Evento</label><input type="text" id="formato_evento" placeholder="Ex.: Auditório, coquetel, plenária, workshop..."></div>
-                </div>
+					<div class="grid-full">
+						<label>Nome do Evento *</label>
+						<input type="text" id="nome_evento" required>
+					</div>
+					<div>
+						<label>Local *</label>
+						<div class="grupo-busca">
+							<input type="text" id="busca_local" placeholder="Digite o nome do local..." required autocomplete="off">
+							<div id="lista_locais"></div>
+						</div>
+					</div>
+					<div>
+						<label>Quantidade de Pessoas *</label>
+						<input type="number" id="qtd_pessoas" min="1" required>
+					</div>
+					<div class="grid-full agenda-evento">
+						<div class="agenda-linha">
+							<div><label>Data de Montagem</label><input type="date" id="data_montagem"></div>
+							<div class="periodo-horario"><div><label>De</label><input type="time" id="horario_montagem"></div><div><label>Até</label><input type="time" id="horario_montagem_final"></div></div>
+						</div>
+						<div class="agenda-linha-evento">
+							<div><label>Data do Evento | Início</label><input type="date" id="data_evento_inicio"></div>
+							<div><label>Horário</label><input type="time" id="horario_inicio_evento"></div>
+							<div><label>Data do Evento | Final</label><input type="date" id="data_evento_final"></div>
+							<div><label>Horário</label><input type="time" id="horario_fim_evento"></div>
+						</div>
+						<label class="evento-sem-data-caixa"><input type="checkbox" id="evento_sem_data"> Evento sem data definida</label>
+						<div class="agenda-linha">
+							<div><label>Data de Desmontagem</label><input type="date" id="data_desmontagem"></div>
+							<div class="periodo-horario"><div><label>De</label><input type="time" id="horario_desmontagem"></div><div><label>Até</label><input type="time" id="horario_desmontagem_final"></div></div>
+						</div>
+						<div><label for="formato_evento">Formato do Evento</label><select id="formato_evento" aria-describedby="ajuda_formato_evento"><option value="">Carregando formatos cadastrados...</option></select><small id="ajuda_formato_evento" style="color:#718085">Opções cadastradas previamente no Meeventos.</small></div>
+					</div>
+				</div>
             </div>
 
             <div class="bloco-form">
@@ -262,6 +272,54 @@ let selecionados = [];
 let lista_vendedores = [];
 let lista_locais = [];
 let lista_clientes = [];
+let lista_tipos_evento = [];
+
+function normalizarFormatoEvento(valor) {
+    return String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
+function selecionarFormatoEvento(nome, id = "") {
+    const campo = document.getElementById("formato_evento");
+    const tipoPorId = lista_tipos_evento.find(tipo => String(tipo.id) === String(id || ""));
+    const tipoPorNome = lista_tipos_evento.find(tipo => normalizarFormatoEvento(tipo.nome) === normalizarFormatoEvento(nome));
+    const tipo = tipoPorId || tipoPorNome;
+    if (tipo) {
+        campo.value = String(tipo.id);
+        return true;
+    }
+    if (!nome) {
+        campo.value = "";
+        return false;
+    }
+    const opcaoLegada = document.createElement("option");
+    opcaoLegada.value = `legado:${nome}`;
+    opcaoLegada.dataset.nome = nome;
+    opcaoLegada.dataset.legado = "true";
+    opcaoLegada.textContent = `Formato salvo: ${nome} (não localizado no cadastro atual)`;
+    campo.appendChild(opcaoLegada);
+    campo.value = opcaoLegada.value;
+    return false;
+}
+
+function renderizarTiposEvento() {
+    const campo = document.getElementById("formato_evento");
+    const nomeAtual = campo.selectedOptions?.[0]?.dataset?.nome || "";
+    const valorAtual = campo.value || "";
+    campo.innerHTML = '<option value="">Selecione o formato do evento</option>';
+    lista_tipos_evento.forEach(tipo => {
+        const opcao = document.createElement("option");
+        opcao.value = String(tipo.id);
+        opcao.dataset.nome = tipo.nome;
+        opcao.textContent = tipo.nome;
+        campo.appendChild(opcao);
+    });
+    if (nomeAtual || valorAtual) selecionarFormatoEvento(nomeAtual, valorAtual);
+}
+
+function obterFormatoEventoSelecionado() {
+    const opcao = document.getElementById("formato_evento").selectedOptions?.[0];
+    return opcao?.dataset?.nome || (opcao && !opcao.value ? "" : String(opcao?.textContent || "").trim());
+}
 
 // ===== CARREGA TODOS OS DADOS DO BACKEND =====
 async function carregar_tudo() {
@@ -286,6 +344,17 @@ async function carregar_tudo() {
             console.log(`Locais carregados: ${lista_locais.length}`);
         }
     } catch (e) { console.error("Erro locais:", e); }
+
+    // Formatos de evento cadastrados no Meeventos
+    try {
+        const res = await fetch(`${API_BASE_URL}/tipos-evento`);
+        if(res.ok) {
+            const json = await res.json();
+            lista_tipos_evento = Array.isArray(json.dados) ? json.dados : [];
+            console.log(`Formatos de evento carregados: ${lista_tipos_evento.length}`);
+        }
+    } catch (e) { console.error("Erro formatos de evento:", e); }
+    renderizarTiposEvento();
 
     // Clientes (745+)
     try {
@@ -331,13 +400,15 @@ function preencherFormularioDeEdicao() {
 		document.getElementById("data_evento_inicio").value = evento.data_evento_inicio || evento.data_evento || "";
 		document.getElementById("data_evento_final").value = evento.data_evento_final || evento.data_evento || "";
         document.getElementById("evento_sem_data").checked = Boolean(evento.evento_sem_data);
-        document.getElementById("data_montagem").value = evento.data_montagem || "";
-        document.getElementById("horario_montagem").value = evento.horario_montagem || "";
-        document.getElementById("horario_inicio_evento").value = evento.horario_inicio_evento || "";
-        document.getElementById("horario_fim_evento").value = evento.horario_fim_evento || "";
-        document.getElementById("data_desmontagem").value = evento.data_desmontagem || "";
-        document.getElementById("horario_desmontagem").value = evento.horario_desmontagem || "";
-        document.getElementById("formato_evento").value = evento.formato_evento || "";
+			document.getElementById("data_montagem").value = evento.data_montagem || "";
+			document.getElementById("horario_montagem").value = evento.horario_montagem || "";
+			document.getElementById("horario_montagem_final").value = evento.horario_montagem_final || "";
+			document.getElementById("horario_inicio_evento").value = evento.horario_inicio_evento || "";
+			document.getElementById("horario_fim_evento").value = evento.horario_fim_evento || "";
+			document.getElementById("data_desmontagem").value = evento.data_desmontagem || "";
+			document.getElementById("horario_desmontagem").value = evento.horario_desmontagem || "";
+			document.getElementById("horario_desmontagem_final").value = evento.horario_desmontagem_final || "";
+			selecionarFormatoEvento(evento.formato_evento || "", evento.id_formato_evento || evento.formato_evento_id || "");
         document.getElementById("qtd_pessoas").value = evento.qtd_pessoas || "";
         document.getElementById("busca_cliente").value = cliente.razao_social || cliente.nome || "";
         document.getElementById("cliente_cnpj").value = cliente.documento || cliente.cnpj || "";
@@ -402,7 +473,7 @@ carregar_tudo().finally(() => {
     const validade = document.getElementById("validade_proposta");
     if (!validade.value) validade.value = adicionarDias(new Date(), 7);
     atualizarEstadoDataEvento();
-		["nome_evento", "busca_local", "data_evento_inicio", "data_evento_final", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "formato_evento", "desconto_proposta"].forEach(id => {
+		["nome_evento", "busca_local", "data_evento_inicio", "data_evento_final", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_montagem_final", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "horario_desmontagem_final", "formato_evento", "desconto_proposta"].forEach(id => {
         document.getElementById(id).addEventListener("input", atualizar_previa_completa);
         document.getElementById(id).addEventListener("change", atualizar_previa_completa);
     });
@@ -478,11 +549,15 @@ async function analisarBriefingIA() {
 
 function aplicarCamposIA() {
     if (!analiseIACorrente) return 0;
-		const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento_inicio",qtd_pessoas:"qtd_pessoas",formato_evento:"formato_evento",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
+		const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento_inicio",qtd_pessoas:"qtd_pessoas",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
     const campos = analiseIACorrente.campos || {};
     const clienteEstavaVazio = !String(document.getElementById("busca_cliente").value || "").trim();
     let preenchidos = 0;
-    Object.entries(mapa).forEach(([chave, id]) => { const campo = document.getElementById(id); if (campos[chave] && !String(campo.value || "").trim()) { campo.value = campos[chave]; preenchidos += 1; } });
+	    Object.entries(mapa).forEach(([chave, id]) => { const campo = document.getElementById(id); if (campos[chave] && !String(campo.value || "").trim()) { campo.value = campos[chave]; preenchidos += 1; } });
+		if (campos.formato_evento && !document.getElementById("formato_evento").value) {
+			selecionarFormatoEvento(campos.formato_evento, campos.id_formato_evento || "");
+			preenchidos += 1;
+		}
     const nomeCliente = String(campos.nome_cliente || "").trim();
     const clienteCadastrado = lista_clientes.find(item => normalizarBuscaIA(item.nome || item.razaosocial) === normalizarBuscaIA(nomeCliente));
     if (clienteEstavaVazio && clienteCadastrado) selecionar_da_lista(clienteCadastrado, "nome", "lista_clientes");
@@ -898,11 +973,14 @@ document.getElementById("form").addEventListener("submit", async e => {
         evento_sem_data: document.getElementById("evento_sem_data").checked,
         data_montagem: document.getElementById("data_montagem").value,
         horario_montagem: document.getElementById("horario_montagem").value,
+		horario_montagem_final: document.getElementById("horario_montagem_final").value,
         horario_inicio_evento: document.getElementById("horario_inicio_evento").value,
         horario_fim_evento: document.getElementById("horario_fim_evento").value,
         data_desmontagem: document.getElementById("data_desmontagem").value,
         horario_desmontagem: document.getElementById("horario_desmontagem").value,
-        formato_evento: document.getElementById("formato_evento").value.trim(),
+		horario_desmontagem_final: document.getElementById("horario_desmontagem_final").value,
+        formato_evento: obterFormatoEventoSelecionado(),
+		id_formato_evento: String(document.getElementById("formato_evento").value || "").startsWith("legado:") ? "" : document.getElementById("formato_evento").value,
         qtd_pessoas: document.getElementById("qtd_pessoas").value,
         cliente_nome: document.getElementById("busca_cliente").value,
         cliente_cnpj: document.getElementById("cliente_cnpj").value,

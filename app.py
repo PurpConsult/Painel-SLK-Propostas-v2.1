@@ -58,7 +58,12 @@ def buscar_paginado(endpoint, max_pages=10):
             resp = requests.get(f"{API_BASE}{endpoint}?page={page}&limit=200", headers=HEADERS, timeout=15)
             resp.raise_for_status()
             data = resp.json()
-            items = data.get("data", data if isinstance(data, list) else [])
+            if isinstance(data, list):
+                todos.extend(data)
+                break
+            if not isinstance(data, dict):
+                break
+            items = data.get("data", [])
             todos.extend(items)
             pagination = data.get("pagination", {})
             total_pages = int(pagination.get("total_page", 1))
@@ -142,11 +147,14 @@ def normalizar_dados_proposta(bruto):
         "evento_sem_data": bool(evento_bruto.get("evento_sem_data", bruto.get("evento_sem_data", False))),
         "data_montagem": _primeiro_valor(evento_bruto.get("data_montagem"), bruto.get("data_montagem"), padrao=""),
         "horario_montagem": _primeiro_valor(evento_bruto.get("horario_montagem"), bruto.get("horario_montagem"), padrao=""),
+        "horario_montagem_final": _primeiro_valor(evento_bruto.get("horario_montagem_final"), bruto.get("horario_montagem_final"), padrao=""),
         "horario_inicio_evento": _primeiro_valor(evento_bruto.get("horario_inicio_evento"), bruto.get("horario_inicio_evento"), padrao=""),
         "horario_fim_evento": _primeiro_valor(evento_bruto.get("horario_fim_evento"), bruto.get("horario_fim_evento"), padrao=""),
         "data_desmontagem": _primeiro_valor(evento_bruto.get("data_desmontagem"), bruto.get("data_desmontagem"), padrao=""),
         "horario_desmontagem": _primeiro_valor(evento_bruto.get("horario_desmontagem"), bruto.get("horario_desmontagem"), padrao=""),
+        "horario_desmontagem_final": _primeiro_valor(evento_bruto.get("horario_desmontagem_final"), bruto.get("horario_desmontagem_final"), padrao=""),
         "formato_evento": _primeiro_valor(evento_bruto.get("formato_evento"), bruto.get("formato_evento"), padrao=""),
+        "id_formato_evento": str(_primeiro_valor(evento_bruto.get("id_formato_evento"), evento_bruto.get("formato_evento_id"), bruto.get("id_formato_evento"), bruto.get("formato_evento_id"), padrao="")),
         "local_evento": _primeiro_valor(evento_bruto.get("local_evento"), evento_bruto.get("local"), bruto.get("local_nome"), bruto.get("local_evento"), padrao="-"),
         "qtd_pessoas": _primeiro_valor(evento_bruto.get("qtd_pessoas"), evento_bruto.get("quantidade_pessoas"), bruto.get("qtd_pessoas"), padrao="-"),
         "nome_vendedor": _primeiro_valor(evento_bruto.get("nome_vendedor"), evento_bruto.get("vendedor"), bruto.get("vendedor_nome"), bruto.get("vendedor"), padrao="-"),
@@ -236,6 +244,21 @@ def api_locais():
         resp = requests.get(f"{API_BASE}/eventlocation", headers=HEADERS, timeout=10)
         dados = resp.json()
         return jsonify(sucesso=True, dados=dados)
+    except Exception as e:
+        return jsonify(sucesso=False, erro=str(e)), 500
+
+@app.route("/api/tipos-evento")
+def api_tipos_evento():
+    """Lista os formatos cadastrados no Meeventos sem expor o token ao navegador."""
+    try:
+        tipos = buscar_paginado("/eventtype")
+        tipos_normalizados = [
+            {"id": str(tipo.get("id") or "").strip(), "nome": str(tipo.get("nome") or tipo.get("descricao") or "").strip()}
+            for tipo in tipos if isinstance(tipo, dict)
+        ]
+        tipos_normalizados = [tipo for tipo in tipos_normalizados if tipo["id"] and tipo["nome"]]
+        tipos_normalizados.sort(key=lambda tipo: tipo["nome"].casefold())
+        return jsonify(sucesso=True, dados=tipos_normalizados)
     except Exception as e:
         return jsonify(sucesso=False, erro=str(e)), 500
 
@@ -544,13 +567,25 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     evento_sem_data = str(campo_evento("evento_sem_data", "")).lower() in {"true", "1", "sim"}
     data_inicio_pdf = texto("data_a_definir") if evento_sem_data else formatar_data_pdf(campo_evento("data_evento_inicio", campo_evento("data_evento")))
     data_final_pdf = texto("data_a_definir") if evento_sem_data else formatar_data_pdf(campo_evento("data_evento_final", campo_evento("data_evento")))
+    def periodo_horario(chave_inicio, chave_final):
+        inicio = campo_evento(chave_inicio, "")
+        final = campo_evento(chave_final, "")
+        if inicio and final:
+            return f"de {inicio} até {final}"
+        if inicio:
+            return f"de {inicio}"
+        if final:
+            return f"até {final}"
+        return "-"
+    horario_montagem_pdf = periodo_horario("horario_montagem", "horario_montagem_final")
+    horario_desmontagem_pdf = periodo_horario("horario_desmontagem", "horario_desmontagem_final")
     elementos.append(Paragraph(f"<b>📌 {texto('dados_evento')}</b>", H2))
     tev = Table([
         [Paragraph(f"<b>{texto('evento')}</b>",ROT), Paragraph(pegar("nome_evento","nome"),NE),
          Paragraph(f"<b>{texto('data_evento_inicio')}</b>",ROT), Paragraph(data_inicio_pdf,NE)],
         [Paragraph(f"<b>{texto('data_evento_final')}</b>",ROT), Paragraph(data_final_pdf,NE),
-         Paragraph(f"<b>{texto('montagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_montagem'))} {campo_evento('horario_montagem', '')}".strip(),NE)],
-        [Paragraph(f"<b>{texto('desmontagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_desmontagem'))} {campo_evento('horario_desmontagem', '')}".strip(),NE),
+         Paragraph(f"<b>{texto('montagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_montagem'))} · {horario_montagem_pdf}",NE)],
+        [Paragraph(f"<b>{texto('desmontagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_desmontagem'))} · {horario_desmontagem_pdf}",NE),
          Paragraph(f"<b>{texto('horario_evento')}</b>",ROT), Paragraph(f"{campo_evento('horario_inicio_evento', '-')} às {campo_evento('horario_fim_evento', '-')}",NE)],
         [Paragraph(f"<b>{texto('formato')}</b>",ROT), Paragraph(campo_evento("formato_evento"),NE),
          Paragraph(f"<b>{texto('local')}</b>",ROT),  Paragraph(pegar("local_evento","local"),NE)],

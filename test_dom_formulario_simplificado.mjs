@@ -28,11 +28,14 @@ window.fetch = async (url, options = {}) => {
       }),
     };
   }
+  if (String(url).endsWith('/tipos-evento')) {
+    return { ok: true, json: async () => ({ dados: [{ id: '4', nome: 'Auditório' }, { id: '5', nome: 'Corporativo' }] }) };
+  }
   return { ok: true, json: async () => ({ dados: [] }) };
 };
 
 window.localStorage.setItem('dados_editar', JSON.stringify({
-  evento: { nome_evento: 'Evento DOM', local_evento: 'Local DOM', qtd_pessoas: 25, formato_evento: 'Auditório', evento_sem_data: false, nome_vendedor: 'Jairo DOM', id_vendedor: '51' },
+  evento: { nome_evento: 'Evento DOM', local_evento: 'Local DOM', qtd_pessoas: 25, formato_evento: 'Auditório', id_formato_evento: '4', evento_sem_data: false, nome_vendedor: 'Jairo DOM', id_vendedor: '51' },
   cliente: { nome: 'Cliente DOM', cnpj: '29.649.702/0001-82', email: 'dom@example.com', telefone: '21999999999', contato: 'Contato DOM' },
   itens: [
     { id: '901', nome: 'PROJETOR DOM', valor: 100, valor_padrao: 100, valor_manual: '', quantidade: 2, tipo_item: 'Equipamento', externo: false, fornecedor_externo: '', custo_externo: 0 },
@@ -61,7 +64,13 @@ preencher('busca_local', 'Local DOM');
 preencher('data_evento_inicio', '2026-09-24');
 preencher('data_evento_final', '2026-09-25');
 preencher('qtd_pessoas', '25');
-preencher('formato_evento', 'Auditório');
+preencher('data_montagem', '2026-09-23');
+preencher('horario_montagem', '09:00');
+preencher('horario_montagem_final', '12:00');
+preencher('data_desmontagem', '2026-09-25');
+preencher('horario_desmontagem', '18:00');
+preencher('horario_desmontagem_final', '20:00');
+preencher('formato_evento', '4');
 preencher('busca_cliente', 'Cliente DOM');
 preencher('cliente_cnpj', '29.649.702/0001-82');
 preencher('cliente_email', 'dom@example.com');
@@ -95,6 +104,10 @@ assert.equal(payloadEnviado.desconto_proposta, 30);
 assert.equal(payloadEnviado.data_evento_inicio, '2026-09-24');
 assert.equal(payloadEnviado.data_evento_final, '2026-09-25');
 assert.equal(payloadEnviado.evento_sem_data, false);
+assert.equal(payloadEnviado.horario_montagem_final, '12:00');
+assert.equal(payloadEnviado.horario_desmontagem_final, '20:00');
+assert.equal(payloadEnviado.formato_evento, 'Auditório');
+assert.equal(payloadEnviado.id_formato_evento, '4');
 assert.equal(payloadEnviado.itens.length, 2);
 assert.equal(payloadEnviado.itens[0].valor_manual, '125');
 assert.equal(payloadEnviado.itens[0].valor, 125);

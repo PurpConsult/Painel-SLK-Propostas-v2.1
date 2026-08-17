@@ -15,16 +15,32 @@ const browser = await puppeteer.launch({
 try {
   const page = await browser.newPage();
   await page.setViewport({ width: 375, height: 812, isMobile: true, deviceScaleFactor: 1 });
+  await page.setRequestInterception(true);
   page.on('request', request => {
+    const caminho = new URL(request.url()).pathname;
+    const respostasCatalogo = {
+      '/api/vendedores': { sucesso: true, dados: [{ id: '62', nome: 'Jairo Junior' }] },
+      '/api/locais': { sucesso: true, dados: [{ id: '301', nome: 'Local Mobile Real' }] },
+      '/api/tipos-evento': { sucesso: true, dados: [{ id: '5', nome: 'Corporativo' }] },
+      '/api/clientes': { sucesso: true, dados: [{ id: '401', nome: 'Cliente Mobile Real' }] },
+      '/api/produtos-catalogo': { sucesso: true, dados: [] },
+    };
+    if (respostasCatalogo[caminho]) {
+      request.respond({ contentType: 'application/json', body: JSON.stringify(respostasCatalogo[caminho]) });
+      return;
+    }
     if (request.url().endsWith('/api/gerar-proposta') && request.method() === 'POST') {
       payloadEnviado = JSON.parse(request.postData() || '{}');
+      request.respond({ contentType: 'application/json', body: JSON.stringify({ sucesso: true, mensagem: 'Proposta salva localmente para validação.' }) });
+      return;
     }
+    request.continue();
   });
 
-  await page.goto(url, { waitUntil: 'networkidle0' });
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => {
     localStorage.setItem('dados_editar', JSON.stringify({
-      evento: { nome_evento: 'Evento Mobile Real', local_evento: 'Local Mobile Real', qtd_pessoas: 12, formato_evento: 'Auditório', evento_sem_data: true, nome_vendedor: 'Jairo Mobile', id_vendedor: '62' },
+      evento: { nome_evento: 'Evento Mobile Real', local_evento: 'Local Mobile Real', qtd_pessoas: 12, formato_evento: 'Corporativo', id_formato_evento: '5', data_montagem: '2026-09-23', horario_montagem: '09:00', horario_montagem_final: '12:00', data_evento_inicio: '2026-09-24', horario_inicio_evento: '14:00', data_evento_final: '2026-09-24', horario_fim_evento: '18:00', data_desmontagem: '2026-09-24', horario_desmontagem: '18:00', horario_desmontagem_final: '20:00', evento_sem_data: false, nome_vendedor: 'Jairo Mobile', id_vendedor: '62' },
       cliente: { nome: 'Cliente Mobile Real', cnpj: '', email: '', telefone: '', contato: '' },
       itens: [
         { id: '701', nome: 'PROJETOR MOBILE REAL', valor: 100, valor_padrao: 100, valor_manual: '', quantidade: 2, tipo_item: 'Equipamento', externo: false, fornecedor_externo: '', custo_externo: 0 },
@@ -32,7 +48,11 @@ try {
       ],
     }));
   });
-  await page.reload({ waitUntil: 'networkidle0' });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => Array.from(document.querySelector('#formato_evento')?.options || []).some(opcao => opcao.value === '5'),
+    { timeout: 45000 }
+  );
   await page.waitForSelector('[data-comercial-campo="valor_manual"][data-idx="0"]');
 
   const layout = await page.evaluate(() => {
@@ -54,15 +74,22 @@ try {
   await page.locator('#nome_evento').fill('Evento Mobile Real');
   await page.locator('#busca_local').fill('Local Mobile Real');
   await page.locator('#qtd_pessoas').fill('12');
-  await page.locator('#formato_evento').fill('Auditório');
+  await page.locator('#data_montagem').fill('2026-09-23');
+  await page.locator('#horario_montagem').fill('09:00');
+  await page.locator('#horario_montagem_final').fill('12:00');
+  await page.locator('#data_evento_inicio').fill('2026-09-24');
+  await page.locator('#horario_inicio_evento').fill('14:00');
+  await page.locator('#data_evento_final').fill('2026-09-24');
+  await page.locator('#horario_fim_evento').fill('18:00');
+  await page.locator('#data_desmontagem').fill('2026-09-24');
+  await page.locator('#horario_desmontagem').fill('18:00');
+  await page.locator('#horario_desmontagem_final').fill('20:00');
+  await page.locator('#formato_evento').fill('5');
   await page.locator('#busca_cliente').fill('Cliente Mobile Real');
   await page.locator('[data-comercial-campo="valor_manual"][data-idx="0"]').fill('125');
   await page.keyboard.press('Tab');
   await page.locator('[data-externo-campo="externo"][data-idx="0"]').click();
-  await page.locator('.comercial-extra summary').click();
   await page.locator('#desconto_proposta').fill('30');
-  const semDataMarcado = await page.$eval('#evento_sem_data', campo => campo.checked);
-  if (!semDataMarcado) await page.locator('#evento_sem_data').click();
   const respostaEnvio = page.waitForResponse(resposta => resposta.url().endsWith('/api/gerar-proposta') && resposta.request().method() === 'POST');
   await page.locator('#btnSubmit').click();
   const resposta = await respostaEnvio;
@@ -76,6 +103,17 @@ try {
   assert.equal(payloadEnviado.itens[0].externo, true);
   assert.equal(payloadEnviado.desconto_proposta, 30);
   assert.equal(payloadEnviado.total_proposta, 700);
+  const eventoEnviado = payloadEnviado.evento || payloadEnviado;
+  assert.equal(eventoEnviado.formato_evento, 'Corporativo');
+  assert.equal(eventoEnviado.id_formato_evento, '5');
+  assert.equal(eventoEnviado.data_montagem, '2026-09-23');
+  assert.equal(eventoEnviado.horario_montagem_final, '12:00');
+  assert.equal(eventoEnviado.data_evento_inicio, '2026-09-24');
+  assert.equal(eventoEnviado.horario_inicio_evento, '14:00');
+  assert.equal(eventoEnviado.data_evento_final, '2026-09-24');
+  assert.equal(eventoEnviado.horario_fim_evento, '18:00');
+  assert.equal(eventoEnviado.data_desmontagem, '2026-09-24');
+  assert.equal(eventoEnviado.horario_desmontagem_final, '20:00');
 
   await page.screenshot({ path: screenshot, fullPage: true });
   assert.ok(fs.existsSync(screenshot), 'A captura de validação móvel precisa ser gerada.');
