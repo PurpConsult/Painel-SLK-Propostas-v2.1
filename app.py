@@ -134,6 +134,131 @@ def _primeiro_valor(*valores, padrao=""):
             return valor
     return padrao
 
+
+def _somente_digitos(valor):
+    return re.sub(r"\D", "", str(valor or ""))
+
+
+def _normalizar_texto_cliente(valor):
+    texto = unicodedata.normalize("NFD", str(valor or ""))
+    texto = "".join(char for char in texto if unicodedata.category(char) != "Mn")
+    return re.sub(r"\s+", " ", texto).strip().casefold()
+
+
+def _itens_resposta_clientes(resposta):
+    if isinstance(resposta, list):
+        return [item for item in resposta if isinstance(item, dict)]
+    if isinstance(resposta, dict):
+        dados = resposta.get("data", [])
+        if isinstance(dados, dict):
+            return [dados]
+        if isinstance(dados, list):
+            return [item for item in dados if isinstance(item, dict)]
+    return []
+
+
+def _cliente_para_formulario(cliente, alternativa=None):
+    """Converte o retorno do Meeventos nos campos necessários à proposta local."""
+    cliente = cliente if isinstance(cliente, dict) else {}
+    alternativa = alternativa if isinstance(alternativa, dict) else {}
+    nome = _primeiro_valor(cliente.get("nome"), cliente.get("razaosocial"), cliente.get("nomefantasia"), cliente.get("cliente"), alternativa.get("nome"), padrao="")
+    documento = _primeiro_valor(cliente.get("cnpjpj"), cliente.get("cpf"), cliente.get("cnpj"), alternativa.get("cnpjpj"), alternativa.get("cpf"), padrao="")
+    return {
+        "id": str(_primeiro_valor(cliente.get("id"), alternativa.get("id"), padrao="")).strip(),
+        "nome": str(nome).strip(),
+        "razaosocial": str(_primeiro_valor(cliente.get("razaosocial"), alternativa.get("razaosocial"), nome, padrao="")).strip(),
+        "nomefantasia": str(_primeiro_valor(cliente.get("nomefantasia"), alternativa.get("nomefantasia"), padrao="")).strip(),
+        "cnpjpj": str(_primeiro_valor(cliente.get("cnpjpj"), alternativa.get("cnpjpj"), padrao="")).strip(),
+        "cpf": str(_primeiro_valor(cliente.get("cpf"), alternativa.get("cpf"), padrao="")).strip(),
+        "documento": str(documento).strip(),
+        "email": str(_primeiro_valor(cliente.get("email"), alternativa.get("email"), padrao="")).strip(),
+        "telefone": str(_primeiro_valor(cliente.get("telefone"), alternativa.get("telefone"), padrao="")).strip(),
+        "celular": str(_primeiro_valor(cliente.get("celular"), alternativa.get("celular"), padrao="")).strip(),
+        "responsavel": str(_primeiro_valor(cliente.get("responsavel"), alternativa.get("responsavel"), nome, padrao="")).strip(),
+        "tipocadastro": str(_primeiro_valor(cliente.get("tipocadastro"), alternativa.get("tipocadastro"), padrao="0")).strip(),
+    }
+
+
+def _preparar_novo_cliente(dados):
+    """Mantém no servidor somente os campos de cadastro explicitamente permitidos."""
+    if not isinstance(dados, dict):
+        raise ValueError("Informe os dados do novo cliente.")
+    tipo = str(dados.get("tipo_cadastro") or dados.get("tipocadastro") or "pj").strip().lower()
+    pessoa_juridica = tipo in {"pj", "1", "juridica", "jurídica", "pessoa juridica", "pessoa jurídica"}
+    nome = str(_primeiro_valor(dados.get("nome"), dados.get("razao_social"), dados.get("razaosocial"), padrao="")).strip()
+    if len(nome) < 3:
+        raise ValueError("Informe a razão social ou o nome completo do cliente.")
+    documento = _somente_digitos(dados.get("documento") or dados.get("cnpj") or dados.get("cpf"))
+    if documento:
+        tamanho_esperado = 14 if pessoa_juridica else 11
+        tipo_documento = "CNPJ" if pessoa_juridica else "CPF"
+        if len(documento) != tamanho_esperado:
+            raise ValueError(f"Informe um {tipo_documento} com {tamanho_esperado} dígitos ou deixe o campo em branco.")
+    email = str(dados.get("email") or "").strip()
+    if email and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        raise ValueError("Informe um e-mail válido.")
+    telefone = str(dados.get("telefone") or "").strip()
+    celular = str(dados.get("celular") or "").strip()
+    if not email and not telefone and not celular:
+        raise ValueError("Informe ao menos um e-mail, telefone ou celular para o novo cliente.")
+    registro = {
+        "tipocadastro": 1 if pessoa_juridica else 0,
+        "nome": nome,
+        "email": email,
+        "telefone": telefone,
+        "celular": celular,
+        "responsavel": str(dados.get("responsavel") or dados.get("contato") or "").strip(),
+        "cep": _somente_digitos(dados.get("cep")),
+        "endereco": str(dados.get("endereco") or "").strip(),
+        "numero": str(dados.get("numero") or "").strip(),
+        "complemento": str(dados.get("complemento") or "").strip(),
+        "bairro": str(dados.get("bairro") or "").strip(),
+        "cidade": str(dados.get("cidade") or "").strip(),
+        "estado": str(dados.get("estado") or "").strip().upper(),
+        "anotacoes": str(dados.get("anotacoes") or "").strip(),
+    }
+    if pessoa_juridica:
+        registro.update({"razaosocial": str(dados.get("razao_social") or nome).strip(), "nomefantasia": str(dados.get("nome_fantasia") or dados.get("nomefantasia") or "").strip(), "cnpjpj": documento})
+    else:
+        registro["cpf"] = documento
+    return registro
+
+
+def _buscar_cliente_no_meeventos(valor, tipo_busca=None):
+    parametros = {"search": valor, "page": 1, "limit": 20}
+    if tipo_busca is not None:
+        parametros["type"] = tipo_busca
+    resposta = requests.get(f"{API_BASE}/clients", headers=HEADERS, params=parametros, timeout=15)
+    resposta.raise_for_status()
+    return _itens_resposta_clientes(resposta.json())
+
+
+def _localizar_clientes_duplicados(registro):
+    """Não permite criação automática quando documento, e-mail ou nome já existem exatamente."""
+    encontrados, ids_adicionados = [], set()
+    documento = _somente_digitos(registro.get("cnpjpj") or registro.get("cpf"))
+    criterios = []
+    if documento:
+        criterios.append((documento, 3, "documento"))
+    if registro.get("email"):
+        criterios.append((registro["email"], 1, "email"))
+    criterios.append((registro.get("nome") or registro.get("razaosocial") or "", None, "nome"))
+    for valor, tipo_busca, campo in criterios:
+        if not valor:
+            continue
+        for item in _buscar_cliente_no_meeventos(valor, tipo_busca):
+            documento_item = _somente_digitos(item.get("cnpjpj") or item.get("cpf") or item.get("cnpj"))
+            corresponde = (
+                (campo == "documento" and documento_item == documento) or
+                (campo == "email" and str(item.get("email") or "").strip().casefold() == str(registro.get("email") or "").strip().casefold()) or
+                (campo == "nome" and _normalizar_texto_cliente(_primeiro_valor(item.get("nome"), item.get("razaosocial"), item.get("nomefantasia"), padrao="")) == _normalizar_texto_cliente(registro.get("nome")))
+            )
+            identificador = str(item.get("id") or "")
+            if corresponde and identificador not in ids_adicionados:
+                encontrados.append(_cliente_para_formulario(item))
+                ids_adicionados.add(identificador)
+    return encontrados
+
 def normalizar_dados_proposta(bruto):
     """Converte o payload do formulário em uma estrutura única para PDF, histórico e edição."""
     bruto = bruto or {}
@@ -162,6 +287,7 @@ def normalizar_dados_proposta(bruto):
         "id_vendedor": str(_primeiro_valor(evento_bruto.get("id_vendedor"), bruto.get("id_vendedor"), padrao="51")),
     }
     cliente = {
+        "id": str(_primeiro_valor(cliente_bruto.get("id"), cliente_bruto.get("id_cliente"), bruto.get("cliente_id"), bruto.get("id_cliente"), padrao="")),
         "razao_social": _primeiro_valor(cliente_bruto.get("razao_social"), cliente_bruto.get("nome"), cliente_bruto.get("nome_cliente"), bruto.get("cliente_nome"), bruto.get("razao_social"), bruto.get("nome_cliente"), padrao="Cliente"),
         "documento": _primeiro_valor(cliente_bruto.get("documento"), cliente_bruto.get("cnpj"), cliente_bruto.get("cpf"), bruto.get("cliente_cnpj"), bruto.get("cnpj"), bruto.get("cpf"), padrao="-"),
         "email": _primeiro_valor(cliente_bruto.get("email"), bruto.get("cliente_email"), bruto.get("email"), padrao="-"),
@@ -271,6 +397,42 @@ def api_clientes():
         return jsonify(sucesso=True, dados=clientes)
     except Exception as e:
         return jsonify(sucesso=False, erro=str(e)), 500
+
+
+@app.route("/api/clientes/novo", methods=["POST"])
+def api_novo_cliente():
+    """Cria um cliente somente após a ação explícita da equipe no formulário."""
+    if not TOKEN:
+        return jsonify(sucesso=False, erro="A integração Meeventos não está configurada neste computador."), 503
+    try:
+        registro = _preparar_novo_cliente(request.get_json(silent=True) or {})
+    except ValueError as erro:
+        return jsonify(sucesso=False, erro=str(erro)), 400
+    try:
+        duplicados = _localizar_clientes_duplicados(registro)
+    except requests.RequestException:
+        return jsonify(sucesso=False, erro="Não foi possível conferir duplicidade no Meeventos. Verifique a conexão e tente novamente para evitar cadastros repetidos."), 502
+    except (ValueError, TypeError, json.JSONDecodeError):
+        return jsonify(sucesso=False, erro="O Meeventos respondeu de forma inesperada durante a conferência do cliente. Nenhum cadastro foi criado."), 502
+    if duplicados:
+        return jsonify(sucesso=False, duplicado=True, erro="Já existe um cliente com o mesmo documento, e-mail ou nome. Selecione o cadastro existente abaixo.", dados=duplicados), 409
+    try:
+        resposta = requests.post(
+            f"{API_BASE}/clients",
+            headers={**HEADERS, "Content-Type": "application/json", "Accept": "application/json"},
+            json=[registro],
+            timeout=15,
+        )
+        resposta.raise_for_status()
+        criados = _itens_resposta_clientes(resposta.json())
+        cliente = _cliente_para_formulario(criados[0] if criados else {}, registro)
+        if not cliente.get("id"):
+            return jsonify(sucesso=False, erro="O Meeventos confirmou o cadastro, mas não retornou o identificador do cliente. Nenhuma proposta foi gerada; confira o cadastro antes de continuar."), 502
+        return jsonify(sucesso=True, mensagem="Novo cliente cadastrado no Meeventos e selecionado na proposta.", cliente=cliente), 201
+    except requests.RequestException:
+        return jsonify(sucesso=False, erro="Não foi possível cadastrar o cliente no Meeventos. Verifique a conexão e tente novamente."), 502
+    except (ValueError, TypeError, json.JSONDecodeError):
+        return jsonify(sucesso=False, erro="O Meeventos respondeu de forma inesperada ao cadastrar o cliente. Confira o cadastro antes de tentar novamente."), 502
 
 @app.route("/api/produtos-catalogo")
 def api_produtos_catalogo():
