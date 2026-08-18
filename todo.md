@@ -398,4 +398,4 @@
 - [x] Validar o layout compacto em equipamentos e serviços antes de preparar a atualização local.
 
 ## Publicação da Edição de Kits
-- [ ] Publicar no repositório oficial o código, os testes e o registro de tarefas da composição editável de kits, sem dados operacionais ou credenciais.
+- [x] Publicar no repositório oficial o código, os testes e o registro de tarefas da composição editável de kits, sem dados operacionais ou credenciais.
