@@ -8,10 +8,19 @@ import io
 import re
 import unicodedata
 import zipfile
+import tempfile
+import uuid
 from difflib import SequenceMatcher
 from xml.etree import ElementTree as ET
 from xml.sax.saxutils import escape as xml_escape
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+try:
+    import boto3
+    from botocore.config import Config as BotoConfig
+except ImportError:
+    boto3 = None
+    BotoConfig = None
 
 app = Flask(__name__)
 
@@ -279,6 +288,7 @@ def normalizar_dados_proposta(bruto):
         "data_desmontagem": _primeiro_valor(evento_bruto.get("data_desmontagem"), bruto.get("data_desmontagem"), padrao=""),
         "horario_desmontagem": _primeiro_valor(evento_bruto.get("horario_desmontagem"), bruto.get("horario_desmontagem"), padrao=""),
         "horario_desmontagem_final": _primeiro_valor(evento_bruto.get("horario_desmontagem_final"), bruto.get("horario_desmontagem_final"), padrao=""),
+        "observacao_montagem": _primeiro_valor(evento_bruto.get("observacao_montagem"), evento_bruto.get("montagem_observacao"), bruto.get("observacao_montagem"), bruto.get("montagem_observacao"), evento_bruto.get("formato_evento"), bruto.get("formato_evento"), padrao=""),
         "formato_evento": _primeiro_valor(evento_bruto.get("formato_evento"), bruto.get("formato_evento"), padrao=""),
         "id_formato_evento": str(_primeiro_valor(evento_bruto.get("id_formato_evento"), evento_bruto.get("formato_evento_id"), bruto.get("id_formato_evento"), bruto.get("formato_evento_id"), padrao="")),
         "local_evento": _primeiro_valor(evento_bruto.get("local_evento"), evento_bruto.get("local"), bruto.get("local_nome"), bruto.get("local_evento"), padrao="-"),
@@ -347,7 +357,7 @@ def normalizar_dados_proposta(bruto):
         "validade_proposta": _primeiro_valor(bruto.get("validade_proposta"), padrao=""),
         "desconto_proposta": desconto_proposta,
         "link_projeto": _primeiro_valor(bruto.get("link_projeto"), bruto.get("link"), padrao=""),
-        "foto_proposta": _primeiro_valor(bruto.get("foto_proposta"), padrao=""),
+        "foto_proposta": _primeiro_valor(bruto.get("foto_proposta"), padrao="static/imagem_referencia_padrao.jpeg"),
         "opcoes_pdf": opcoes_pdf,
         "observacoes_gerais": _primeiro_valor(bruto.get("observacoes_gerais"), bruto.get("observacoes"), bruto.get("observacao"), padrao=""),
         "observacoes": _primeiro_valor(bruto.get("observacoes_gerais"), bruto.get("observacoes"), bruto.get("observacao"), padrao=""),
@@ -750,7 +760,7 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
          Paragraph(f"<b>{texto('montagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_montagem'))} · {horario_montagem_pdf}",NE)],
         [Paragraph(f"<b>{texto('desmontagem')}</b>",ROT), Paragraph(f"{formatar_data_pdf(campo_evento('data_desmontagem'))} · {horario_desmontagem_pdf}",NE),
          Paragraph(f"<b>{texto('horario_evento')}</b>",ROT), Paragraph(f"{campo_evento('horario_inicio_evento', '-')} às {campo_evento('horario_fim_evento', '-')}",NE)],
-        [Paragraph(f"<b>{texto('formato')}</b>",ROT), Paragraph(campo_evento("formato_evento"),NE),
+        [Paragraph("<b>Montagem / arrumação</b>",ROT), Paragraph(campo_evento("observacao_montagem", campo_evento("formato_evento", "-")) or "-",NE),
          Paragraph(f"<b>{texto('local')}</b>",ROT),  Paragraph(pegar("local_evento","local"),NE)],
         [Paragraph(f"<b>{texto('pessoas')}</b>",ROT),Paragraph(pegar("qtd_pessoas","quantidade_pessoas"),NE),
          Paragraph(f"<b>{texto('vendedor')}</b>",ROT),Paragraph(pegar("vendedor","nome_vendedor"),NE)],
@@ -976,12 +986,51 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     return buffer
 
 @app.route("/api/gerar-pdf", methods=["POST"])
-def api_gerar_pdf():
-    dados_proposta = request.json
-    num_orcamento = dados_proposta.get("num_orcamento", "")
-    pdf_buffer = gerar_pdf_buffer(dados_proposta, num_orcamento)
-    filename = f"proposta_SLK_{num_orcamento}_{datetime.now().strftime('%d%m%Y')}.pdf"
-    return send_file(pdf_buffer, download_name=filename, mimetype="application/pdf")
+@app.route("/api/proposta/visualizar", methods=["POST"])
+def api_visualizar_proposta_pdf():
+    """Gera uma cópia de conferência sem criar versão, salvar arquivo ou enviar dados ao Meeventos."""
+    foto_temporaria = ""
+    try:
+        if request.is_json:
+            bruto = request.get_json(silent=True) or {}
+        else:
+            dados_serializados = str(request.form.get("dados") or "{}").strip()
+            try:
+                bruto = json.loads(dados_serializados)
+            except json.JSONDecodeError as erro:
+                raise ValueError("Os dados da proposta para visualização estão inválidos.") from erro
+
+            foto = request.files.get("foto")
+            if foto and foto.filename:
+                nome_seguro = secure_filename(foto.filename)
+                extensao = nome_seguro.rsplit(".", 1)[-1].lower() if "." in nome_seguro else ""
+                if extensao not in EXTENSOES_IMAGEM_PERMITIDAS:
+                    raise ValueError("Use uma imagem JPG, PNG ou WEBP na proposta.")
+                arquivo_temporario = tempfile.NamedTemporaryFile(prefix="soulink_previa_", suffix=f".{extensao}", delete=False)
+                foto_temporaria = arquivo_temporario.name
+                arquivo_temporario.close()
+                foto.save(foto_temporaria)
+                bruto["foto_proposta"] = foto_temporaria
+
+        dados_proposta = normalizar_dados_proposta(bruto)
+        dados_proposta["blocos"] = aplicar_desconto_blocos(
+            calcular_blocos(dados_proposta.get("itens", [])), dados_proposta.get("desconto_proposta")
+        )
+        numero_exibicao = str(dados_proposta.get("numero") or "RASCUNHO").strip() or "RASCUNHO"
+        pdf_buffer = gerar_pdf_buffer(dados_proposta, numero_exibicao)
+        filename = f"proposta_SLK_{numero_exibicao}_CONFERENCIA_{datetime.now().strftime('%d%m%Y')}.pdf"
+        return send_file(pdf_buffer, download_name=filename, mimetype="application/pdf")
+    except (TypeError, ValueError, KeyError) as erro:
+        return jsonify({"sucesso": False, "erro": str(erro) or "Não foi possível preparar a visualização."}), 400
+    except Exception:
+        app.logger.exception("Falha ao gerar PDF provisório da proposta")
+        return jsonify({"sucesso": False, "erro": "Não foi possível gerar a visualização agora. Confira os dados preenchidos e tente novamente."}), 500
+    finally:
+        if foto_temporaria and os.path.exists(foto_temporaria):
+            try:
+                os.remove(foto_temporaria)
+            except OSError:
+                pass
 
 # ============================== #
 # ENVIO PARA O MEEVENTOS         #
@@ -1037,6 +1086,15 @@ EXTENSOES_IMAGEM_PERMITIDAS = {"jpg", "jpeg", "png", "webp"}
 EXTENSOES_BRIEFING_PERMITIDAS = {"txt", "pdf", "docx"}
 TAMANHO_MAXIMO_BRIEFING = 5 * 1024 * 1024
 CARACTERES_MAXIMOS_BRIEFING = 24000
+TAMANHO_MAXIMO_ANEXO_PROJETO = 20 * 1024 * 1024
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "").strip()
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "").strip()
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "").strip()
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "soulink-projetos").strip() or "soulink-projetos"
+try:
+    R2_LINK_TTL_SECONDS = max(300, min(int(os.environ.get("R2_LINK_TTL_SECONDS", "604800")), 604800))
+except ValueError:
+    R2_LINK_TTL_SECONDS = 604800
 STATUS_PROPOSTA = {
     "rascunho": "Rascunho",
     "data_a_definir": "Data a definir",
@@ -1800,7 +1858,7 @@ def _schema_briefing_ia():
                             "local_evento": {"type": "string"},
                             "data_evento": {"type": "string"},
                             "qtd_pessoas": {"type": "string"},
-                            "formato_evento": {"type": "string"},
+                            "observacao_montagem": {"type": "string"},
                             "data_montagem": {"type": "string"},
                             "horario_montagem": {"type": "string"},
                             "horario_inicio_evento": {"type": "string"},
@@ -1809,7 +1867,7 @@ def _schema_briefing_ia():
                             "horario_desmontagem": {"type": "string"},
                             "nome_cliente": {"type": "string"}
                         },
-                        "required": ["nome_evento", "local_evento", "data_evento", "qtd_pessoas", "formato_evento", "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "nome_cliente"],
+                        "required": ["nome_evento", "local_evento", "data_evento", "qtd_pessoas", "observacao_montagem", "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "nome_cliente"],
                         "additionalProperties": False
                     },
                     "itens_solicitados": {
@@ -1882,7 +1940,7 @@ def _normalizar_analise_briefing(resultado):
     if not isinstance(resultado, dict):
         raise ValueError("A análise da IA precisa ser um objeto JSON.")
     campos_esperados = (
-        "nome_evento", "local_evento", "data_evento", "qtd_pessoas", "formato_evento",
+        "nome_evento", "local_evento", "data_evento", "qtd_pessoas", "observacao_montagem",
         "data_montagem", "horario_montagem", "horario_inicio_evento", "horario_fim_evento",
         "data_desmontagem", "horario_desmontagem", "nome_cliente",
     )
@@ -2103,6 +2161,91 @@ def upload_imagem_proposta():
     arquivo.save(os.path.join(PASTA_IMAGENS_PROPOSTA, nome_final))
     return jsonify({"sucesso": True, "foto_proposta": f"imagens_propostas/{nome_final}"})
 
+
+def _validar_configuracao_r2():
+    faltantes = [nome for nome, valor in {
+        "R2_ACCOUNT_ID": R2_ACCOUNT_ID,
+        "R2_ACCESS_KEY_ID": R2_ACCESS_KEY_ID,
+        "R2_SECRET_ACCESS_KEY": R2_SECRET_ACCESS_KEY,
+    }.items() if not valor]
+    if faltantes:
+        raise ValueError("O armazenamento de projetos ainda não está configurado neste computador. Defina as credenciais R2 e reinicie a aplicação.")
+    if boto3 is None or BotoConfig is None:
+        raise ValueError("Falta instalar a dependência de armazenamento. Execute pip install -r requirements.txt e reinicie a aplicação.")
+
+
+def _criar_cliente_r2():
+    _validar_configuracao_r2()
+    return boto3.client(
+        "s3",
+        endpoint_url=f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        region_name="auto",
+        config=BotoConfig(signature_version="s3v4", retries={"max_attempts": 3, "mode": "standard"}),
+    )
+
+
+def _gerar_link_assinado_r2(chave_arquivo):
+    chave = str(chave_arquivo or "").strip()
+    if not chave:
+        return ""
+    cliente = _criar_cliente_r2()
+    return cliente.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": R2_BUCKET_NAME, "Key": chave},
+        ExpiresIn=R2_LINK_TTL_SECONDS,
+    )
+
+
+def _enviar_anexo_projeto_r2(arquivo):
+    if not arquivo or not arquivo.filename:
+        raise ValueError("Selecione o PDF do projeto para enviar.")
+    nome_seguro = secure_filename(arquivo.filename)
+    if not nome_seguro.lower().endswith(".pdf"):
+        raise ValueError("Envie somente arquivos em PDF.")
+
+    conteudo = arquivo.read(TAMANHO_MAXIMO_ANEXO_PROJETO + 1)
+    if len(conteudo) > TAMANHO_MAXIMO_ANEXO_PROJETO:
+        raise ValueError("O PDF do projeto deve ter no máximo 20 MB.")
+    if not conteudo.startswith(b"%PDF-"):
+        raise ValueError("O arquivo enviado não parece ser um PDF válido.")
+
+    chave = f"projetos/{datetime.now().strftime('%Y/%m')}/{uuid.uuid4().hex}_{nome_seguro}"
+    cliente = _criar_cliente_r2()
+    cliente.put_object(
+        Bucket=R2_BUCKET_NAME,
+        Key=chave,
+        Body=conteudo,
+        ContentType="application/pdf",
+        ContentDisposition=f'inline; filename="{nome_seguro}"',
+        Metadata={"origem": "soulink-propostas"},
+    )
+    return {
+        "chave": chave,
+        "nome": nome_seguro,
+        "link": _gerar_link_assinado_r2(chave),
+    }
+
+
+@app.route("/api/upload-anexo-projeto", methods=["POST"])
+def upload_anexo_projeto():
+    """Envia um PDF de projeto ao bucket privado e retorna apenas um link temporário para a proposta."""
+    try:
+        anexo = _enviar_anexo_projeto_r2(request.files.get("arquivo"))
+        return jsonify({
+            "sucesso": True,
+            "link_projeto": anexo["link"],
+            "anexo_projeto_chave": anexo["chave"],
+            "anexo_projeto_nome": anexo["nome"],
+            "validade_link_dias": round(R2_LINK_TTL_SECONDS / 86400, 2),
+        })
+    except ValueError as erro:
+        return jsonify({"sucesso": False, "erro": str(erro)}), 400
+    except Exception:
+        app.logger.exception("Falha ao enviar PDF de projeto ao armazenamento externo")
+        return jsonify({"sucesso": False, "erro": "Não foi possível enviar o PDF do projeto agora. Confira a conexão e tente novamente."}), 502
+
 @app.route("/api/ia/briefing/arquivo", methods=["POST"])
 def upload_arquivo_briefing():
     """Lê um anexo apenas para extrair texto; o arquivo não é persistido nem enviado ao Meeventos."""
@@ -2111,6 +2254,12 @@ def upload_arquivo_briefing():
         return jsonify({"sucesso": True, "arquivo": nome, "texto": texto})
     except ValueError as erro:
         return jsonify({"sucesso": False, "erro": str(erro)}), 400
+    except Exception:
+        app.logger.exception("Falha inesperada ao ler o anexo do briefing")
+        return jsonify({
+            "sucesso": False,
+            "erro": "Não foi possível ler este anexo agora. Confira se é um PDF com texto selecionável e tente novamente."
+        }), 500
 
 @app.route("/api/ia/briefing", methods=["POST"])
 def analisar_briefing_ia():
@@ -2274,6 +2423,14 @@ def api_calcular():
 @app.route("/api/gerar-proposta", methods=["POST"])
 def api_gerar_proposta():
     dados = normalizar_dados_proposta(request.get_json(force=True) or {})
+    if dados.get("anexo_projeto_chave"):
+        try:
+            dados["link_projeto"] = _gerar_link_assinado_r2(dados["anexo_projeto_chave"])
+        except ValueError as erro:
+            return jsonify({"sucesso": False, "erro": str(erro)}), 400
+        except Exception:
+            app.logger.exception("Falha ao renovar link do PDF de projeto")
+            return jsonify({"sucesso": False, "erro": "Não foi possível preparar o link seguro do projeto. Tente novamente."}), 502
     blocos = aplicar_desconto_blocos(calcular_blocos(dados.get("itens", [])), dados.get("desconto_proposta"))
     dados["blocos"] = blocos
 
@@ -2347,6 +2504,8 @@ def api_gerar_proposta():
         "validade_proposta": dados.get("validade_proposta", ""),
         "desconto_proposta": dados.get("desconto_proposta", 0),
         "link_projeto": dados.get("link_projeto", ""),
+        "anexo_projeto_chave": dados.get("anexo_projeto_chave", ""),
+        "anexo_projeto_nome": dados.get("anexo_projeto_nome", ""),
         "foto_proposta": dados.get("foto_proposta", ""),
         "opcoes_pdf": dados.get("opcoes_pdf", {}),
         "arquivo_pdf": nome_pdf,
@@ -2596,6 +2755,14 @@ def api_reemitir_pdf_idioma(numero, versao):
             continue
         opcoes = proposta.get("opcoes_pdf") if isinstance(proposta.get("opcoes_pdf"), dict) else {}
         dados_pdf = {**proposta, "opcoes_pdf": {**opcoes, "idioma": idioma}}
+        if dados_pdf.get("anexo_projeto_chave"):
+            try:
+                dados_pdf["link_projeto"] = _gerar_link_assinado_r2(dados_pdf["anexo_projeto_chave"])
+            except ValueError as erro:
+                return jsonify({"sucesso": False, "erro": str(erro)}), 400
+            except Exception:
+                app.logger.exception("Falha ao renovar link do projeto na reemissão")
+                return jsonify({"sucesso": False, "erro": "Não foi possível renovar o link seguro do projeto para esta cópia."}), 502
         nome_seguro = secure_filename(str(numero)) or "proposta"
         nome_pdf = f"orcamento_{nome_seguro}_v{versao}_{idioma}.pdf"
         os.makedirs(PASTA_PDFS, exist_ok=True)

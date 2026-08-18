@@ -91,13 +91,18 @@ input[readonly]{background:#f5f5f5;color:#666}
 .qtd-btn{width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#f9f9f9;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#555}
 .qtd-btn:hover{background:#e0f7fa;border-color:#00bcd4}
 
-				@media(max-width:768px){
-				    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
+					@media(max-width:768px){
+					    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
 				    .grid-3{grid-template-columns:1fr}
 				    .agenda-linha{grid-template-columns:1fr}.agenda-linha-evento{grid-template-columns:1fr 1fr}
 			    .item-operacao{grid-template-columns:auto minmax(0,1fr) auto;gap:6px;padding:6px}.item-nome strong{white-space:normal}.item-total strong{font-size:11px}
-    header{flex-direction:column;gap:10px}
-}
+	    header{flex-direction:column;gap:10px}
+	}
+.painel-previa-proposta{position:sticky;top:10px;margin:0 0 12px;padding:0;overflow:hidden;border:1px solid #b7e3e8;border-radius:9px;background:#fff;box-shadow:0 5px 16px rgba(11,98,111,.08)}
+.painel-previa-proposta summary{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 12px;cursor:pointer;list-style:none;color:#087480;font-size:13px;font-weight:800;background:linear-gradient(135deg,#eefcfd,#fff)}
+.painel-previa-proposta summary::-webkit-details-marker{display:none}.painel-previa-proposta summary::after{content:'▾';font-size:14px}.painel-previa-proposta:not([open]) summary::after{content:'▸'}
+.previa-proposta-conteudo{padding:11px 12px;border-top:1px solid #dceff1}.previa-aviso{margin:0 0 9px;color:#607f84;font-size:10px;line-height:1.4}.folha-previa{min-height:250px;padding:13px;border:1px solid #e2ebec;border-radius:6px;background:linear-gradient(180deg,#fff 0,#fbfcfc 100%);box-shadow:0 3px 10px rgba(0,0,0,.05);font-size:10px;color:#35545a}.folha-previa-cab{display:flex;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:2px solid #00a9b9}.folha-previa-logo{font-size:13px;font-weight:900;letter-spacing:.02em;color:#008696}.folha-previa-numero{color:#56767b;font-size:9px;text-align:right}.folha-previa-titulo{margin:10px 0 3px;color:#1b424a;font-size:14px;font-weight:800}.folha-previa-meta{color:#608087;line-height:1.45}.folha-previa-imagem{display:none;width:100%;height:84px;margin:9px 0;border-radius:4px;overflow:hidden;background:#eaf6f7}.folha-previa-imagem.ativa{display:block}.folha-previa-imagem img{width:100%;height:100%;object-fit:cover}.folha-previa-secao{margin-top:9px;padding-top:7px;border-top:1px solid #e8efef}.folha-previa-secao strong{display:block;margin-bottom:4px;color:#16818c;font-size:9px;text-transform:uppercase;letter-spacing:.06em}.folha-previa-itens{display:grid;gap:3px}.folha-previa-item{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;overflow:hidden}.folha-previa-item span:first-child{overflow:hidden;text-overflow:ellipsis}.folha-previa-mais{color:#708e92;font-style:italic}.folha-previa-total{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:2px solid #d5edef;color:#0b6c76;font-size:12px;font-weight:900}.previa-acoes{display:flex;justify-content:flex-end;margin-top:8px}.previa-acoes button{padding:5px 8px;font-size:10px}
+@media (max-width:780px){.painel-previa-proposta{position:static}.folha-previa{min-height:220px}}
 </style>
 </head>
 <body>
@@ -169,7 +174,7 @@ input[readonly]{background:#f5f5f5;color:#666}
 							<div><label>Data de Desmontagem</label><input type="date" id="data_desmontagem"></div>
 							<div class="periodo-horario"><div><label>De</label><input type="time" id="horario_desmontagem"></div><div><label>Até</label><input type="time" id="horario_desmontagem_final"></div></div>
 						</div>
-						<div><label for="formato_evento">Formato do Evento</label><select id="formato_evento" aria-describedby="ajuda_formato_evento"><option value="">Carregando formatos cadastrados...</option></select><small id="ajuda_formato_evento" style="color:#718085">Opções cadastradas previamente no Meeventos.</small></div>
+							<div><label for="observacao_montagem">Montagem / arrumação</label><input type="text" id="observacao_montagem" placeholder="Ex.: Auditório, coquetel, escolar, ATC..."><small style="color:#718085">Descreva livremente a configuração do espaço. Esta informação será exibida no PDF.</small></div>
 					</div>
 				</div>
             </div>
@@ -212,8 +217,8 @@ input[readonly]{background:#f5f5f5;color:#666}
 	            </div>
         </div>
 
-        <div class="coluna-form coluna-direita">
-            <div class="bloco-form catalogo-rapido">
+		<div class="coluna-form coluna-direita">
+			<div class="bloco-form catalogo-rapido">
                 <h3>📦 Seleção de Itens</h3>
                 <p>Busque pelo nome ou código para adicionar equipamentos e serviços à proposta.</p>
                 <label for="busca_item">Buscar no catálogo oficial</label>
@@ -265,8 +270,9 @@ input[readonly]{background:#f5f5f5;color:#666}
                     <div class="grid-2">
                         <div><label>Validade da Proposta</label><input type="date" id="validade_proposta"><small style="color:#718085">Padrão: 7 dias a partir da geração.</small></div>
 	                        <div><label>Idioma da cópia comercial do PDF</label><select id="idioma_pdf"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
-                        <div class="grid-full"><label>Link do Projeto / Referência</label><input type="url" id="link_projeto" placeholder="https://..."></div>
-                        <div class="grid-full"><label>Foto de Referência da Proposta</label><input type="file" id="foto_proposta" accept="image/png,image/jpeg,image/webp"><input type="hidden" id="foto_proposta_atual" value=""><small style="color:#718085">A imagem aparecerá após os dados do cliente no PDF.</small></div>
+						<div class="grid-full"><label>PDF do Projeto / Referência</label><input type="file" id="arquivo_projeto" accept="application/pdf,.pdf"><input type="hidden" id="anexo_projeto_chave" value=""><input type="hidden" id="anexo_projeto_nome" value=""><small id="status_arquivo_projeto" style="color:#718085">Opcional. Ao criar a proposta, o PDF será enviado automaticamente à nuvem e o cliente receberá um link seguro válido por 7 dias. A visualização não envia arquivos.</small></div>
+                        <div class="grid-full"><label>Link externo do Projeto / Referência</label><input type="url" id="link_projeto" placeholder="https://..."><small style="color:#718085">Opcional. Use apenas se o projeto já estiver publicado em outro local.</small></div>
+						<div class="grid-full"><label>Foto de Referência da Proposta</label><input type="file" id="foto_proposta" accept="image/png,image/jpeg,image/webp"><input type="hidden" id="foto_proposta_atual" value="static/imagem_referencia_padrao.jpeg"><small style="color:#718085">Se nenhuma foto for escolhida, será usada a imagem padrão de referência. A imagem aparecerá após os dados do cliente no PDF.</small></div>
                     </div>
 					</div>
 				</div>
@@ -274,7 +280,8 @@ input[readonly]{background:#f5f5f5;color:#666}
     </div>
 
 <div class="area-botao">
-    <button type="submit" class="btn" id="btnSubmit">📄 Gerar Orçamento e Enviar ao Meeventos</button>
+    <button type="button" class="btn btn-secundario" id="btnVisualizar">👁 Visualizar proposta</button>
+    <button type="submit" class="btn" id="btnSubmit">✅ Criar proposta</button>
 </div>
 <div id="msg_resultado"></div>
 </form>
@@ -294,54 +301,6 @@ let selecionados = [];
 let lista_vendedores = [];
 let lista_locais = [];
 let lista_clientes = [];
-let lista_tipos_evento = [];
-
-function normalizarFormatoEvento(valor) {
-    return String(valor || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-}
-
-function selecionarFormatoEvento(nome, id = "") {
-    const campo = document.getElementById("formato_evento");
-    const tipoPorId = lista_tipos_evento.find(tipo => String(tipo.id) === String(id || ""));
-    const tipoPorNome = lista_tipos_evento.find(tipo => normalizarFormatoEvento(tipo.nome) === normalizarFormatoEvento(nome));
-    const tipo = tipoPorId || tipoPorNome;
-    if (tipo) {
-        campo.value = String(tipo.id);
-        return true;
-    }
-    if (!nome) {
-        campo.value = "";
-        return false;
-    }
-    const opcaoLegada = document.createElement("option");
-    opcaoLegada.value = `legado:${nome}`;
-    opcaoLegada.dataset.nome = nome;
-    opcaoLegada.dataset.legado = "true";
-    opcaoLegada.textContent = `Formato salvo: ${nome} (não localizado no cadastro atual)`;
-    campo.appendChild(opcaoLegada);
-    campo.value = opcaoLegada.value;
-    return false;
-}
-
-function renderizarTiposEvento() {
-    const campo = document.getElementById("formato_evento");
-    const nomeAtual = campo.selectedOptions?.[0]?.dataset?.nome || "";
-    const valorAtual = campo.value || "";
-    campo.innerHTML = '<option value="">Selecione o formato do evento</option>';
-    lista_tipos_evento.forEach(tipo => {
-        const opcao = document.createElement("option");
-        opcao.value = String(tipo.id);
-        opcao.dataset.nome = tipo.nome;
-        opcao.textContent = tipo.nome;
-        campo.appendChild(opcao);
-    });
-    if (nomeAtual || valorAtual) selecionarFormatoEvento(nomeAtual, valorAtual);
-}
-
-function obterFormatoEventoSelecionado() {
-    const opcao = document.getElementById("formato_evento").selectedOptions?.[0];
-    return opcao?.dataset?.nome || (opcao && !opcao.value ? "" : String(opcao?.textContent || "").trim());
-}
 
 // ===== CARREGA TODOS OS DADOS DO BACKEND =====
 async function carregar_tudo() {
@@ -366,17 +325,6 @@ async function carregar_tudo() {
             console.log(`Locais carregados: ${lista_locais.length}`);
         }
     } catch (e) { console.error("Erro locais:", e); }
-
-    // Formatos de evento cadastrados no Meeventos
-    try {
-        const res = await fetch(`${API_BASE_URL}/tipos-evento`);
-        if(res.ok) {
-            const json = await res.json();
-            lista_tipos_evento = Array.isArray(json.dados) ? json.dados : [];
-            console.log(`Formatos de evento carregados: ${lista_tipos_evento.length}`);
-        }
-    } catch (e) { console.error("Erro formatos de evento:", e); }
-    renderizarTiposEvento();
 
     // Clientes (745+)
     try {
@@ -430,7 +378,7 @@ function preencherFormularioDeEdicao() {
 			document.getElementById("data_desmontagem").value = evento.data_desmontagem || "";
 			document.getElementById("horario_desmontagem").value = evento.horario_desmontagem || "";
 			document.getElementById("horario_desmontagem_final").value = evento.horario_desmontagem_final || "";
-			selecionarFormatoEvento(evento.formato_evento || "", evento.id_formato_evento || evento.formato_evento_id || "");
+			document.getElementById("observacao_montagem").value = evento.observacao_montagem || evento.montagem_observacao || evento.formato_evento || "";
         document.getElementById("qtd_pessoas").value = evento.qtd_pessoas || "";
 	        document.getElementById("busca_cliente").value = cliente.razao_social || cliente.nome || "";
 			document.getElementById("id_cliente").value = cliente.id || cliente.id_cliente || "";
@@ -441,6 +389,9 @@ function preencherFormularioDeEdicao() {
         document.getElementById("validade_proposta").value = dados.validade_proposta || "";
         document.getElementById("desconto_proposta").value = Number(dados.desconto_proposta || 0) || "";
         document.getElementById("link_projeto").value = dados.link_projeto || "";
+			document.getElementById("anexo_projeto_chave").value = dados.anexo_projeto_chave || "";
+			document.getElementById("anexo_projeto_nome").value = dados.anexo_projeto_nome || "";
+			if (dados.anexo_projeto_nome) document.getElementById("status_arquivo_projeto").textContent = `PDF vinculado: ${dados.anexo_projeto_nome}. Selecione outro arquivo apenas para substituir.`;
         document.getElementById("observacoes_gerais").value = dados.observacoes_gerais || dados.observacoes || "";
         document.getElementById("mostrar_valor_unitario").checked = dados.opcoes_pdf?.mostrar_valor_unitario !== false;
         document.getElementById("mostrar_condicoes_gerais").checked = dados.opcoes_pdf?.mostrar_condicoes_gerais !== false;
@@ -496,10 +447,10 @@ carregar_tudo().finally(() => {
     const validade = document.getElementById("validade_proposta");
     if (!validade.value) validade.value = adicionarDias(new Date(), 7);
     atualizarEstadoDataEvento();
-		["nome_evento", "busca_local", "data_evento_inicio", "data_evento_final", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_montagem_final", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "horario_desmontagem_final", "formato_evento", "desconto_proposta"].forEach(id => {
-        document.getElementById(id).addEventListener("input", atualizar_previa_completa);
-        document.getElementById(id).addEventListener("change", atualizar_previa_completa);
-    });
+		["nome_evento", "busca_cliente", "busca_local", "data_evento_inicio", "data_evento_final", "qtd_pessoas", "data_montagem", "horario_montagem", "horario_montagem_final", "horario_inicio_evento", "horario_fim_evento", "data_desmontagem", "horario_desmontagem", "horario_desmontagem_final", "observacao_montagem", "desconto_proposta"].forEach(id => {
+	        document.getElementById(id).addEventListener("input", atualizar_previa_completa);
+	        document.getElementById(id).addEventListener("change", atualizar_previa_completa);
+	    });
 	    document.getElementById("evento_sem_data").addEventListener("change", atualizarEstadoDataEvento);
 	});
 
@@ -546,7 +497,10 @@ async function lerArquivoBriefing() {
     if (!arquivo) { textoArquivoBriefing = ""; return true; }
     const dados = new FormData(); dados.append("arquivo", arquivo);
     const resposta = await fetch("/api/ia/briefing/arquivo", {method:"POST", body:dados});
-    const retorno = await resposta.json();
+    const conteudo = await resposta.text();
+    let retorno = {};
+    try { retorno = conteudo ? JSON.parse(conteudo) : {}; }
+    catch (_) { throw new Error("O sistema não conseguiu interpretar a resposta ao ler o anexo. Reinicie a aplicação e tente novamente."); }
     if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível ler o arquivo.");
     textoArquivoBriefing = retorno.texto || "";
     return true;
@@ -572,15 +526,11 @@ async function analisarBriefingIA() {
 
 function aplicarCamposIA() {
     if (!analiseIACorrente) return 0;
-		const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento_inicio",qtd_pessoas:"qtd_pessoas",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
+		const mapa = {nome_evento:"nome_evento",local_evento:"busca_local",data_evento:"data_evento_inicio",qtd_pessoas:"qtd_pessoas",observacao_montagem:"observacao_montagem",data_montagem:"data_montagem",horario_montagem:"horario_montagem",horario_inicio_evento:"horario_inicio_evento",horario_fim_evento:"horario_fim_evento",data_desmontagem:"data_desmontagem",horario_desmontagem:"horario_desmontagem",nome_cliente:"busca_cliente"};
     const campos = analiseIACorrente.campos || {};
     const clienteEstavaVazio = !String(document.getElementById("busca_cliente").value || "").trim();
     let preenchidos = 0;
 	    Object.entries(mapa).forEach(([chave, id]) => { const campo = document.getElementById(id); if (campos[chave] && !String(campo.value || "").trim()) { campo.value = campos[chave]; preenchidos += 1; } });
-		if (campos.formato_evento && !document.getElementById("formato_evento").value) {
-			selecionarFormatoEvento(campos.formato_evento, campos.id_formato_evento || "");
-			preenchidos += 1;
-		}
     const nomeCliente = String(campos.nome_cliente || "").trim();
     const clienteCadastrado = lista_clientes.find(item => normalizarBuscaIA(item.nome || item.razaosocial) === normalizarBuscaIA(nomeCliente));
     if (clienteEstavaVazio && clienteCadastrado) selecionar_da_lista(clienteCadastrado, "nome", "lista_clientes");
@@ -991,7 +941,7 @@ function atualizar_previa_completa() {
 		 linhaDesconto.textContent = desconto > 0 ? `Desconto: - ${dinheiro(desconto)}` : "";
 		 document.getElementById("total_geral").textContent = `Valor total da proposta: ${dinheiro(totalFinal)}`;
 		 atualizarResumoLocacaoExterna();
-}
+	}
 
 function escaparHtml(valor) {
     return String(valor || "").replace(/[&<>'"]/g, caractere => ({
@@ -1118,25 +1068,11 @@ async function alternarTipoItem(idx) {
 	}
 }
 
-// ===== ENVIAR FORMULÁRIO =====
-document.getElementById("form").addEventListener("submit", async e => {
-    e.preventDefault();
-    const msgEl = document.getElementById("msg_resultado");
-    const btnSubmit = document.getElementById("btnSubmit");
-    msgEl.innerHTML = "";
-
-    if (selecionados.length === 0) {
-        msgEl.innerHTML = '<div class="msg-erro">Adicione pelo menos um item à proposta.</div>';
-        return;
-    }
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "⏳ Processando...";
-
-        const dados = {
-        vendedor_nome: document.getElementById("busca_vendedor").value,
-        id_vendedor: document.getElementById("id_vendedor").value || "51",
-        nome_evento: document.getElementById("nome_evento").value,
+	function obterDadosProposta() {
+	    return {
+	        vendedor_nome: document.getElementById("busca_vendedor").value,
+	        id_vendedor: document.getElementById("id_vendedor").value || "51",
+	        nome_evento: document.getElementById("nome_evento").value,
         local_nome: document.getElementById("busca_local").value,
 		data_evento_inicio: document.getElementById("data_evento_inicio").value,
 		data_evento_final: document.getElementById("data_evento_final").value,
@@ -1147,11 +1083,12 @@ document.getElementById("form").addEventListener("submit", async e => {
 		horario_montagem_final: document.getElementById("horario_montagem_final").value,
         horario_inicio_evento: document.getElementById("horario_inicio_evento").value,
         horario_fim_evento: document.getElementById("horario_fim_evento").value,
-        data_desmontagem: document.getElementById("data_desmontagem").value,
-        horario_desmontagem: document.getElementById("horario_desmontagem").value,
+		data_desmontagem: document.getElementById("data_desmontagem").value,
+		horario_desmontagem: document.getElementById("horario_desmontagem").value,
 		horario_desmontagem_final: document.getElementById("horario_desmontagem_final").value,
-        formato_evento: obterFormatoEventoSelecionado(),
-		id_formato_evento: String(document.getElementById("formato_evento").value || "").startsWith("legado:") ? "" : document.getElementById("formato_evento").value,
+		observacao_montagem: document.getElementById("observacao_montagem").value.trim(),
+		formato_evento: "",
+			id_formato_evento: "",
         qtd_pessoas: document.getElementById("qtd_pessoas").value,
 		cliente_nome: document.getElementById("busca_cliente").value,
 		cliente_id: document.getElementById("id_cliente").value,
@@ -1164,19 +1101,120 @@ document.getElementById("form").addEventListener("submit", async e => {
         desconto_proposta: Math.max(0, Number(document.getElementById("desconto_proposta").value || 0)),
         observacoes_gerais: document.getElementById("observacoes_gerais").value.trim(),
             link_projeto: document.getElementById("link_projeto").value.trim(),
+            anexo_projeto_chave: document.getElementById("anexo_projeto_chave").value,
+            anexo_projeto_nome: document.getElementById("anexo_projeto_nome").value,
             foto_proposta: document.getElementById("foto_proposta_atual").value,
         opcoes_pdf: {
             mostrar_valor_unitario: document.getElementById("mostrar_valor_unitario").checked,
             mostrar_condicoes_gerais: document.getElementById("mostrar_condicoes_gerais").checked,
             idioma: document.getElementById("idioma_pdf").value
         },
-		total_proposta: Math.max(0, selecionados.reduce((acc, it) => { const valor = it.valor_manual !== "" && it.valor_manual !== null && it.valor_manual !== undefined ? Number(it.valor_manual) : Number(it.valor_padrao ?? it.valor ?? 0); return acc + (Number(it.quantidade || 0) * valor); }, 0) - Math.max(0, Number(document.getElementById("desconto_proposta").value || 0))),
-        numero_original: localStorage.getItem("editar_numero") || "",
-        versao_origem: localStorage.getItem("editar_versao") || ""
-    };
+			total_proposta: Math.max(0, selecionados.reduce((acc, it) => { const valor = it.valor_manual !== "" && it.valor_manual !== null && it.valor_manual !== undefined ? Number(it.valor_manual) : Number(it.valor_padrao ?? it.valor ?? 0); return acc + (Number(it.quantidade || 0) * valor); }, 0) - Math.max(0, Number(document.getElementById("desconto_proposta").value || 0))),
+	        numero_original: localStorage.getItem("editar_numero") || "",
+	        versao_origem: localStorage.getItem("editar_versao") || ""
+	    };
+	}
 
-    // O backend envia a proposta nova ao Meeventos, salva o PDF e registra todo o histórico.
-    try {
+	async function lerMensagemDeErro(resposta, padrao) {
+	    const conteudo = await resposta.text();
+	    try {
+	        const retorno = conteudo ? JSON.parse(conteudo) : {};
+	        return retorno.erro || padrao;
+	    } catch (_) {
+	        return padrao;
+	    }
+	}
+
+	function validarItensParaProposta(msgEl) {
+	    if (selecionados.length > 0) return true;
+	    msgEl.innerHTML = '<div class="msg-erro">Adicione pelo menos um item à proposta.</div>';
+	    return false;
+	}
+
+	async function visualizarProposta() {
+	    const msgEl = document.getElementById("msg_resultado");
+	    const botao = document.getElementById("btnVisualizar");
+	    msgEl.innerHTML = "";
+	    if (!validarItensParaProposta(msgEl)) return;
+
+	    const aba = window.open("about:blank", "_blank");
+	    if (!aba) {
+	        msgEl.innerHTML = '<div class="msg-erro">O navegador bloqueou a nova aba. Libere pop-ups para este endereço e tente novamente.</div>';
+	        return;
+	    }
+	    aba.document.title = "Gerando visualização da proposta";
+	    aba.document.body.innerHTML = "<p style='font-family:Arial,sans-serif;padding:24px'>Gerando a visualização da proposta…</p>";
+
+	    botao.disabled = true;
+	    botao.textContent = "⏳ Gerando PDF...";
+	    try {
+	        const dados = obterDadosProposta();
+	        const formulario = new FormData();
+	        formulario.append("dados", JSON.stringify(dados));
+	        const fotoSelecionada = document.getElementById("foto_proposta").files[0];
+	        if (fotoSelecionada) formulario.append("foto", fotoSelecionada);
+	        const resposta = await fetch(`${API_BASE_URL}/proposta/visualizar`, { method: "POST", body: formulario });
+	        if (!resposta.ok) throw new Error(await lerMensagemDeErro(resposta, "Não foi possível gerar a visualização da proposta."));
+	        const pdf = await resposta.blob();
+	        if (!pdf.size) throw new Error("O PDF de visualização foi gerado vazio.");
+	        const urlPdf = URL.createObjectURL(pdf);
+	        aba.location.href = urlPdf;
+	        window.setTimeout(() => URL.revokeObjectURL(urlPdf), 60000);
+	        msgEl.innerHTML = '<div class="msg-sucesso">Visualização aberta em uma nova aba. Este passo não salvou nem enviou a proposta ao Meeventos.</div>';
+	    } catch (erro) {
+	        aba.close();
+	        msgEl.innerHTML = `<div class="msg-erro">Não foi possível visualizar a proposta: ${escaparHtml(erro.message || "Tente novamente.")}</div>`;
+	    } finally {
+	        botao.disabled = false;
+	        botao.textContent = "👁 Visualizar proposta";
+	    }
+	}
+
+	document.getElementById("btnVisualizar").addEventListener("click", visualizarProposta);
+
+	document.getElementById("arquivo_projeto").addEventListener("change", () => {
+		const arquivo = document.getElementById("arquivo_projeto").files[0];
+		if (!arquivo) return;
+		document.getElementById("status_arquivo_projeto").textContent = `${arquivo.name} será enviado à nuvem somente ao criar a proposta.`;
+	});
+
+	document.getElementById("link_projeto").addEventListener("input", () => {
+		if (!document.getElementById("anexo_projeto_chave").value) return;
+		document.getElementById("anexo_projeto_chave").value = "";
+		document.getElementById("anexo_projeto_nome").value = "";
+		document.getElementById("status_arquivo_projeto").textContent = "O link externo informado substituirá o PDF anteriormente vinculado nesta nova versão.";
+	});
+
+	// ===== CRIAR PROPOSTA DEFINITIVA =====
+	document.getElementById("form").addEventListener("submit", async e => {
+	    e.preventDefault();
+	    const msgEl = document.getElementById("msg_resultado");
+	    const btnSubmit = document.getElementById("btnSubmit");
+	    msgEl.innerHTML = "";
+	    if (!validarItensParaProposta(msgEl)) return;
+	    btnSubmit.disabled = true;
+	    btnSubmit.textContent = "⏳ Criando proposta...";
+
+	    const dados = obterDadosProposta();
+
+	    // Somente esta ação envia ao Meeventos, salva o PDF e registra todo o histórico.
+	    try {
+	        const arquivoProjeto = document.getElementById("arquivo_projeto").files[0];
+	        if (arquivoProjeto) {
+	            btnSubmit.textContent = "⏳ Enviando PDF do projeto...";
+	            const dadosAnexo = new FormData();
+	            dadosAnexo.append("arquivo", arquivoProjeto);
+	            const respostaAnexo = await fetch(`${API_BASE_URL}/upload-anexo-projeto`, { method: "POST", body: dadosAnexo });
+	            const resultadoAnexo = await respostaAnexo.json().catch(() => ({}));
+	            if (!respostaAnexo.ok || !resultadoAnexo.sucesso) throw new Error(resultadoAnexo.erro || "Não foi possível enviar o PDF do projeto.");
+	            dados.link_projeto = resultadoAnexo.link_projeto;
+	            dados.anexo_projeto_chave = resultadoAnexo.anexo_projeto_chave;
+	            dados.anexo_projeto_nome = resultadoAnexo.anexo_projeto_nome;
+	            document.getElementById("anexo_projeto_chave").value = dados.anexo_projeto_chave;
+	            document.getElementById("anexo_projeto_nome").value = dados.anexo_projeto_nome;
+	            document.getElementById("status_arquivo_projeto").textContent = `PDF enviado com segurança. O link ficará válido por ${resultadoAnexo.validade_link_dias || 7} dias.`;
+	            btnSubmit.textContent = "⏳ Criando proposta...";
+	        }
         const fotoSelecionada = document.getElementById("foto_proposta").files[0];
         if (fotoSelecionada) {
             const dadosFoto = new FormData();
@@ -1201,10 +1239,10 @@ document.getElementById("form").addEventListener("submit", async e => {
             msgEl.innerHTML = `<div class="msg-sucesso">✅ Proposta ${textoMeeventos}. Versão registrada no histórico.</div>`;
             if (resultado.url_pdf) window.open(resultado.url_pdf, "_blank");
             localStorage.removeItem("dados_editar");
-            localStorage.removeItem("editar_numero");
-            localStorage.removeItem("editar_versao");
-            restaurarTituloPadrao();
-            document.getElementById("btnSubmit").textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
+	            localStorage.removeItem("editar_numero");
+	            localStorage.removeItem("editar_versao");
+	            restaurarTituloPadrao();
+	            document.getElementById("btnSubmit").textContent = "✅ Criar proposta";
         } else {
             msgEl.innerHTML = `<div class="msg-erro">Não foi possível salvar a proposta: ${resultado.erro || "erro desconhecido"}</div>`;
         }
@@ -1212,9 +1250,9 @@ document.getElementById("form").addEventListener("submit", async e => {
         msgEl.innerHTML = `<div class="msg-erro">Erro ao salvar proposta: ${err.message}</div>`;
     }
 
-    btnSubmit.disabled = false;
-    btnSubmit.textContent = "📄 Gerar Orçamento e Enviar ao Meeventos";
-});
+	    btnSubmit.disabled = false;
+	    btnSubmit.textContent = "✅ Criar proposta";
+	});
 </script>
 </body>
 </html>
