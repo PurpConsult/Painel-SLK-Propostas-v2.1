@@ -1041,6 +1041,70 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     buffer.seek(0)
     return buffer
 
+
+def gerar_ordem_servico_buffer(registro):
+    """Gera uma OS local para consulta operacional, sem gravar ou alterar dados externos."""
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import cm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=1.55 * cm, rightMargin=1.55 * cm, topMargin=1.45 * cm, bottomMargin=1.45 * cm)
+    estilos = getSampleStyleSheet()
+    titulo = ParagraphStyle("osTitulo", parent=estilos["Heading1"], fontName="Helvetica-Bold", fontSize=18, leading=22, textColor=colors.HexColor("#005f78"), spaceAfter=4)
+    subtitulo = ParagraphStyle("osSubtitulo", parent=estilos["Normal"], fontSize=8.5, leading=11, textColor=colors.HexColor("#61717a"), spaceAfter=14)
+    rotulo = ParagraphStyle("osRotulo", parent=estilos["Normal"], fontName="Helvetica-Bold", fontSize=8, leading=10, textColor=colors.HexColor("#005f78"))
+    conteudo = ParagraphStyle("osConteudo", parent=estilos["Normal"], fontSize=9, leading=12, textColor=colors.HexColor("#273740"))
+    item_estilo = ParagraphStyle("osItem", parent=conteudo, fontSize=8.6, leading=11)
+
+    def texto(valor, padrao="—"):
+        valor_limpo = str(valor or "").strip()
+        return xml_escape(valor_limpo or padrao)
+
+    elementos = [
+        Paragraph("ORDEM DE SERVIÇO", titulo),
+        Paragraph("Documento operacional gerado localmente. Confirme equipe, disponibilidade e escopo técnico antes da execução.", subtitulo),
+    ]
+    dados = [
+        [Paragraph("REFERÊNCIA", rotulo), Paragraph(texto(registro.get("referencia")), conteudo), Paragraph("STATUS", rotulo), Paragraph(texto(registro.get("status")), conteudo)],
+        [Paragraph("EVENTO", rotulo), Paragraph(texto(registro.get("evento")), conteudo), Paragraph("CLIENTE", rotulo), Paragraph(texto(registro.get("cliente")), conteudo)],
+        [Paragraph("DATA", rotulo), Paragraph(texto(registro.get("data")), conteudo), Paragraph("HORÁRIO", rotulo), Paragraph(texto(registro.get("horario")), conteudo)],
+        [Paragraph("LOCAL", rotulo), Paragraph(texto(registro.get("local")), conteudo), Paragraph("RESPONSÁVEL", rotulo), Paragraph(texto(registro.get("responsavel")), conteudo)],
+    ]
+    tabela = Table(dados, colWidths=[2.45 * cm, 6.1 * cm, 2.4 * cm, 6.0 * cm])
+    tabela.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white), ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#d9e6e9")),
+        ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f0f9fb")), ("BACKGROUND", (2, 0), (2, -1), colors.HexColor("#f0f9fb")),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+        ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+    ]))
+    elementos.extend([tabela, Spacer(1, 0.45 * cm), Paragraph("ESCOPO TÉCNICO", rotulo), Spacer(1, 0.12 * cm)])
+
+    itens = registro.get("itens") or []
+    if itens:
+        linhas = [[Paragraph("QTD.", rotulo), Paragraph("ITEM", rotulo)]]
+        for item in itens:
+            linhas.append([Paragraph(texto(item.get("quantidade") or 1), item_estilo), Paragraph(texto(item.get("nome") or item.get("descricao")), item_estilo)])
+        tabela_itens = Table(linhas, colWidths=[1.5 * cm, 15.45 * cm])
+        tabela_itens.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eaf6f8")), ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#d9e6e9")),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+            ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ]))
+        elementos.append(tabela_itens)
+    else:
+        elementos.append(Paragraph("A API Meeventos não disponibilizou composição de itens para este evento. Complete o escopo técnico mediante conferência humana no ERP e com a equipe responsável.", conteudo))
+
+    observacao = str(registro.get("observacao") or "").strip()
+    if observacao:
+        elementos.extend([Spacer(1, 0.4 * cm), Paragraph("OBSERVAÇÕES", rotulo), Paragraph(texto(observacao), conteudo)])
+    elementos.extend([Spacer(1, 0.7 * cm), Paragraph(f"Emitida em {datetime.now().strftime('%d/%m/%Y %H:%M')} · SOULINK | Operação", subtitulo)])
+    doc.build(elementos)
+    buffer.seek(0)
+    return buffer
+
 @app.route("/api/gerar-pdf", methods=["POST"])
 @app.route("/api/proposta/visualizar", methods=["POST"])
 def api_visualizar_proposta_pdf():
@@ -2748,6 +2812,7 @@ def api_listar_propostas():
                 "numero": n,
                 "cliente": p.get("cliente",{}).get("razao_social") or p.get("cliente",{}).get("nome") or "-",
                 "evento": p.get("evento",{}).get("nome_evento") or "-",
+                "local": p.get("evento",{}).get("local_evento") or p.get("evento",{}).get("local") or "-",
                 "total": p.get("blocos",{}).get("total_geral",0),
                 "ultima_versao": 1,
                 "ultima_data": p.get("data_criacao",""),
@@ -2772,6 +2837,7 @@ def api_listar_propostas():
             agrupado[n]["ultima_data"] = p.get("data_criacao", "")
             agrupado[n]["cliente"] = p.get("cliente",{}).get("razao_social") or "-"
             agrupado[n]["evento"] = p.get("evento",{}).get("nome_evento") or "-"
+            agrupado[n]["local"] = p.get("evento",{}).get("local_evento") or p.get("evento",{}).get("local") or "-"
             agrupado[n]["total"] = p.get("blocos",{}).get("total_geral",0)
             agrupado[n]["status"] = p.get("status", "rascunho")
             agrupado[n]["status_atualizado_em"] = p.get("status_atualizado_em", p.get("data_criacao", ""))
@@ -2781,6 +2847,218 @@ def api_listar_propostas():
         item["versoes"].sort(key=lambda v: int(v.get("versao", 1)), reverse=True)
     
     return jsonify({"quantidade": len(agrupado), "dados": list(agrupado.values())})
+
+
+def _consulta_meeventos_pagina(endpoint, parametros=None):
+    """Consulta uma página do Meeventos em modo leitura, sem transportar resposta bruta ao navegador."""
+    if not TOKEN:
+        raise RuntimeError("O token do Meeventos não está configurado neste computador.")
+    resposta = requests.get(f"{API_BASE}{endpoint}", headers=HEADERS, params=parametros or {}, timeout=(5, 15))
+    resposta.raise_for_status()
+    corpo = resposta.json()
+    if isinstance(corpo, list):
+        return corpo, {"page": 1, "total_page": 1, "total_data": len(corpo)}
+    if not isinstance(corpo, dict):
+        return [], {}
+    dados = corpo.get("data", [])
+    return (dados if isinstance(dados, list) else []), (corpo.get("pagination") or {})
+
+
+def _resumir_orcamento_meeventos(orcamento):
+    registro = orcamento if isinstance(orcamento, dict) else {}
+    return {
+        "id": str(registro.get("id") or ""),
+        "numero": f"ME-{registro.get('id')}" if registro.get("id") not in (None, "") else "Meeventos",
+        "cliente": str(registro.get("nome") or registro.get("nomecliente") or registro.get("cliente") or "Cliente não informado"),
+        "evento": str(registro.get("nomedoevento") or registro.get("nomeevento") or "Evento não informado"),
+        "local": str(registro.get("localevento") or registro.get("local") or "Local não informado"),
+        "data_evento": str(registro.get("dataevento") or registro.get("data_evento") or ""),
+        "vendedor": str(registro.get("vendedor") or registro.get("nomevendedor") or ""),
+        "status": str(registro.get("status") or "Orçamento Meeventos"),
+        "total": registro.get("valorinicial") or registro.get("valortotal") or registro.get("valor") or 0,
+        "origem": "meeventos",
+        "somente_leitura": True,
+    }
+
+
+@app.route("/api/meeventos/orcamentos")
+def api_listar_orcamentos_meeventos():
+    """Lista externa somente por consulta; nunca grava, edita ou cria versões locais."""
+    termo = str(request.args.get("busca") or "").strip()[:120]
+    try:
+        dados, paginacao = _consulta_meeventos_pagina("/budgets", {
+            "search": termo, "page": 1, "limit": 100, "field_sort": "id", "sort": "desc",
+        })
+        return jsonify({
+            "sucesso": True,
+            "origem": "meeventos",
+            "dados": [_resumir_orcamento_meeventos(item) for item in dados],
+            "paginacao": {"total": int((paginacao or {}).get("total_data") or len(dados))},
+        })
+    except RuntimeError as erro:
+        return jsonify({"sucesso": False, "erro": str(erro)}), 503
+    except requests.exceptions.RequestException as erro:
+        codigo = getattr(getattr(erro, "response", None), "status_code", None)
+        detalhe = "Confira a conexão e tente novamente."
+        if codigo in (401, 403):
+            detalhe = "A credencial de integração foi recusada. Confirme a configuração local e reinicie a aplicação."
+        return jsonify({"sucesso": False, "erro": "Não foi possível consultar os orçamentos do Meeventos agora.", "detalhes": detalhe}), 502
+    except (TypeError, ValueError):
+        return jsonify({"sucesso": False, "erro": "O Meeventos retornou dados de orçamento em formato inesperado."}), 502
+
+
+def _data_operacional(data):
+    texto = str(data or "").strip()[:10]
+    try:
+        return datetime.strptime(texto, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _periodo_operacional(inicio, fim):
+    data_inicio = _data_operacional(inicio)
+    data_fim = _data_operacional(fim)
+    if not data_inicio or not data_fim:
+        raise ValueError("Informe um período operacional válido.")
+    if data_inicio > data_fim:
+        raise ValueError("A data inicial não pode ser posterior à data final.")
+    if (data_fim - data_inicio).days > 124:
+        raise ValueError("Escolha um período de até 125 dias para uma consulta operacional rápida.")
+    return data_inicio, data_fim
+
+
+def _registro_operacional_local(proposta):
+    evento = proposta.get("evento") if isinstance(proposta.get("evento"), dict) else {}
+    cliente = proposta.get("cliente") if isinstance(proposta.get("cliente"), dict) else {}
+    status = str(proposta.get("status") or "rascunho")
+    data = str(evento.get("data_evento_inicio") or evento.get("data_evento") or "")[:10]
+    return {
+        "id": f"{proposta.get('numero')}:{int(proposta.get('versao') or 1)}",
+        "numero": str(proposta.get("numero") or "Proposta"),
+        "versao": int(proposta.get("versao") or 1),
+        "origem": "soulink",
+        "tipo": status,
+        "status": STATUS_PROPOSTA.get(status, status.replace("_", " ").title()),
+        "data": data,
+        "horario": str(evento.get("horario_inicio_evento") or ""),
+        "evento": str(evento.get("nome_evento") or "Evento não informado"),
+        "cliente": str(cliente.get("razao_social") or cliente.get("nome") or "Cliente não informado"),
+        "local": str(evento.get("local_evento") or evento.get("local") or "Local não informado"),
+        "responsavel": str(evento.get("nome_vendedor") or evento.get("vendedor") or ""),
+        "numero_oficial": str(proposta.get("numero_oficial") or ""),
+        "pode_gerar_os": status == "aprovada",
+        "sem_data": bool(evento.get("evento_sem_data")),
+    }
+
+
+def _registro_operacional_evento(evento):
+    dados = evento if isinstance(evento, dict) else {}
+    status = str(dados.get("status") or "Evento Meeventos")
+    cancelado = "cancel" in _normalizar_texto_busca(status)
+    return {
+        "id": str(dados.get("id") or ""),
+        "numero": f"EV-{dados.get('id')}" if dados.get("id") not in (None, "") else "Evento Meeventos",
+        "versao": None,
+        "origem": "meeventos_evento",
+        "tipo": "evento",
+        "status": status,
+        "data": str(dados.get("dataevento") or dados.get("data_evento") or "")[:10],
+        "horario": str(dados.get("horaevento") or dados.get("horario") or ""),
+        "evento": str(dados.get("nomeevento") or dados.get("nome_evento") or "Evento não informado"),
+        "cliente": str(dados.get("nomeCliente") or dados.get("nomecliente") or "Cliente não informado"),
+        "local": str(dados.get("localevento") or dados.get("local") or "Local não informado"),
+        "responsavel": "Meeventos",
+        "numero_oficial": str(dados.get("idorcamento") or ""),
+        "pode_gerar_os": bool(dados.get("id")) and not cancelado,
+        "sem_data": False,
+    }
+
+
+@app.route("/api/operacional")
+def api_operacional():
+    """Consolida calendário local e eventos externos somente de leitura, sem sincronizar alterações."""
+    try:
+        inicio, fim = _periodo_operacional(request.args.get("inicio"), request.args.get("fim"))
+    except ValueError as erro:
+        return jsonify({"sucesso": False, "erro": str(erro)}), 400
+
+    incluir_externos = str(request.args.get("externos", "1")).strip().lower() not in {"0", "false", "nao", "não"}
+    avisos = []
+    eventos_externos = []
+    if incluir_externos:
+        try:
+            eventos_externos = [_registro_operacional_evento(evento) for evento in _buscar_paginado_com_parametros(
+                "/events", {"start": inicio.isoformat(), "end": fim.isoformat(), "field_sort": "dataevento", "sort": "asc"}, max_paginas=4,
+            )]
+        except (RuntimeError, requests.exceptions.RequestException, ValueError):
+            avisos.append("Os eventos do Meeventos não puderam ser atualizados agora. As propostas locais continuam disponíveis.")
+
+    orcamentos_vinculados = {item["numero_oficial"] for item in eventos_externos if item.get("numero_oficial")}
+    locais = []
+    for proposta in _ler_json(ARQUIVO_PROPOSTAS, []):
+        registro = _registro_operacional_local(proposta)
+        data = _data_operacional(registro.get("data"))
+        if not data or registro.get("sem_data") or not (inicio <= data <= fim):
+            continue
+        if registro.get("numero_oficial") and registro["numero_oficial"] in orcamentos_vinculados:
+            continue
+        locais.append(registro)
+
+    registros = eventos_externos + locais
+    registros.sort(key=lambda item: (str(item.get("data") or "9999-99-99"), str(item.get("horario") or ""), str(item.get("evento") or "")))
+    resumo = {"cotacao": 0, "pre_reserva": 0, "aprovada": 0, "evento": 0}
+    for registro in registros:
+        chave = registro.get("tipo") if registro.get("tipo") in resumo else "evento"
+        resumo[chave] += 1
+    return jsonify({
+        "sucesso": True, "periodo": {"inicio": inicio.isoformat(), "fim": fim.isoformat()},
+        "dados": registros, "resumo": resumo, "avisos": avisos,
+    })
+
+
+def _proposta_por_numero_versao(numero, versao):
+    for proposta in reversed(_ler_json(ARQUIVO_PROPOSTAS, [])):
+        if str(proposta.get("numero")) == str(numero) and int(proposta.get("versao") or 1) == int(versao):
+            return proposta
+    return None
+
+
+@app.route("/api/operacional/os/proposta/<numero>/<int:versao>")
+def api_ordem_servico_proposta(numero, versao):
+    proposta = _proposta_por_numero_versao(numero, versao)
+    if not proposta:
+        return jsonify({"sucesso": False, "erro": "Proposta não encontrada."}), 404
+    if proposta.get("status") != "aprovada":
+        return jsonify({"sucesso": False, "erro": "A Ordem de Serviço só pode ser gerada para uma proposta aprovada."}), 409
+    evento = proposta.get("evento") if isinstance(proposta.get("evento"), dict) else {}
+    cliente = proposta.get("cliente") if isinstance(proposta.get("cliente"), dict) else {}
+    os_pdf = gerar_ordem_servico_buffer({
+        "referencia": f"{proposta.get('numero')} · V{proposta.get('versao')}", "status": "Proposta aprovada", "evento": evento.get("nome_evento"),
+        "cliente": cliente.get("razao_social") or cliente.get("nome"), "data": evento.get("data_evento_inicio") or evento.get("data_evento"),
+        "horario": evento.get("horario_inicio_evento"), "local": evento.get("local_evento") or evento.get("local"),
+        "responsavel": evento.get("nome_vendedor") or evento.get("vendedor"), "observacao": evento.get("observacao_geral") or evento.get("observacao_montagem"),
+        "itens": proposta.get("itens") or [],
+    })
+    nome = f"os_{secure_filename(str(proposta.get('numero') or 'proposta')).lower()}_v{versao}.pdf"
+    return send_file(os_pdf, mimetype="application/pdf", as_attachment=False, download_name=nome)
+
+
+@app.route("/api/operacional/os/evento/<evento_id>")
+def api_ordem_servico_evento(evento_id):
+    try:
+        resposta = requests.get(f"{API_BASE}/events/{evento_id}", headers=HEADERS, timeout=(5, 15))
+        resposta.raise_for_status()
+        evento = resposta.json() if isinstance(resposta.json(), dict) else {}
+    except requests.exceptions.RequestException:
+        return jsonify({"sucesso": False, "erro": "Não foi possível consultar este evento no Meeventos agora."}), 502
+    if "cancel" in _normalizar_texto_busca(evento.get("status")):
+        return jsonify({"sucesso": False, "erro": "Não é possível gerar Ordem de Serviço para um evento cancelado."}), 409
+    os_pdf = gerar_ordem_servico_buffer({
+        "referencia": f"EV-{evento.get('id')}", "status": evento.get("status"), "evento": evento.get("nomeevento"),
+        "cliente": evento.get("nomeCliente"), "data": evento.get("dataevento"), "horario": evento.get("horaevento"),
+        "local": evento.get("localevento"), "responsavel": "Meeventos", "observacao": evento.get("observacao") or evento.get("informacoes"), "itens": [],
+    })
+    return send_file(os_pdf, mimetype="application/pdf", as_attachment=False, download_name=f"os_evento_{secure_filename(str(evento_id))}.pdf")
 
 @app.route("/api/propostas/<numero>/versoes/<int:versao>/status", methods=["POST"])
 def api_atualizar_status_proposta(numero, versao):
@@ -3008,6 +3286,11 @@ def pagina_propostas():
         <h3>Detalhe completo:</h3>
         <pre style="background:#f0f0f0;padding:15px;font-size:11px">{traceback.format_exc()}</pre>
         """
+
+
+@app.route("/operacional")
+def pagina_operacional():
+    return render_template("operacional.html")
 
 @app.route("/meus-itens")
 def meus_itens():

@@ -124,8 +124,8 @@ def main():
         assert "imagem_url: item.imagem_aprovada?.image_url" in index_html
         assert 'id="idioma_pdf"' in index_html
         assert 'idioma: document.getElementById("idioma_pdf").value' in index_html
-        assert "localStorage.setItem('dados_editar', dadosOrganizados);" in propostas_html
-        assert "/api/propostas/${encodeURIComponent(numProposta)}/versoes/${versao}" in propostas_html
+        assert "localStorage.setItem('dados_editar',JSON.stringify(d.dados));" in propostas_html
+        assert "/api/propostas/${encodeURIComponent(number)}/versoes/${version}" in propostas_html
         print("OK: criação, listagem, versionamento e recuperação completa para edição validados.")
     finally:
         shutil.rmtree(pasta_teste, ignore_errors=True)

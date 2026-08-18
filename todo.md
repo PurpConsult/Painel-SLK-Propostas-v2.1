@@ -399,3 +399,21 @@
 
 ## Publicação da Edição de Kits
 - [x] Publicar no repositório oficial o código, os testes e o registro de tarefas da composição editável de kits, sem dados operacionais ou credenciais.
+
+## Otimização de Meus Orçamentos — Escopo em Consolidação
+- [x] Adicionar busca por número da proposta, nome do cliente ou local do evento.
+- [x] Recolher versões anteriores em uma ação expansível, mantendo a versão atual em destaque.
+- [x] Unificar a emissão de PDF em um botão com escolha posterior entre Português, Inglês e Espanhol.
+- [x] Refinar a página para uma leitura mais limpa, comercial e objetiva.
+- [x] Confirmar na API Meeventos a consulta de orçamentos existentes, os campos disponíveis e as regras para importá-los sem duplicar o histórico Soulink.
+- [x] Consultar e exibir os orçamentos Meeventos separadamente, em modo somente leitura e com origem identificada.
+
+## Visão Operacional — Escopo em Consolidação
+- [x] Criar uma página operacional visual em calendário e grade para eventos e propostas.
+- [x] Destacar por status as cotações, pré-reservas, propostas aprovadas e eventos realizados.
+- [x] Exibir por dia os dados operacionais essenciais do evento, preservando a origem do registro.
+- [x] Definir uma ação segura de geração de Ordem de Serviço a partir de proposta aprovada ou evento confirmado.
+- [x] Permitir filtros claros por período, status, local e responsável, sem modificar dados no Meeventos sem confirmação humana.
+
+## Publicação de Meus Orçamentos e Operacional
+- [x] Publicar no repositório oficial as páginas comercial e operacional, os endpoints, as regressões e as notas técnicas, sem dados operacionais ou credenciais.
