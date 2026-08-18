@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "atualizado_em": "18/08/2026",
+  "fonte": "Cadastro local confirmado pela equipe a partir da tela de Kits do Meeventos.",
+  "kits": [
+    {
+      "id": "av-laghetto-fernando-pessoa-i-e-ii",
+      "codigo": "KIT-AV-LAGHETTO-FERNANDO-PESSOA-I-E-II",
+      "nome": "KIT A/V - LAGHETTO - FERNANDO PESSOA I E II",
+      "valor": 3665.28,
+      "componentes": [
+        {"id_meeventos": "161", "nome": "CAIXA DE SOM", "quantidade": 4, "valor_unitario": 239.2},
+        {"id_meeventos": "24", "nome": "DISTRIBUIDOR HDMI 1 X 4", "quantidade": 1, "valor_unitario": 114.4},
+        {"id_meeventos": "70", "nome": "KIT ANTENA COM 4 CANAIS", "quantidade": 1, "valor_unitario": 280.08},
+        {"id_meeventos": "150", "nome": "MESA DE SOM DIGITAL", "quantidade": 1, "valor_unitario": 312.0},
+        {"id_meeventos": "159", "nome": "MICROFONE BASTÃO", "quantidade": 4, "valor_unitario": 176.8},
+        {"id_meeventos": "35", "nome": "NOTEBOOK I5", "quantidade": 2, "valor_unitario": 218.4},
+        {"id_meeventos": "34", "nome": "PASSADOR DE SLIDES LOGITECH", "quantidade": 1, "valor_unitario": 26.0},
+        {"id_meeventos": "29", "nome": "PROJETOR 4000 LUMENS", "quantidade": 2, "valor_unitario": 416.0}
+      ]
+    }
+  ]
+}

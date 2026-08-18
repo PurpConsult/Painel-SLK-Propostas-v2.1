@@ -47,8 +47,9 @@ input[readonly]{background:#f5f5f5;color:#666}
 		.foto-item-previa img{width:100%;height:100%;object-fit:cover}
 		.item-com-locacao{border-bottom:1px solid #e8f0f1;padding:7px 4px 8px;margin:0}.item-com-locacao:last-child{border-bottom:0}
 		.item-com-locacao .item-previa{border-bottom:0}
-			.item-cartao{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identidade remover" "operacao operacao";gap:7px 8px;align-items:start;padding:7px 4px 5px}.item-identidade{grid-area:identidade;display:flex;flex-wrap:wrap;align-items:flex-start;min-width:0;gap:6px}.item-nome{min-width:0;flex:1 1 150px;padding-top:1px}.item-nome strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#284e55;font-size:12px;line-height:1.3}.item-operacao{grid-area:operacao;display:flex;justify-content:space-between;align-items:flex-end;gap:8px;padding:6px 7px;border-radius:7px;background:#f8fbfb;border:1px solid #e4eff0}.item-quantidade{display:flex;flex-direction:column;align-items:flex-start;gap:3px}.qtd-acoes{display:flex;align-items:center;gap:4px;min-height:29px}.mini-label,.item-total .rotulo-total{display:block;margin:0;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual{width:118px;flex:0 0 118px}.item-valor-manual label{display:block;margin:0 0 2px;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual input{width:100%;box-sizing:border-box;padding:5px 6px;font-size:12px;text-align:right}.item-total{align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;white-space:nowrap;color:#135d67;font-size:12px}.item-total strong{font-size:12px}.item-cartao > .remover{grid-area:remover;justify-self:end;display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin:0;padding:0;border:1px solid #f0c8c8;border-radius:6px;background:#fff7f7;color:#d53030;cursor:pointer;font-weight:700;font-size:14px;line-height:1}.item-cartao > .remover:hover{background:#ffe8e8;color:#b71c1c}.item-contexto{display:flex;align-items:center;gap:5px;margin-top:3px}.item-contexto .tipo-item-toggle{margin:0}.valor-padronizado{display:block;color:#778f93;font-size:9px;margin-top:2px;text-align:right;white-space:nowrap}
-		.locacao-detalhes{margin:1px 4px 0;border-radius:7px;background:#fffdf8;border:1px solid #f2d38a;color:#644d18}.locacao-detalhes summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;cursor:pointer;font-size:11px;font-weight:700;list-style:none}.locacao-detalhes summary::-webkit-details-marker{display:none}.locacao-detalhes summary::before{content:'▸';display:inline-block;margin-right:5px}.locacao-detalhes[open] summary::before{content:'▾'}.locacao-detalhes summary .locacao-titulo{margin-right:auto}.locacao-detalhes summary .locacao-status{padding:2px 6px;border-radius:10px;background:#fff2ca;color:#826313;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}.locacao-detalhes[open] summary{border-bottom:1px solid #f6e3af}.locacao-detalhes[open] summary .locacao-status{background:#ffe5a2}
+				.item-cartao{display:grid;grid-template-columns:minmax(135px,1fr) auto 112px minmax(82px,auto) 24px;grid-template-areas:"identidade quantidade manual total remover";gap:6px 7px;align-items:center;padding:7px 4px 5px}.item-identidade{grid-area:identidade;display:flex;align-items:center;min-width:0;gap:6px}.item-nome{min-width:0;flex:1;padding-top:1px}.item-nome strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#284e55;font-size:12px;line-height:1.3}.item-quantidade{grid-area:quantidade;display:flex;align-items:center;gap:4px;white-space:nowrap}.qtd-acoes{display:flex;align-items:center;gap:4px;min-height:24px}.mini-label{display:none}.item-total .rotulo-total{display:block;margin:0;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual{grid-area:manual;width:112px}.item-valor-manual label{display:block;margin:0 0 2px;color:#527378;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}.item-valor-manual input{width:100%;box-sizing:border-box;padding:5px 6px;font-size:12px;text-align:right}.item-total{grid-area:total;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;white-space:nowrap;color:#135d67;font-size:12px}.item-total strong{font-size:12px}.item-cartao > .remover{grid-area:remover;justify-self:end;display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin:0;padding:0;border:1px solid #f0c8c8;border-radius:6px;background:#fff7f7;color:#d53030;cursor:pointer;font-weight:700;font-size:14px;line-height:1}.item-cartao > .remover:hover{background:#ffe8e8;color:#b71c1c}.item-contexto{display:flex;align-items:center;gap:5px;margin-top:3px}.item-contexto .tipo-item-toggle{margin:0}.valor-padronizado{display:block;color:#778f93;font-size:9px;margin-top:2px;text-align:right;white-space:nowrap}
+			.locacao-detalhes{margin:1px 4px 0;border-radius:7px;background:#fffdf8;border:1px solid #f2d38a;color:#644d18}.locacao-detalhes summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;cursor:pointer;font-size:11px;font-weight:700;list-style:none}.locacao-detalhes summary::-webkit-details-marker{display:none}.locacao-detalhes summary::before{content:'▸';display:inline-block;margin-right:5px}.locacao-detalhes[open] summary::before{content:'▾'}.locacao-detalhes summary .locacao-titulo{margin-right:auto}.locacao-detalhes summary .locacao-status{padding:2px 6px;border-radius:10px;background:#fff2ca;color:#826313;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}.locacao-detalhes[open] summary{border-bottom:1px solid #f6e3af}.locacao-detalhes[open] summary .locacao-status{background:#ffe5a2}
+			.kit-composicao-detalhes{margin:1px 4px 0;border-radius:7px;background:#f0f9ff;border:1px solid #7ec8d8;color:#1a4f5a}.kit-composicao-detalhes summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;cursor:pointer;font-size:11px;font-weight:700;list-style:none}.kit-composicao-detalhes summary::-webkit-details-marker{display:none}.kit-composicao-detalhes summary::before{content:'▸';display:inline-block;margin-right:5px}.kit-composicao-detalhes[open] summary::before{content:'▾'}.kit-composicao-detalhes[open] summary{border-bottom:1px solid #cde9f0}.kit-componentes-lista{padding:5px 8px 7px}.kit-componente-linha{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #cde9f0;font-size:11px}.kit-componente-linha:last-child{border-bottom:0}.kit-componente-nome{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a4f5a}.kit-componente-qtd{display:flex;align-items:center;gap:3px;white-space:nowrap}.kit-comp-btn{width:18px;height:18px;border:1px solid #7ec8d8;border-radius:3px;background:#fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:#1a4f5a;padding:0}.kit-comp-btn:hover{background:#d9f4f7}.kit-comp-remover{border:1px solid #f0c8c8;background:#fff7f7;color:#d53030;cursor:pointer;width:18px;height:18px;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0}.kit-comp-remover:hover{background:#ffe8e8}
 		.locacao-externa{padding:7px 8px 8px;color:#644d18}
 	.locacao-cab{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer}
 	.locacao-cab input{width:auto;accent-color:#d79b00}
@@ -91,13 +92,15 @@ input[readonly]{background:#f5f5f5;color:#666}
 .qtd-btn{width:22px;height:22px;border:1px solid #ddd;border-radius:3px;background:#f9f9f9;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#555}
 .qtd-btn:hover{background:#e0f7fa;border-color:#00bcd4}
 
-					@media(max-width:768px){
-					    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
-				    .grid-3{grid-template-columns:1fr}
-				    .agenda-linha{grid-template-columns:1fr}.agenda-linha-evento{grid-template-columns:1fr 1fr}
-			    .item-operacao{grid-template-columns:auto minmax(0,1fr) auto;gap:6px;padding:6px}.item-nome strong{white-space:normal}.item-total strong{font-size:11px}
-	    header{flex-direction:column;gap:10px}
-	}
+						@media(max-width:768px){
+						    .formulario-duas-colunas{grid-template-columns:1fr;gap:0}
+					    .grid-3{grid-template-columns:1fr}
+					    .agenda-linha{grid-template-columns:1fr}.agenda-linha-evento{grid-template-columns:1fr 1fr}
+				    .item-nome strong{white-space:normal}.item-total strong{font-size:11px}
+			    header{flex-direction:column;gap:10px}
+		}
+		@media(max-width:1100px) and (min-width:769px){.item-cartao{grid-template-columns:minmax(0,1fr) auto 24px;grid-template-areas:"identidade quantidade remover" "manual total total";align-items:start}.item-quantidade{padding-top:1px}.item-valor-manual{width:118px}.item-total{align-self:center}}
+		@media(max-width:560px){.item-cartao{grid-template-columns:minmax(0,1fr) auto 24px;grid-template-areas:"identidade quantidade remover" "manual total total";align-items:start}.item-quantidade{padding-top:1px}.item-valor-manual{width:118px}.item-total{align-self:center}.foto-item-previa{display:none}}
 .painel-previa-proposta{position:sticky;top:10px;margin:0 0 12px;padding:0;overflow:hidden;border:1px solid #b7e3e8;border-radius:9px;background:#fff;box-shadow:0 5px 16px rgba(11,98,111,.08)}
 .painel-previa-proposta summary{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 12px;cursor:pointer;list-style:none;color:#087480;font-size:13px;font-weight:800;background:linear-gradient(135deg,#eefcfd,#fff)}
 .painel-previa-proposta summary::-webkit-details-marker{display:none}.painel-previa-proposta summary::after{content:'▾';font-size:14px}.painel-previa-proposta:not([open]) summary::after{content:'▸'}
@@ -237,18 +240,19 @@ input[readonly]{background:#f5f5f5;color:#666}
                     <section class="quadro-selecao equipamentos">
                         <div class="quadro-selecao-cab"><span>📦 Equipamentos</span><span id="contador_equipamentos">0</span></div>
                         <div id="lista_produtos"></div>
-                        <div id="subtotal_produtos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+                        <div id="subtotal_produtos" class="subtotal-bloco">Total equipamentos (+ 5% de impostos): R$ 0,00</div>
                     </section>
                     <section class="quadro-selecao servicos">
                         <div class="quadro-selecao-cab"><span>🛠 Serviços</span><span id="contador_servicos">0</span></div>
                         <div id="lista_servicos"></div>
-                        <div id="subtotal_servicos" class="subtotal-bloco">Subtotal: R$ 0,00</div>
+                        <div id="subtotal_servicos" class="subtotal-bloco">Total serviços (+ 5% + 12% de impostos): R$ 0,00</div>
                     </section>
 				</div>
-				<div class="selecao-financeiro">
-					<div class="desconto-inline"><div><label for="desconto_proposta">Desconto da proposta (R$)</label><input type="number" id="desconto_proposta" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>
+					<div class="selecao-financeiro">
+						<div id="subtotal_geral" class="subtotal-bloco">Subtotal geral: R$ 0,00</div>
+						<div class="desconto-inline"><div><label for="desconto_proposta">Desconto da proposta (R$)</label><input type="number" id="desconto_proposta" min="0" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>
 					<div id="linha_desconto" class="linha-desconto"></div>
-					<div id="total_geral" class="total-geral">Valor total da proposta: R$ 0,00</div>
+						<div id="total_geral" class="total-geral">Investimento total: R$ 0,00</div>
 				</div>
 				<small class="tipo-item-ajuda">Clique na etiqueta <strong>Equipamento</strong> ou <strong>Serviço</strong> para mover o item de quadro e registrar a correção local.</small>
             </section>
@@ -271,7 +275,6 @@ input[readonly]{background:#f5f5f5;color:#666}
                         <div><label>Validade da Proposta</label><input type="date" id="validade_proposta"><small style="color:#718085">Padrão: 7 dias a partir da geração.</small></div>
 	                        <div><label>Idioma da cópia comercial do PDF</label><select id="idioma_pdf"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
 						<div class="grid-full"><label>PDF do Projeto / Referência</label><input type="file" id="arquivo_projeto" accept="application/pdf,.pdf"><input type="hidden" id="anexo_projeto_chave" value=""><input type="hidden" id="anexo_projeto_nome" value=""><small id="status_arquivo_projeto" style="color:#718085">Opcional. Ao criar a proposta, o PDF será enviado automaticamente à nuvem e o cliente receberá um link seguro válido por 7 dias. A visualização não envia arquivos.</small></div>
-                        <div class="grid-full"><label>Link externo do Projeto / Referência</label><input type="url" id="link_projeto" placeholder="https://..."><small style="color:#718085">Opcional. Use apenas se o projeto já estiver publicado em outro local.</small></div>
 						<div class="grid-full"><label>Foto de Referência da Proposta</label><input type="file" id="foto_proposta" accept="image/png,image/jpeg,image/webp"><input type="hidden" id="foto_proposta_atual" value="static/imagem_referencia_padrao.jpeg"><small style="color:#718085">Se nenhuma foto for escolhida, será usada a imagem padrão de referência. A imagem aparecerá após os dados do cliente no PDF.</small></div>
                     </div>
 					</div>
@@ -388,7 +391,6 @@ function preencherFormularioDeEdicao() {
         document.getElementById("cliente_contato").value = cliente.contato || cliente.responsavel || "";
         document.getElementById("validade_proposta").value = dados.validade_proposta || "";
         document.getElementById("desconto_proposta").value = Number(dados.desconto_proposta || 0) || "";
-        document.getElementById("link_projeto").value = dados.link_projeto || "";
 			document.getElementById("anexo_projeto_chave").value = dados.anexo_projeto_chave || "";
 			document.getElementById("anexo_projeto_nome").value = dados.anexo_projeto_nome || "";
 			if (dados.anexo_projeto_nome) document.getElementById("status_arquivo_projeto").textContent = `PDF vinculado: ${dados.anexo_projeto_nome}. Selecione outro arquivo apenas para substituir.`;
@@ -398,8 +400,9 @@ function preencherFormularioDeEdicao() {
         document.getElementById("idioma_pdf").value = dados.opcoes_pdf?.idioma || "pt";
 
 		selecionados = (dados.itens || []).map(item => ({
-            ...item,
-            id: item.id || item.codigo || "",
+	            ...item,
+	            componentes: Array.isArray(item.componentes) ? item.componentes.map(componente => ({...componente})) : [],
+	            id: item.id || item.codigo || "",
             nome: item.nome || item.descricao || "Item sem descrição",
             valor: Number(item.valor || item.valor_unitario || 0),
             valor_padrao: Number(item.valor_padrao || item.valor_catalogo || item.valor || item.valor_unitario || 0),
@@ -855,7 +858,7 @@ function mostrar_filtrado_produto(texto) {
 	            const icone = tipo === "Serviço" ? "🛠" : "📦";
 	            const classe = tipo === "Serviço" ? "servico" : "";
 	            return `<div class="catalogo-grupo-titulo">${icone} ${tipo}s</div>${itens.map(item => `<div class="item-linha" data-id="${item.id}">
-	                <strong>#${item.id}</strong> · ${escaparHtml(item.nome)} <em class="tipo-badge ${classe}">${tipo}</em><br><small>R$ ${Number(item.valor||0).toFixed(2).replace(".",",")} · ${escaparHtml(item.categoria||"Sem categoria")}</small>
+	                <strong>#${escaparHtml(item.codigo || item.id_meeventos || item.id)}</strong> · ${escaparHtml(item.nome)} <em class="tipo-badge ${classe}">${tipo}</em>${item.item_de_composicao ? ' <em class="tipo-badge">Kit / composição</em>' : ''}<br><small>R$ ${Number(item.valor||0).toFixed(2).replace(".",",")} · ${escaparHtml(item.categoria||"Sem categoria")}</small>
 	            </div>`).join("")}`;
 	        }).join("");
 	    }
@@ -874,9 +877,14 @@ document.addEventListener("click", e => {
     if (existe) {
         existe.quantidade++;
     } else {
-		selecionados.push({
-			id: item.id,
-			nome: item.nome,
+			selecionados.push({
+				id: item.id,
+				id_meeventos: item.id_meeventos || item.id,
+				codigo: item.codigo || item.id_meeventos || item.id,
+				origem_catalogo: item.origem_catalogo || "Produtos e Serviços",
+				item_de_composicao: item.item_de_composicao === true,
+				componentes: Array.isArray(item.componentes) ? item.componentes.map(componente => ({...componente})) : [],
+				nome: item.nome,
 			valor: parseFloat(item.valor || 0),
 			valor_padrao: parseFloat(item.valor || 0),
 				valor_manual: "",
@@ -912,11 +920,13 @@ function atualizar_previa_completa() {
 			const imagemItem = item.imagem_url
 				? `<a class="foto-item-previa" href="${escaparHtml(item.imagem_url)}" target="_blank" rel="noopener noreferrer" title="Abrir imagem do item em nova guia"><img src="${escaparHtml(item.imagem_url)}" alt="Imagem de ${escaparHtml(item.nome)}" onerror="this.closest('a').remove()"></a>`
 				: "";
-				const linha = `<div class="item-com-locacao"><div class="item-cartao">
-					<div class="item-identidade">${imagemItem}<div class="item-nome"><strong title="${escaparHtml(item.nome)}">${escaparHtml(item.nome)}</strong><div class="item-contexto"><button type="button" class="tipo-item-toggle ${ehServico ? "servico" : ""}" data-tipo-toggle data-idx="${idx}" title="Clique para mover este item para ${tipoDestino}">${ehServico ? "🛠" : "📦"} ${tipoAtual} ↔</button></div></div><div class="item-valor-manual"><label>Valor manual</label><input type="number" min="0" step="0.01" inputmode="decimal" data-comercial-campo="valor_manual" data-idx="${idx}" value="${manual ? valorExibido : ""}" placeholder="${dinheiro(item.valor_padrao ?? item.valor)}"><span class="valor-padronizado">${manual ? `Padrão: ${dinheiro(item.valor_padrao ?? 0)}` : "Opcional"}</span></div></div>
-					<button type="button" class="remover" data-idx="${idx}" title="Remover item" aria-label="Remover ${escaparHtml(item.nome)}">✕</button>
-					<div class="item-operacao"><div class="item-quantidade" aria-label="Quantidade"><span class="mini-label">Qtd.</span><div class="qtd-acoes"><span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span><strong>${item.quantidade}</strong><span class="qtd-btn" data-action="plus" data-idx="${idx}">+</span></div></div><div class="item-total"><span class="rotulo-total">Total</span><strong>${dinheiro(sub)}</strong></div></div>
-			</div>${renderizarLocacaoExterna(item, idx)}</div>`;
+					const linha = `<div class="item-com-locacao"><div class="item-cartao">
+						<div class="item-identidade">${imagemItem}<div class="item-nome"><strong title="${escaparHtml(item.nome)}">${escaparHtml(item.nome)}</strong><div class="item-contexto"><button type="button" class="tipo-item-toggle ${ehServico ? "servico" : ""}" data-tipo-toggle data-idx="${idx}" title="Clique para mover este item para ${tipoDestino}">${ehServico ? "🛠" : "📦"} ${tipoAtual} ↔</button></div></div></div>
+						<div class="item-quantidade" aria-label="Quantidade"><span class="mini-label">Qtd.</span><div class="qtd-acoes"><span class="qtd-btn" data-action="minus" data-idx="${idx}">-</span><strong>${item.quantidade}</strong><span class="qtd-btn" data-action="plus" data-idx="${idx}">+</span></div></div>
+						<div class="item-valor-manual"><label>Valor manual</label><input type="number" min="0" step="0.01" inputmode="decimal" data-comercial-campo="valor_manual" data-idx="${idx}" value="${manual ? valorExibido : ""}" placeholder="${dinheiro(item.valor_padrao ?? item.valor)}"><span class="valor-padronizado">${manual ? `Padrão: ${dinheiro(item.valor_padrao ?? 0)}` : "Opcional"}</span></div>
+						<div class="item-total"><span class="rotulo-total">Total</span><strong>${dinheiro(sub)}</strong></div>
+						<button type="button" class="remover" data-idx="${idx}" title="Remover item" aria-label="Remover ${escaparHtml(item.nome)}">✕</button>
+					</div>${renderizarComposicaoKit(item, idx)}${renderizarLocacaoExterna(item, idx)}</div>`;
         if (item.tipo_item === "Serviço") {
             html_serv += linha;
             subtotal_serv += sub;
@@ -931,15 +941,21 @@ function atualizar_previa_completa() {
 	    document.getElementById("contador_equipamentos").innerText = selecionados.filter(item => item.tipo_item !== "Serviço").length;
 	    document.getElementById("contador_servicos").innerText = selecionados.filter(item => item.tipo_item === "Serviço").length;
 	    document.getElementById("contador_itens").innerText = `${selecionados.length} ${selecionados.length === 1 ? "item" : "itens"}`;
-		 document.getElementById("subtotal_produtos").innerText = `Subtotal: R$ ${subtotal_prod.toFixed(2).replace(".",",")}`;
-		 document.getElementById("subtotal_servicos").innerText = `Subtotal: R$ ${subtotal_serv.toFixed(2).replace(".",",")}`;
-		 const desconto = Math.max(0, Number(document.getElementById("desconto_proposta")?.value || 0));
-		 const totalBruto = subtotal_prod + subtotal_serv;
-		 const totalFinal = Math.max(0, totalBruto - desconto);
+			 const impostoEquipamentos = subtotal_prod * 0.05;
+			 const impostoServicos5 = subtotal_serv * 0.05;
+			 const impostoServicos12 = impostoServicos5 * 0.12;
+			 const totalEquipamentos = subtotal_prod + impostoEquipamentos;
+			 const totalServicos = subtotal_serv + impostoServicos5 + impostoServicos12;
+			 document.getElementById("subtotal_produtos").innerText = `Total equipamentos (+ 5% de impostos): ${dinheiro(totalEquipamentos)}`;
+			 document.getElementById("subtotal_servicos").innerText = `Total serviços (+ 5% + 12% de impostos): ${dinheiro(totalServicos)}`;
+			 const desconto = Math.max(0, Number(document.getElementById("desconto_proposta")?.value || 0));
+			 const totalBruto = totalEquipamentos + totalServicos;
+			 const totalFinal = Math.max(0, totalBruto - desconto);
+			 document.getElementById("subtotal_geral").textContent = `Subtotal geral: ${dinheiro(totalBruto)}`;
 		 const linhaDesconto = document.getElementById("linha_desconto");
 		 linhaDesconto.classList.toggle("ativo", desconto > 0);
 		 linhaDesconto.textContent = desconto > 0 ? `Desconto: - ${dinheiro(desconto)}` : "";
-		 document.getElementById("total_geral").textContent = `Valor total da proposta: ${dinheiro(totalFinal)}`;
+			 document.getElementById("total_geral").textContent = `Investimento total: ${dinheiro(totalFinal)}`;
 		 atualizarResumoLocacaoExterna();
 	}
 
@@ -963,10 +979,27 @@ function renderizarAjusteComercial(item, idx) {
     </div>`;
 }
 
-	function renderizarLocacaoExterna(item, idx) {
-	    const externo = item.externo === true;
-		return `<details class="locacao-detalhes" ${externo ? "open" : ""}><summary><span class="locacao-titulo"><label class="locacao-caixinha"><input type="checkbox" data-externo-campo="externo" data-idx="${idx}" ${externo ? "checked" : ""}> Locação externa</label></span><span class="locacao-status">${externo ? "ativa" : "opcional"}</span></summary>${externo ? `<div class="locacao-externa"><div class="locacao-campos"><div><label>Fornecedor</label><input type="text" data-externo-campo="fornecedor_externo" data-idx="${idx}" value="${escaparHtml(item.fornecedor_externo || "")}" placeholder="Nome do fornecedor"></div><div><label>Valor do custo</label><input type="number" min="0" step="0.01" inputmode="decimal" data-externo-campo="custo_externo" data-idx="${idx}" value="${Number(item.custo_externo || 0) || ""}" placeholder="R$ 0,00"></div></div></div>` : ""}</details>`;
-	}
+		function renderizarLocacaoExterna(item, idx) {
+		    const externo = item.externo === true;
+			return `<details class="locacao-detalhes" ${externo ? "open" : ""}><summary><span class="locacao-titulo"><label class="locacao-caixinha"><input type="checkbox" data-externo-campo="externo" data-idx="${idx}" ${externo ? "checked" : ""}> Locação externa</label></span><span class="locacao-status">${externo ? "ativa" : "opcional"}</span></summary>${externo ? `<div class="locacao-externa"><div class="locacao-campos"><div><label>Fornecedor</label><input type="text" data-externo-campo="fornecedor_externo" data-idx="${idx}" value="${escaparHtml(item.fornecedor_externo || "")}" placeholder="Nome do fornecedor"></div><div><label>Valor do custo</label><input type="number" min="0" step="0.01" inputmode="decimal" data-externo-campo="custo_externo" data-idx="${idx}" value="${Number(item.custo_externo || 0) || ""}" placeholder="R$ 0,00"></div></div></div>` : ""}</details>`;
+		}
+
+		function renderizarComposicaoKit(item, idx) {
+			if (!item.item_de_composicao || !Array.isArray(item.componentes) || item.componentes.length === 0) return "";
+			const linhasComponentes = item.componentes.map((componente, cidx) => {
+				const quantidade = Number(componente.quantidade || 1);
+				return `<div class="kit-componente-linha">
+					<span class="kit-componente-nome" title="${escaparHtml(componente.nome)}">${escaparHtml(componente.nome)}</span>
+					<div class="kit-componente-qtd" aria-label="Quantidade de ${escaparHtml(componente.nome)}">
+						<button type="button" class="kit-comp-btn" data-comp-action="minus" data-idx="${idx}" data-cidx="${cidx}" title="Diminuir quantidade">-</button>
+						<strong>${quantidade}</strong>
+						<button type="button" class="kit-comp-btn" data-comp-action="plus" data-idx="${idx}" data-cidx="${cidx}" title="Aumentar quantidade">+</button>
+					</div>
+					<button type="button" class="kit-comp-remover" data-comp-action="remover" data-idx="${idx}" data-cidx="${cidx}" title="Remover componente desta proposta" aria-label="Remover ${escaparHtml(componente.nome)} desta proposta">✕</button>
+				</div>`;
+			}).join("");
+			return `<details class="kit-composicao-detalhes" open><summary>Composição do kit (${item.componentes.length} ${item.componentes.length === 1 ? "item" : "itens"})</summary><div class="kit-componentes-lista">${linhasComponentes}</div></details>`;
+		}
 
 function atualizarResumoLocacaoExterna() {
     const resumo = document.getElementById("resumo_externo");
@@ -1017,6 +1050,41 @@ document.addEventListener("click", e => {
 	const etiquetaTipo = e.target.closest("[data-tipo-toggle]");
 	if (etiquetaTipo) {
 		alternarTipoItem(Number(etiquetaTipo.dataset.idx));
+		return;
+	}
+	const botaoComponente = e.target.closest("[data-comp-action]");
+	if (botaoComponente) {
+		const kitIdx = Number(botaoComponente.dataset.idx);
+		const componenteIdx = Number(botaoComponente.dataset.cidx);
+		const acao = botaoComponente.dataset.compAction;
+		const kit = selecionados[kitIdx];
+		if (!kit || !Array.isArray(kit.componentes) || !Number.isInteger(componenteIdx)) return;
+
+		const componente = kit.componentes[componenteIdx];
+		if (!componente) return;
+		if (acao === "remover") {
+			kit.componentes.splice(componenteIdx, 1);
+		} else if (acao === "plus") {
+			componente.quantidade = (Number(componente.quantidade) || 1) + 1;
+		} else if (acao === "minus") {
+			const quantidadeAtual = Number(componente.quantidade) || 1;
+			if (quantidadeAtual > 1) {
+				componente.quantidade = quantidadeAtual - 1;
+			} else {
+				kit.componentes.splice(componenteIdx, 1);
+			}
+		} else {
+			return;
+		}
+
+		const novoValor = kit.componentes.reduce((soma, componenteAtual) => {
+			const quantidade = Math.max(0, Number(componenteAtual.quantidade) || 0);
+			const valorUnitario = Math.max(0, Number(componenteAtual.valor_unitario ?? componenteAtual.valor ?? 0));
+			return soma + quantidade * valorUnitario;
+		}, 0);
+		kit.valor = Math.round(novoValor * 100) / 100;
+		kit.valor_padrao = kit.valor;
+		atualizar_previa_completa();
 		return;
 	}
     if (e.target.classList.contains("remover")) {
@@ -1100,7 +1168,6 @@ async function alternarTipoItem(idx) {
         validade_proposta: document.getElementById("validade_proposta").value,
         desconto_proposta: Math.max(0, Number(document.getElementById("desconto_proposta").value || 0)),
         observacoes_gerais: document.getElementById("observacoes_gerais").value.trim(),
-            link_projeto: document.getElementById("link_projeto").value.trim(),
             anexo_projeto_chave: document.getElementById("anexo_projeto_chave").value,
             anexo_projeto_nome: document.getElementById("anexo_projeto_nome").value,
             foto_proposta: document.getElementById("foto_proposta_atual").value,
@@ -1178,12 +1245,6 @@ async function alternarTipoItem(idx) {
 		document.getElementById("status_arquivo_projeto").textContent = `${arquivo.name} será enviado à nuvem somente ao criar a proposta.`;
 	});
 
-	document.getElementById("link_projeto").addEventListener("input", () => {
-		if (!document.getElementById("anexo_projeto_chave").value) return;
-		document.getElementById("anexo_projeto_chave").value = "";
-		document.getElementById("anexo_projeto_nome").value = "";
-		document.getElementById("status_arquivo_projeto").textContent = "O link externo informado substituirá o PDF anteriormente vinculado nesta nova versão.";
-	});
 
 	// ===== CRIAR PROPOSTA DEFINITIVA =====
 	document.getElementById("form").addEventListener("submit", async e => {

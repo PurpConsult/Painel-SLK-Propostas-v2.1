@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 import requests
 import json
@@ -115,10 +115,22 @@ def calcular_blocos(itens):
             svc.append(item_novo)
         else:
             loc.append(item_novo)
+    subtotal_equipamentos = round(sum(i["subtotal"] for i in loc), 2)
+    subtotal_servicos = round(sum(i["subtotal"] for i in svc), 2)
+    imposto_equipamentos_5 = round(subtotal_equipamentos * 0.05, 2)
+    imposto_servicos_5 = round(subtotal_servicos * 0.05, 2)
+    # Regra comercial confirmada: 12% sobre o valor do primeiro imposto de 5%,
+    # e não uma alíquota de 12% sobre toda a base de serviços.
+    imposto_servicos_12_sobre_5 = round(imposto_servicos_5 * 0.12, 2)
+    total_equipamentos = round(subtotal_equipamentos + imposto_equipamentos_5, 2)
+    total_servicos = round(subtotal_servicos + imposto_servicos_5 + imposto_servicos_12_sobre_5, 2)
+    subtotal_geral = round(total_equipamentos + total_servicos, 2)
     return {
-        "locacao": {"itens": loc, "subtotal": round(sum(i["subtotal"] for i in loc), 2)},
-        "servicos": {"itens": svc, "subtotal": round(sum(i["subtotal"] for i in svc), 2)},
-        "total_geral": round(sum(i["subtotal"] for i in loc) + sum(i["subtotal"] for i in svc), 2),
+        "locacao": {"itens": loc, "subtotal": subtotal_equipamentos, "imposto_5": imposto_equipamentos_5, "total": total_equipamentos},
+        "servicos": {"itens": svc, "subtotal": subtotal_servicos, "imposto_5": imposto_servicos_5, "imposto_12_sobre_5": imposto_servicos_12_sobre_5, "total": total_servicos},
+        "impostos_total": round(imposto_equipamentos_5 + imposto_servicos_5 + imposto_servicos_12_sobre_5, 2),
+        "subtotal_geral": subtotal_geral,
+        "total_geral": subtotal_geral,
     }
 
 def aplicar_desconto_blocos(blocos, desconto):
@@ -446,9 +458,9 @@ def api_novo_cliente():
 
 @app.route("/api/produtos-catalogo")
 def api_produtos_catalogo():
-    """Busca TODOS os 375 produtos/serviços da API com categorias."""
+    """Consulta produtos, serviços, itens, insumos e composições para a seleção local."""
     try:
-        produtos = buscar_paginado("/products-services")
+        produtos, avisos_catalogo = _buscar_catalogo_ampliado()
         caminho_imagens = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "catalogo_imagens_sugeridas.json"
@@ -456,7 +468,7 @@ def api_produtos_catalogo():
         imagens_candidatas = _ler_json(caminho_imagens, {}).get("candidates", {})
         imagens_revisadas = _ler_json(ARQUIVO_IMAGENS_APROVADAS, {})
         correcoes_tipo = _ler_correcoes_tipo_itens()
-        # Enriquecer com nome da categoria e tipo (Equipamento/Serviço)
+        # Enriquecer com origem, tipo comercial e imagem disponível.
         for p in produtos:
             _aplicar_tipo_item_catalogo(p, correcoes_tipo)
             candidato = imagens_candidatas.get(str(p.get("id")), {})
@@ -467,7 +479,7 @@ def api_produtos_catalogo():
                 "atualizado_em": revisao.get("atualizado_em", "")
             }
             p["imagem_aprovada"] = _imagem_aprovada_para_item(p, imagens_revisadas)
-        return jsonify(sucesso=True, dados=produtos)
+        return jsonify(sucesso=True, dados=produtos, avisos=avisos_catalogo)
     except Exception as e:
         return jsonify(sucesso=False, erro=str(e)), 500
 
@@ -485,7 +497,10 @@ TEXTOS_PDF = {
         "item": "ITEM", "foto": "FOTO", "descricao": "DESCRIÇÃO", "qtd": "QTD", "unitario": "UNITÁRIO", "subtotal": "SUBTOTAL",
         "abrir_imagem": "Abrir imagem ampliada", "ver_foto": "Ver foto", "equipamentos": "EQUIPAMENTOS / LOCAÇÃO",
         "servicos": "SERVIÇOS / MÃO DE OBRA", "nenhum_equipamento": "Nenhum equipamento", "nenhum_servico": "Nenhum serviço",
-        "subtotal_equipamentos": "SUBTOTAL EQUIPAMENTOS", "subtotal_servicos": "SUBTOTAL SERVIÇOS", "desconto": "DESCONTO CONCEDIDO",
+        "base_equipamentos": "BASE EQUIPAMENTOS", "imposto_equipamentos": "IMPOSTO EQUIPAMENTOS (5%)", "total_equipamentos": "TOTAL EQUIPAMENTOS (+ 5% DE IMPOSTOS)",
+        "base_servicos": "BASE SERVIÇOS", "imposto_servicos_5": "IMPOSTO SERVIÇOS (5%)", "imposto_servicos_12": "IMPOSTO SOBRE O 5% (12%)", "total_servicos": "TOTAL SERVIÇOS (+ 5% + 12% DE IMPOSTOS)",
+        "impostos_incluidos": "Impostos incluídos: os totais de equipamentos e serviços já contemplam os acréscimos aplicáveis.",
+        "subtotal_geral": "SUBTOTAL GERAL", "desconto": "DESCONTO CONCEDIDO",
         "investimento_total": "INVESTIMENTO TOTAL", "investimento_pos_desconto": "INVESTIMENTO TOTAL APÓS DESCONTO",
         "observacoes": "OBSERVAÇÕES:", "projeto": "PROJETO / REFERÊNCIAS:", "acessar_projeto": "Acessar projeto e referências da proposta",
         "pagamento": "FORMA DE PAGAMENTO:", "pagamento_texto": "TRANSFERÊNCIA BANCÁRIA, PIX OU BOLETO BANCÁRIO",
@@ -508,7 +523,10 @@ TEXTOS_PDF = {
         "item": "ITEM", "foto": "PHOTO", "descricao": "DESCRIPTION", "qtd": "QTY", "unitario": "UNIT PRICE", "subtotal": "SUBTOTAL",
         "abrir_imagem": "Open enlarged image", "ver_foto": "View photo", "equipamentos": "EQUIPMENT / RENTAL",
         "servicos": "SERVICES / LABOR", "nenhum_equipamento": "No equipment", "nenhum_servico": "No services",
-        "subtotal_equipamentos": "EQUIPMENT SUBTOTAL", "subtotal_servicos": "SERVICES SUBTOTAL", "desconto": "DISCOUNT GRANTED",
+        "base_equipamentos": "EQUIPMENT BASE", "imposto_equipamentos": "EQUIPMENT TAX (5%)", "total_equipamentos": "TOTAL EQUIPMENT (+ 5% TAX)",
+        "base_servicos": "SERVICES BASE", "imposto_servicos_5": "SERVICES TAX (5%)", "imposto_servicos_12": "TAX ON THE 5% AMOUNT (12%)", "total_servicos": "TOTAL SERVICES (+ 5% + 12% TAX)",
+        "impostos_incluidos": "Taxes included: equipment and service totals already include the applicable charges.",
+        "subtotal_geral": "GENERAL SUBTOTAL", "desconto": "DISCOUNT GRANTED",
         "investimento_total": "TOTAL INVESTMENT", "investimento_pos_desconto": "TOTAL INVESTMENT AFTER DISCOUNT",
         "observacoes": "NOTES:", "projeto": "PROJECT / REFERENCES:", "acessar_projeto": "Open project and proposal references",
         "pagamento": "PAYMENT METHOD:", "pagamento_texto": "BANK TRANSFER, PIX OR BANK SLIP",
@@ -531,7 +549,10 @@ TEXTOS_PDF = {
         "item": "ÍTEM", "foto": "FOTO", "descricao": "DESCRIPCIÓN", "qtd": "CANT.", "unitario": "PRECIO UNIT.", "subtotal": "SUBTOTAL",
         "abrir_imagem": "Abrir imagen ampliada", "ver_foto": "Ver foto", "equipamentos": "EQUIPOS / ALQUILER",
         "servicos": "SERVICIOS / MANO DE OBRA", "nenhum_equipamento": "Sin equipos", "nenhum_servico": "Sin servicios",
-        "subtotal_equipamentos": "SUBTOTAL EQUIPOS", "subtotal_servicos": "SUBTOTAL SERVICIOS", "desconto": "DESCUENTO OTORGADO",
+        "base_equipamentos": "BASE EQUIPOS", "imposto_equipamentos": "IMPUESTO EQUIPOS (5%)", "total_equipamentos": "TOTAL EQUIPOS (+ 5% DE IMPUESTOS)",
+        "base_servicos": "BASE SERVICIOS", "imposto_servicos_5": "IMPUESTO SERVICIOS (5%)", "imposto_servicos_12": "IMPUESTO SOBRE EL 5% (12%)", "total_servicos": "TOTAL SERVICIOS (+ 5% + 12% DE IMPUESTOS)",
+        "impostos_incluidos": "Impuestos incluidos: los totales de equipos y servicios ya contemplan los cargos aplicables.",
+        "subtotal_geral": "SUBTOTAL GENERAL", "desconto": "DESCUENTO OTORGADO",
         "investimento_total": "INVERSIÓN TOTAL", "investimento_pos_desconto": "INVERSIÓN TOTAL CON DESCUENTO",
         "observacoes": "OBSERVACIONES:", "projeto": "PROYECTO / REFERENCIAS:", "acessar_projeto": "Abrir proyecto y referencias de la cotización",
         "pagamento": "FORMA DE PAGO:", "pagamento_texto": "TRANSFERENCIA BANCARIA, PIX O BOLETO BANCARIO",
@@ -648,6 +669,10 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     TIT = ParagraphStyle('TIT', parent=styles['Heading1'], fontSize=14, leading=18, alignment=1, textColor=colors.HexColor("#006c8d"))
     SUB = ParagraphStyle('SUB', parent=styles['Normal'], fontSize=9, leading=12, alignment=1, textColor=colors.HexColor("#666"), spaceAfter=0)
     NEG = ParagraphStyle('NEG', parent=NE, fontName='Helvetica-Bold')
+    NOTA_IMPOSTOS = ParagraphStyle(
+        'NOTA_IMPOSTOS', parent=ROT, fontSize=8, leading=10,
+        textColor=colors.HexColor("#3d6c78"), spaceBefore=2, spaceAfter=0,
+    )
 
     opcoes_pdf = dados_proposta.get("opcoes_pdf") if isinstance(dados_proposta.get("opcoes_pdf"), dict) else {}
     idioma_pdf = str(opcoes_pdf.get("idioma") or "pt").lower()
@@ -784,14 +809,31 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
         ('LEFTPADDING',(0,0),(-1,-1),6),('RIGHTPADDING',(0,0),(-1,-1),6),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4)]))
     elementos.append(tcl); elementos.append(Spacer(1,0.5*cm))
 
-    # Foto de referência: aparece logo após os dados do cliente.
+    class ImagemReferenciaClicavel(Image):
+        """Imagem de referência que abre seu endereço local em nova aba no leitor de PDF."""
+        def __init__(self, caminho, url):
+            super().__init__(caminho)
+            self.url = url
+
+        def drawOn(self, canvas, x, y, _sW=0):
+            super().drawOn(canvas, x, y, _sW)
+            if self.url:
+                canvas.linkURL(
+                    self.url,
+                    (x, y, x + self.drawWidth, y + self.drawHeight),
+                    relative=1,
+                    thickness=0,
+                    NewWindow=True,
+                )
+
+    # Foto de referência: aparece logo após os dados do cliente e abre em nova aba ao ser clicada.
     foto_relativa = str(dados_proposta.get("foto_proposta") or "").strip()
     if foto_relativa and not os.path.isabs(foto_relativa):
         caminho_foto = os.path.normpath(os.path.join(BASE_DIR, foto_relativa))
         if os.path.commonpath([BASE_DIR, caminho_foto]) == BASE_DIR and os.path.exists(caminho_foto):
             try:
                 elementos.append(Paragraph(f"<b>{texto('imagem_referencia')}</b>", H2))
-                imagem_proposta = Image(caminho_foto)
+                imagem_proposta = ImagemReferenciaClicavel(caminho_foto, _url_publica_imagem_referencia(foto_relativa))
                 imagem_proposta._restrictSize(14*cm, 7.5*cm)
                 elementos.append(imagem_proposta)
                 elementos.append(Spacer(1,0.45*cm))
@@ -804,7 +846,7 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
         blocos = calcular_blocos(dados_proposta.get("itens", []))
     loc = blocos.get("locacao",  {"itens":[],"subtotal":0})
     svc = blocos.get("servicos", {"itens":[],"subtotal":0})
-    total = blocos.get("total_geral", loc["subtotal"]+svc["subtotal"])
+    total = blocos.get("total_geral", loc.get("total", loc["subtotal"]) + svc.get("total", svc["subtotal"]))
 
     mostrar_valores_unitarios = opcoes_pdf.get("mostrar_valor_unitario") is not False
     CAB = [[texto("item"), texto("foto"), texto("descricao"), texto("qtd"), texto("unitario"), texto("subtotal")]] if mostrar_valores_unitarios else [[texto("item"), texto("foto"), texto("descricao"), texto("qtd")]]
@@ -880,11 +922,13 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     t1 = Table(CAB+dloc, colWidths=LARG)
     e1 = list(EST_BASE) + [('BACKGROUND',(0,0),(-1,0),colors.HexColor("#008cab")),('TEXTCOLOR',(0,0),(-1,0),colors.white)]
     t1.setStyle(e1); elementos.append(t1)
-    s1 = Table([[Paragraph(f"<b>{texto('subtotal_equipamentos')}</b>", NEG), Paragraph(fmt(loc['subtotal']), NEG)]], colWidths=[13.0*cm,4.5*cm])
+    s1 = Table([
+        [Paragraph(f"<b>{texto('total_equipamentos')}</b>", NEG), Paragraph(fmt(loc.get("total", loc.get("subtotal", 0))), NEG)],
+    ], colWidths=[13.0*cm,4.5*cm])
     s1.setStyle(TableStyle([
         ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
-        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#e2f6fa")),
+        ('BACKGROUND',(0,0),(-1,0),colors.HexColor("#e2f6fa")),
         ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
         ('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),
         ('LINEABOVE',(0,0),(-1,-1),.6,colors.HexColor("#79cfdf")),
@@ -898,18 +942,31 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
     t2 = Table(CAB+dsv, colWidths=LARG)
     e2 = list(EST_BASE) + [('BACKGROUND',(0,0),(-1,0),colors.HexColor("#007d9f")),('TEXTCOLOR',(0,0),(-1,0),colors.white)]
     t2.setStyle(e2); elementos.append(t2)
-    s2 = Table([[Paragraph(f"<b>{texto('subtotal_servicos')}</b>", NEG), Paragraph(fmt(svc['subtotal']), NEG)]], colWidths=[13.0*cm,4.5*cm])
+    s2 = Table([
+        [Paragraph(f"<b>{texto('total_servicos')}</b>", NEG), Paragraph(fmt(svc.get("total", svc.get("subtotal", 0))), NEG)],
+    ], colWidths=[13.0*cm,4.5*cm])
     s2.setStyle(TableStyle([
         ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
-        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#eaf7f9")),
+        ('BACKGROUND',(0,0),(-1,0),colors.HexColor("#eaf7f9")),
         ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
         ('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),
         ('LINEABOVE',(0,0),(-1,-1),.6,colors.HexColor("#78c5d4")),
     ]))
-    elementos.append(s2); elementos.append(Spacer(1,0.7*cm))
+    elementos.append(s2)
+    elementos.append(Paragraph(texto("impostos_incluidos"), NOTA_IMPOSTOS))
+    elementos.append(Spacer(1,0.45*cm))
 
-    # 💰 DESCONTO E TOTAL
+    # 💰 SUBTOTAL GERAL, DESCONTO E INVESTIMENTO TOTAL
+    subtotal_geral_pdf = float(blocos.get("subtotal_geral") or (loc.get("total", loc.get("subtotal", 0)) + svc.get("total", svc.get("subtotal", 0))))
+    ts = Table([[Paragraph(f"<b>{texto('subtotal_geral')}</b>", NEG), Paragraph(fmt(subtotal_geral_pdf), NEG)]], colWidths=[13.0*cm,4.5*cm])
+    ts.setStyle(TableStyle([
+        ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
+        ('BACKGROUND',(0,0),(-1,-1),colors.HexColor("#f2f8fa")),
+        ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5),
+        ('LINEABOVE',(0,0),(-1,-1),.6,colors.HexColor("#78c5d4")),
+    ]))
+    elementos.append(ts); elementos.append(Spacer(1,0.15*cm))
     try:
         desconto_pdf = max(0, float(blocos.get("desconto") or dados_proposta.get("desconto_proposta") or 0))
     except (TypeError, ValueError):
@@ -927,8 +984,7 @@ def gerar_pdf_buffer(dados_proposta, num_orcamento=""):
 
     TT = ParagraphStyle('TT',parent=NEG,fontSize=12,textColor=colors.HexColor("#006c8d"))
     TTV = ParagraphStyle('TTV',parent=NEG,fontSize=14,textColor=colors.HexColor("#006c8d"))
-    titulo_total = texto("investimento_total") if not desconto_pdf else texto("investimento_pos_desconto")
-    tt = Table([[Paragraph(titulo_total, TT), Paragraph(fmt(total), TTV)]], colWidths=[13.0*cm,4.5*cm])
+    tt = Table([[Paragraph(texto("investimento_total"), TT), Paragraph(fmt(total), TTV)]], colWidths=[13.0*cm,4.5*cm])
     tt.setStyle(TableStyle([
         ('ALIGN',(0,0),(0,0),'RIGHT'), ('ALIGN',(1,0),(1,0),'RIGHT'),
         ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
@@ -1080,6 +1136,7 @@ PASTA_CACHE_IMAGENS_ITENS = os.path.join(BASE_DIR, "imagens_itens_aprovadas")
 ARQUIVO_IMAGENS_APROVADAS = os.path.join(BASE_DIR, "imagens_itens_aprovadas.json")
 ARQUIVO_APRENDIZADOS_CATALOGO = os.path.join(BASE_DIR, "aprendizados_catalogo.json")
 ARQUIVO_CORRECOES_TIPO_ITENS = os.path.join(BASE_DIR, "correcoes_tipo_itens.json")
+ARQUIVO_CATALOGO_KITS_LOCAIS = os.path.join(BASE_DIR, "catalogo_kits_manuais.json")
 ARQUIVO_CONFIGURACOES_RELATORIOS = os.path.join(BASE_DIR, "configuracoes_relatorios.json")
 PASTA_RELATORIOS = os.path.join(BASE_DIR, "relatorios")
 EXTENSOES_IMAGEM_PERMITIDAS = {"jpg", "jpeg", "png", "webp"}
@@ -1087,6 +1144,27 @@ EXTENSOES_BRIEFING_PERMITIDAS = {"txt", "pdf", "docx"}
 TAMANHO_MAXIMO_BRIEFING = 5 * 1024 * 1024
 CARACTERES_MAXIMOS_BRIEFING = 24000
 TAMANHO_MAXIMO_ANEXO_PROJETO = 20 * 1024 * 1024
+
+
+def _url_publica_imagem_referencia(foto_relativa):
+    """Retorna um endereço local de leitura para abrir a imagem em nova aba pelo PDF."""
+    caminho = str(foto_relativa or "").replace("\\", "/").lstrip("/")
+    base_publica = os.environ.get("SOULINK_APP_BASE_URL", "http://127.0.0.1:5000").rstrip("/")
+    if caminho.startswith("static/"):
+        return f"{base_publica}/{caminho}"
+    if caminho.startswith("imagens_propostas/"):
+        nome = secure_filename(os.path.basename(caminho))
+        return f"{base_publica}/imagens-proposta/{nome}" if nome else ""
+    return ""
+
+
+@app.route("/imagens-proposta/<path:nome_arquivo>")
+def servir_imagem_proposta(nome_arquivo):
+    """Disponibiliza somente imagens já enviadas para a proposta, sem acesso a outras pastas locais."""
+    nome_seguro = secure_filename(os.path.basename(nome_arquivo))
+    if not nome_seguro or nome_seguro != nome_arquivo:
+        return jsonify(sucesso=False, erro="Imagem não encontrada."), 404
+    return send_from_directory(PASTA_IMAGENS_PROPOSTA, nome_seguro, as_attachment=False, max_age=0)
 R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "").strip()
 R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "").strip()
 R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "").strip()
@@ -1724,8 +1802,9 @@ def _ler_correcoes_tipo_itens():
 
 def _aplicar_tipo_item_catalogo(item, correcoes=None):
     """Aplica ao item a classificação original ou a correção supervisionada pela equipe."""
-    categoria = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
-    tipo_original = "Serviço" if categoria in SERVICO_CATS else "Equipamento"
+    origem_catalogo = str(item.get("origem_catalogo") or "")
+    categoria = str(item.get("categoria") or "").strip() if origem_catalogo == "Itens e Insumos" else CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
+    tipo_original = "Equipamento" if origem_catalogo == "Itens e Insumos" else ("Serviço" if categoria in SERVICO_CATS else "Equipamento")
     dados = correcoes if isinstance(correcoes, dict) else _ler_correcoes_tipo_itens()
     registro = dados.get("itens", {}).get(str(item.get("id")), {})
     tipo_corrigido = registro.get("tipo_item") if isinstance(registro, dict) else None
@@ -1734,6 +1813,98 @@ def _aplicar_tipo_item_catalogo(item, correcoes=None):
     item["tipo_item_original"] = tipo_original
     item["tipo_corrigido_pela_equipe"] = bool(tipo_corrigido in {"Equipamento", "Serviço"} and tipo_corrigido != tipo_original)
     return item
+
+
+def _valor_catalogo_item_insumo(item):
+    """Obtém o valor de venda informado pelo Meeventos, sem criar preço alternativo local."""
+    for chave in ("valor_da_venda", "valor_venda", "valor", "valor_unitario"):
+        try:
+            valor = item.get(chave)
+            if valor not in (None, ""):
+                return float(valor)
+        except (TypeError, ValueError):
+            continue
+    return 0.0
+
+
+def _normalizar_item_insumo_catalogo(registro):
+    """Converte Item/Insumo oficial em um equipamento selecionável, sem perder o ID de origem."""
+    item = dict(registro or {})
+    identificador = str(item.get("id") or "").strip()
+    if not identificador:
+        return None
+    item["id_meeventos"] = identificador
+    item["id"] = f"item-insumo:{identificador}"
+    item["origem_catalogo"] = "Itens e Insumos"
+    item["nome"] = item.get("nome") or item.get("descricao") or f"Item e insumo {identificador}"
+    item["codigo"] = item.get("codigo") or item.get("cod") or identificador
+    item["valor"] = _valor_catalogo_item_insumo(item)
+    item["item_de_composicao"] = bool(item.get("item_de_composicao"))
+    item["categoria"] = "Itens e Insumos · Kit / composição" if item["item_de_composicao"] else "Itens e Insumos"
+    item["tipo_item"] = "Equipamento"
+    item["tipo_item_original"] = "Equipamento"
+    return item
+
+
+def _normalizar_kit_local(registro):
+    """Converte um kit cadastrado pela equipe em um equipamento selecionável, sem alterar o Meeventos."""
+    kit = dict(registro or {})
+    nome_original = str(kit.get("nome") or "").strip()
+    if not nome_original:
+        return None
+    identificador = str(kit.get("id") or _normalizar_texto_busca(nome_original).replace(" ", "-")).strip()
+    if not identificador:
+        return None
+    try:
+        valor = round(float(kit.get("valor") or 0), 2)
+    except (TypeError, ValueError):
+        valor = 0.0
+    componentes = kit.get("componentes") if isinstance(kit.get("componentes"), list) else []
+    nome_exibicao = nome_original if nome_original.upper().startswith("KIT ") else f"KIT {nome_original}"
+    return {
+        "id": f"kit-local:{identificador}",
+        "id_meeventos": "",
+        "id_kit_local": identificador,
+        "codigo": str(kit.get("codigo") or f"KIT-{identificador.upper()}"),
+        "nome": nome_exibicao,
+        "valor": valor,
+        "valor_padrao": valor,
+        "origem_catalogo": "Kits cadastrados localmente",
+        "categoria": "Kits · composição",
+        "tipo_item": "Equipamento",
+        "tipo_item_original": "Equipamento",
+        "item_de_composicao": True,
+        "componentes": [dict(componente) for componente in componentes if isinstance(componente, dict)],
+    }
+
+
+def _buscar_kits_locais():
+    """Lê somente os kits confirmados pela equipe, pois a API pública não expõe a visão de Kits."""
+    dados = _ler_json(ARQUIVO_CATALOGO_KITS_LOCAIS, {"kits": []})
+    registros = dados.get("kits", []) if isinstance(dados, dict) else []
+    kits = []
+    for registro in registros if isinstance(registros, list) else []:
+        kit = _normalizar_kit_local(registro)
+        if kit:
+            kits.append(kit)
+    return kits
+
+
+def _buscar_catalogo_ampliado():
+    """Une catálogos oficiais e kits confirmados localmente usados pela seleção da Soulink."""
+    produtos_servicos = [dict(item) for item in buscar_paginado("/products-services") if isinstance(item, dict)]
+    for item in produtos_servicos:
+        item["origem_catalogo"] = "Produtos e Serviços"
+        item["id_meeventos"] = str(item.get("id") or "")
+
+    itens_insumos = []
+    for registro in buscar_paginado("/equipment"):
+        if not isinstance(registro, dict):
+            continue
+        item = _normalizar_item_insumo_catalogo(registro)
+        if item:
+            itens_insumos.append(item)
+    return produtos_servicos + itens_insumos + _buscar_kits_locais(), []
 
 def _normalizar_texto_busca(texto):
     texto = unicodedata.normalize("NFKD", str(texto or ""))
@@ -1755,13 +1926,16 @@ def _ler_aprendizados_catalogo():
 
 def _candidato_catalogo(item, confianca, origem):
     try:
-        valor = float(item.get("valor") or item.get("valor_unitario") or 0)
+        valor = float(item.get("valor") or item.get("valor_da_venda") or item.get("valor_unitario") or 0)
     except (TypeError, ValueError):
         valor = 0.0
     return {
         "id": item.get("id"), "nome": item.get("nome") or item.get("descricao") or "Item sem descrição",
         "valor": valor,
         "tipo_item": item.get("tipo_item") or "Equipamento", "categoria": item.get("categoria") or "",
+        "codigo": item.get("codigo") or item.get("id_meeventos") or item.get("id"),
+        "origem_catalogo": item.get("origem_catalogo") or "Produtos e Serviços",
+        "id_meeventos": item.get("id_meeventos") or item.get("id"),
         "confianca": confianca, "origem": origem, "imagem_aprovada": item.get("imagem_aprovada") or {},
     }
 
@@ -1973,11 +2147,30 @@ def _sugerir_itens_catalogo(itens_solicitados, catalogo, retornar_nao_localizado
         "de", "da", "do", "para", "com", "e", "ou", "em", "a", "o", "os", "as",
         "kit", "evento", "apresentacao", "durante", "necessario", "necessaria", "solicitado",
     }
+    # Vocabulário comercial recorrente. A equivalência amplia somente a busca por candidatos;
+    # a equipe continua escolhendo ou excluindo cada item antes de gerar a proposta.
+    termos_equivalentes = {
+        "notebook": {"laptop", "computador"}, "laptop": {"notebook", "computador"}, "computador": {"notebook", "laptop"},
+        "projetor": {"datashow", "data", "show"}, "datashow": {"projetor"},
+        "tela": {"telao", "telão"}, "telao": {"tela"}, "telão": {"tela"},
+        "microfone": {"mic"}, "mic": {"microfone"},
+        "pulpito": {"podio"}, "podio": {"pulpito"},
+        "cadeira": {"assento"}, "assento": {"cadeira"},
+        "iluminacao": {"luz", "luzes"}, "luz": {"iluminacao"}, "luzes": {"iluminacao"},
+        "sonorizacao": {"som", "audio"}, "som": {"sonorizacao", "audio"}, "audio": {"sonorizacao", "som"},
+        "palco": {"praticavel", "praticaveis"}, "praticavel": {"palco"}, "praticaveis": {"palco"},
+    }
+
+    def termos_expandidos(termos):
+        resultado = set(termos)
+        for termo in termos:
+            resultado.update(termos_equivalentes.get(termo, set()))
+        return resultado
 
     def termos_compativeis(termos_pedido, termos_item):
         """Aceita igualdade e variações simples como técnico/técnicos ou tela/telão."""
         encontrados = set()
-        for termo_pedido in termos_pedido:
+        for termo_pedido in termos_expandidos(termos_pedido):
             for termo_item in termos_item:
                 if termo_pedido == termo_item:
                     encontrados.add(termo_pedido)
@@ -1999,6 +2192,7 @@ def _sugerir_itens_catalogo(itens_solicitados, catalogo, retornar_nao_localizado
         ids_aprendidos = {str(candidato.get("id")) for candidato in candidatos_aprendidos}
         busca = _normalizar_texto_busca(descricao)
         termos = {termo for termo in busca.split() if termo not in palavras_ignoradas and len(termo) > 1}
+        usa_termo_equivalente = any(termo in termos_equivalentes for termo in termos)
         candidatos = []
         for item in catalogo if isinstance(catalogo, list) else []:
             nome = str(item.get("nome") or item.get("descricao") or "").strip()
@@ -2020,7 +2214,7 @@ def _sugerir_itens_catalogo(itens_solicitados, catalogo, retornar_nao_localizado
             "pedido": descricao,
             "quantidade_sugerida": quantidade,
             "candidatos": candidatos_aprendidos + [
-                _candidato_catalogo(item, pontuacao, "Catálogo por similaridade") for pontuacao, item in melhores
+                _candidato_catalogo(item, pontuacao, "Catálogo por termos equivalentes" if usa_termo_equivalente else "Catálogo por similaridade") for pontuacao, item in melhores
             ]
         }
         sugestoes.append(grupo)
@@ -2274,7 +2468,7 @@ def analisar_briefing_ia():
         texto = texto[:CARACTERES_MAXIMOS_BRIEFING]
     try:
         analise, modelo = _analisar_briefing_com_ia(texto)
-        catalogo = buscar_paginado("/products-services")
+        catalogo, _ = _buscar_catalogo_ampliado()
         catalogo_revisado = _ler_json(ARQUIVO_IMAGENS_APROVADAS, {})
         for item in catalogo:
             _aplicar_tipo_item_catalogo(item)
@@ -2335,7 +2529,7 @@ def salvar_aprendizado_catalogo():
     if not chave or not ids_solicitados:
         return jsonify({"sucesso": False, "erro": "Informe o pedido e selecione pelo menos um item oficial do catálogo."}), 400
 
-    catalogo = buscar_paginado("/products-services")
+    catalogo, _ = _buscar_catalogo_ampliado()
     por_id = {str(item.get("id")): item for item in catalogo if isinstance(item, dict)}
     itens_validos = [por_id[item_id] for item_id in ids_solicitados if item_id in por_id]
     if not itens_validos:
@@ -2394,14 +2588,14 @@ def corrigir_tipo_item_catalogo():
     if not item_id or tipo_item not in {"Equipamento", "Serviço"}:
         return jsonify({"sucesso": False, "erro": "Informe um item oficial e uma categoria válida."}), 400
 
-    catalogo = buscar_paginado("/products-services")
+    catalogo, _ = _buscar_catalogo_ampliado()
     item = next((registro for registro in catalogo if str(registro.get("id")) == item_id), None)
     if not item:
         return jsonify({"sucesso": False, "erro": "O item não foi encontrado no catálogo oficial."}), 404
 
     dados = _ler_correcoes_tipo_itens()
-    categoria = CAT_ID_TO_NAME.get(str(item.get("id_cat", "")), "OUTROS")
-    tipo_original = "Serviço" if categoria in SERVICO_CATS else "Equipamento"
+    _aplicar_tipo_item_catalogo(item, dados)
+    tipo_original = item.get("tipo_item_original") or "Equipamento"
     if tipo_item == tipo_original:
         dados["itens"].pop(item_id, None)
         mensagem = "O item voltou à classificação original do catálogo."
