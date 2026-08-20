@@ -1,0 +1,17 @@
+/* Navegação institucional compartilhada da Soulink. */
+body.soulink-com-cabecalho{padding:0!important}
+/* As páginas antigas possuem regras genéricas para header e links. Estes resets
+   garantem que todas usem exatamente o mesmo cabeçalho compacto de referência. */
+.soulink-app-header{position:relative;z-index:20;display:block!important;margin:0!important;padding:0!important;border:0!important;border-top:1px solid #8e5965!important;border-radius:0!important;background:linear-gradient(108deg,#073c4b 0%,#00667e 48%,#119bb4 100%)!important;color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.1)}
+.soulink-app-header__inner{box-sizing:border-box;max-width:none!important;width:100%;min-height:80px;margin:0!important;padding:0 36px;display:flex;align-items:center;justify-content:space-between;gap:28px}
+.soulink-app-header__brand{display:inline-flex;align-items:baseline;gap:8px;color:#fff;text-decoration:none;white-space:nowrap;letter-spacing:-.02em}
+.soulink-app-header__brand strong{font:800 19px/1 'Segoe UI',Arial,sans-serif}
+.soulink-app-header__brand span{font:400 19px/1 'Segoe UI',Arial,sans-serif;color:#e2f3f6}
+.soulink-app-header__nav{display:flex!important;align-items:center;justify-content:flex-end;gap:4px;flex-wrap:wrap;margin:0!important;padding:0!important;background:transparent!important;border:0!important}
+.soulink-app-header .soulink-app-header__link{display:inline-flex!important;align-items:center;min-height:34px;margin:0!important;padding:0 10px!important;border:0!important;border-radius:7px!important;color:#eafdff!important;background:transparent!important;text-decoration:none!important;font:700 12px/1 'Segoe UI',Arial,sans-serif!important;transition:background .18s cubic-bezier(.23,1,.32,1),transform .18s cubic-bezier(.23,1,.32,1),color .18s cubic-bezier(.23,1,.32,1)}
+.soulink-app-header__link:hover,.soulink-app-header__link:focus-visible{background:rgba(255,255,255,.12)!important;color:#fff!important;outline:none}
+.soulink-app-header__link:active{transform:scale(.97)}
+.soulink-app-header__link.is-active{background:rgba(137,221,233,.27)!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+body.soulink-com-cabecalho .wrap{padding-left:15px;padding-right:15px}
+@media(max-width:860px){.soulink-app-header__inner{min-height:auto;padding:13px 18px;align-items:flex-start;flex-direction:column;gap:10px}.soulink-app-header__nav{justify-content:flex-start;gap:3px}.soulink-app-header__link{min-height:30px;padding:0 8px;font-size:11px!important}}
+@media(max-width:520px){.soulink-app-header__inner{padding:12px 14px}.soulink-app-header__brand strong,.soulink-app-header__brand span{font-size:17px}.soulink-app-header__nav{width:100%;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.soulink-app-header__link{white-space:nowrap;flex:0 0 auto}}

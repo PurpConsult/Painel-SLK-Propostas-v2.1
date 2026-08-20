@@ -4,16 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SOULINK | Relatórios</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='soulink-header.css') }}">
 <style>
   :root { --cyan:#00bcd4; --teal:#007d8f; --navy:#12333a; --ink:#2c454a; --muted:#668087; --line:#dcebed; --pale:#f5fbfc; --warning:#76591b; --warning-bg:#fff8e6; --green:#137452; }
   * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Arial,sans-serif; }
   body { background:#f4f7f8; color:var(--ink); padding:15px; font-size:14px; line-height:1.45; }
   .wrap { max-width:1240px; margin:0 auto; }
-  header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 20px; border-radius:9px; margin-bottom:17px; color:#fff; background:linear-gradient(135deg,#00bcd4,#0097a7); box-shadow:0 3px 12px rgba(0,140,155,.14); }
-  header h1 { font-size:18px; font-weight:600; letter-spacing:.01em; }
-  header nav { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
-  header a { color:#fff; text-decoration:none; font-size:12px; padding:6px 10px; border:1px solid rgba(255,255,255,.55); border-radius:5px; transition:all .18s; }
-  header a:hover, header a:focus { background:#fff; color:var(--teal); outline:none; }
   .intro { display:flex; gap:16px; align-items:flex-start; justify-content:space-between; padding:16px 18px; margin-bottom:13px; background:#fff; border:1px solid var(--line); border-radius:9px; box-shadow:0 1px 4px rgba(22,70,78,.04); }
   .eyebrow { color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; }
   h2 { color:var(--navy); font-size:20px; line-height:1.2; margin-bottom:5px; }
@@ -56,18 +52,28 @@
   @media (max-width:850px) { .grid-top { grid-template-columns:1fr; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.event-summary { grid-template-columns:1fr 1fr; }.event-title { grid-column:1/-1; }.equipment-list { grid-template-columns:1fr; } }
   @media (max-width:600px) { body { padding:9px; } header { align-items:flex-start; flex-direction:column; padding:12px; }.form-grid { grid-template-columns:1fr; }.metrics { grid-template-columns:1fr 1fr; }.metric { min-height:87px; }.metric strong { font-size:16px; }.event-summary { grid-template-columns:1fr; }.event-meta { text-align:left; }.intro { flex-direction:column; }.chip { white-space:normal; } }
   @media (prefers-reduced-motion:no-preference) { .card, .metric, .event-card { transition:transform .18s cubic-bezier(.23,1,.32,1), box-shadow .18s; }.event-card:hover { transform:translateY(-1px); box-shadow:0 5px 12px rgba(22,70,78,.06); } }
+  .assistant-card { margin:13px 0; padding:16px; border:1px solid #b9e3e8; border-radius:9px; background:linear-gradient(120deg,#f1fdff 0%,#fff 55%); box-shadow:0 1px 5px rgba(22,70,78,.05); }
+  .assistant-head { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }.assistant-head h3 { margin:0 0 3px; }.assistant-head p { color:var(--muted); font-size:12px; max-width:770px; }.assistant-badge { color:#087484; background:#ddf7fa; border:1px solid #b7e8ee; border-radius:18px; padding:5px 8px; white-space:nowrap; font-size:10px; font-weight:800; }
+  .assistant-input { width:100%; min-height:88px; resize:vertical; padding:10px; border:1px solid #cfe0e3; border-radius:7px; color:var(--ink); background:#fff; font-size:13px; line-height:1.45; }.assistant-input:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,188,212,.11); }.assistant-response { display:none; margin-top:11px; padding:12px; border:1px solid #cce7ea; border-radius:7px; background:#fff; }.assistant-response.show { display:block; }.assistant-response strong { color:var(--navy); }.assistant-response p { margin-top:5px; color:#47656b; font-size:12px; }.assistant-response ul { margin:7px 0 0 17px; color:#47656b; font-size:12px; }.assistant-response li { margin:3px 0; }.assistant-preview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:10px; }.assistant-preview div { padding:8px; border-radius:6px; background:#f4fbfc; border:1px solid #dcebed; }.assistant-preview small { display:block; color:#698087; font-size:9px; font-weight:800; text-transform:uppercase; }.assistant-preview b { display:block; margin-top:3px; color:#126472; font-size:13px; } .assistant-footnote { margin-top:9px; color:#6c858a; font-size:11px; }
+  @media (max-width:700px) { .assistant-head { flex-direction:column; }.assistant-preview { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='soulink-pages.css') }}">
 </head>
-<body>
+<body class="soulink-com-cabecalho">
+{% include '_cabecalho_soulink.html' %}
 <main class="wrap">
-  <header>
-    <h1>SOULINK | Relatórios</h1>
-    <nav><a href="/">Painel</a><a href="/propostas">Meus Orçamentos</a><a href="/financeiro">Financeiro</a><a href="/meus-itens">Meus Itens</a></nav>
-  </header>
 
-  <section class="intro">
-    <div><div class="eyebrow">Apuração comercial manual</div><h2>Comissão por período, com conferência antes da exportação.</h2><p>Consulte os eventos realizados no Meeventos, valide os equipamentos e somente então gere o PDF ou a planilha de apoio para apresentação ao hotel.</p></div>
+  <section class="intro page-intro">
+    <div><div class="eyebrow">Apuração comercial manual</div><h2>Relatórios com conferência antes da exportação.</h2><p>Organize o pedido com a assistente, consulte os eventos no Meeventos e confirme os dados antes de gerar o PDF ou a planilha.</p></div>
     <span class="chip">Consulta somente leitura</span>
+  </section>
+
+  <section class="assistant-card" aria-labelledby="assistente-title">
+    <div class="assistant-head"><div><div class="eyebrow">Assistente de relatórios</div><h3 id="assistente-title">Conte o que você precisa — mesmo que ainda esteja em dúvida.</h3><p>Escreva do seu jeito. A assistente organiza o pedido, pergunta com calma quando faltar hotel, período ou regra, explica a conta em linguagem simples e consulta o Meeventos somente para leitura. Nenhum PDF é gerado sem sua confirmação.</p></div><span class="assistant-badge">Revisão humana</span></div>
+    <label for="assistente-pedido">Pedido do relatório</label>
+    <textarea id="assistente-pedido" class="assistant-input" maxlength="4000" placeholder="Ex.: Preciso saber a comissão do Lagune neste ano, mas não lembro como descontar impostos e itens terceirizados."></textarea>
+    <div class="actions"><button id="btn-assistente" class="primary" type="button">Organizar meu pedido</button><button id="btn-usar-plano" class="secondary" type="button" hidden>Usar estes dados na apuração</button></div>
+    <section id="assistente-resposta" class="assistant-response" aria-live="polite"></section>
   </section>
 
   <section class="grid-top">
@@ -123,6 +129,11 @@
   const btnRecalcular = document.getElementById('btn-recalcular');
   const baixarPdf = document.getElementById('baixar-pdf');
   const baixarPlanilha = document.getElementById('baixar-planilha');
+  const pedidoAssistente = document.getElementById('assistente-pedido');
+  const btnAssistente = document.getElementById('btn-assistente');
+  const btnUsarPlano = document.getElementById('btn-usar-plano');
+  const respostaAssistente = document.getElementById('assistente-resposta');
+  let planoAssistente = null;
 
   function hojeISO() { return new Date().toISOString().slice(0, 10); }
   function inicioAnoISO() { return `${new Date().getFullYear()}-01-01`; }
@@ -132,6 +143,38 @@
   function mostrarFeedback(tipo, texto) { feedback.className = `feedback show ${tipo}`; feedback.textContent = texto; }
   function esconderFeedback() { feedback.className = 'feedback'; feedback.textContent = ''; }
   function setCarregando(ativo, texto) { btnGerar.disabled = ativo; btnRecalcular.disabled = ativo || !state.resultado; if (ativo) mostrarFeedback('loading', texto); }
+
+  function renderizarAssistente(dados) {
+    const plano = dados.plano || {}; planoAssistente = plano;
+    const perguntas = (plano.perguntas || []).map(item => `<li>${esc(item)}</li>`).join('');
+    const matematica = (plano.matematica || []).map(item => `<li>${esc(item)}</li>`).join('');
+    const previa = dados.previa;
+    const blocoPrevia = previa ? `<div class="assistant-preview"><div><small>Eventos encontrados</small><b>${esc(previa.quantidade_eventos)}</b></div><div><small>Equipamentos</small><b>${dinheiro(previa.equipamentos_apos_desconto)}</b></div><div><small>Base comissionável</small><b>${dinheiro(previa.base_comissionavel)}</b></div><div><small>Comissão estimada</small><b>${dinheiro(previa.comissao)}</b></div></div><p><strong>Consulta somente leitura:</strong> ${dataBr(previa.periodo?.inicio)} a ${dataBr(previa.periodo?.fim)}. Confira itens terceirizados antes de gerar o documento.</p>` : '';
+    respostaAssistente.innerHTML = `<strong>${esc(plano.resposta || 'Vamos organizar seu relatório.')}</strong>${perguntas ? `<p><strong>Para eu acertar o relatório, confirme:</strong></p><ul>${perguntas}</ul>` : ''}${matematica ? `<p><strong>Como a conta será apresentada:</strong></p><ul>${matematica}</ul>` : ''}${blocoPrevia}<p class="assistant-footnote">A assistente apenas organiza e consulta. A geração do relatório continua dependendo da sua revisão e do botão de confirmação.</p>`;
+    respostaAssistente.classList.add('show');
+    btnUsarPlano.hidden = !(plano.hotel_id && plano.data_inicio && plano.data_fim);
+  }
+
+  async function organizarPedidoAssistente() {
+    const mensagem = pedidoAssistente.value.trim();
+    if (mensagem.length < 8) { respostaAssistente.className = 'assistant-response show'; respostaAssistente.textContent = 'Conte um pouco mais do que você precisa para eu organizar o pedido.'; return; }
+    btnAssistente.disabled = true; btnAssistente.textContent = 'Organizando…'; btnUsarPlano.hidden = true;
+    try {
+      const resposta = await fetch('/api/relatorios/assistente', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({mensagem}) });
+      const dados = await resposta.json();
+      if (!resposta.ok || !dados.sucesso) throw new Error(dados.erro || 'Não foi possível organizar este pedido agora.');
+      renderizarAssistente(dados);
+    } catch (erro) { respostaAssistente.className = 'assistant-response show'; respostaAssistente.textContent = erro.message || 'Não foi possível organizar este pedido agora.'; }
+    finally { btnAssistente.disabled = false; btnAssistente.textContent = 'Organizar meu pedido'; }
+  }
+
+  btnAssistente.addEventListener('click', organizarPedidoAssistente);
+  btnUsarPlano.addEventListener('click', () => {
+    if (!planoAssistente) return;
+    hotel.value = planoAssistente.hotel_id; inicio.value = planoAssistente.data_inicio; fim.value = planoAssistente.data_fim;
+    mostrarFeedback('loading', 'Os dados sugeridos foram preenchidos. Revise o período e clique em “Gerar apuração” quando estiver pronta.');
+    document.querySelector('.grid-top').scrollIntoView({behavior:'smooth', block:'start'});
+  });
 
   async function carregarHoteis() {
     inicio.value = inicioAnoISO(); fim.value = hojeISO();

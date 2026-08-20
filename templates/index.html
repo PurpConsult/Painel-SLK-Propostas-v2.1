@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SOULINK | Orçamentos</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='soulink-header.css') }}">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
 body{background:#f5f7fa;padding:15px;color:#333;font-size:14px;line-height:1.5}
@@ -107,17 +108,14 @@ input[readonly]{background:#f5f5f5;color:#666}
 .previa-proposta-conteudo{padding:11px 12px;border-top:1px solid #dceff1}.previa-aviso{margin:0 0 9px;color:#607f84;font-size:10px;line-height:1.4}.folha-previa{min-height:250px;padding:13px;border:1px solid #e2ebec;border-radius:6px;background:linear-gradient(180deg,#fff 0,#fbfcfc 100%);box-shadow:0 3px 10px rgba(0,0,0,.05);font-size:10px;color:#35545a}.folha-previa-cab{display:flex;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:2px solid #00a9b9}.folha-previa-logo{font-size:13px;font-weight:900;letter-spacing:.02em;color:#008696}.folha-previa-numero{color:#56767b;font-size:9px;text-align:right}.folha-previa-titulo{margin:10px 0 3px;color:#1b424a;font-size:14px;font-weight:800}.folha-previa-meta{color:#608087;line-height:1.45}.folha-previa-imagem{display:none;width:100%;height:84px;margin:9px 0;border-radius:4px;overflow:hidden;background:#eaf6f7}.folha-previa-imagem.ativa{display:block}.folha-previa-imagem img{width:100%;height:100%;object-fit:cover}.folha-previa-secao{margin-top:9px;padding-top:7px;border-top:1px solid #e8efef}.folha-previa-secao strong{display:block;margin-bottom:4px;color:#16818c;font-size:9px;text-transform:uppercase;letter-spacing:.06em}.folha-previa-itens{display:grid;gap:3px}.folha-previa-item{display:flex;justify-content:space-between;gap:8px;white-space:nowrap;overflow:hidden}.folha-previa-item span:first-child{overflow:hidden;text-overflow:ellipsis}.folha-previa-mais{color:#708e92;font-style:italic}.folha-previa-total{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:2px solid #d5edef;color:#0b6c76;font-size:12px;font-weight:900}.previa-acoes{display:flex;justify-content:flex-end;margin-top:8px}.previa-acoes button{padding:5px 8px;font-size:10px}
 @media (max-width:780px){.painel-previa-proposta{position:static}.folha-previa{min-height:220px}}
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='soulink-pages.css') }}">
 </head>
-<body>
-<div class="wrap">
-<header>
-    <h1 id="tituloPagina">SOULINK | Orçamentos</h1>
-    <nav>
-        <a href="/meus-itens">📦 Meus Itens</a>
-        <a href="/propostas">📋 Meus Orçamentos</a>
-        <a href="/relatorios">Relatórios</a>
-    </nav>
-</header>
+<body class="soulink-com-cabecalho">
+{% include '_cabecalho_soulink.html' %}
+<main class="wrap">
+  <section class="page-intro">
+    <div><p class="page-kicker">Central comercial</p><h1>Nova Proposta</h1><p>Organize o briefing, os dados do evento e a composição comercial em uma única proposta pronta para conferência.</p></div>
+  </section>
 
 <form id="form">
     <div class="formulario-duas-colunas">
@@ -290,10 +288,10 @@ input[readonly]{background:#f5f5f5;color:#666}
 </form>
 
 <div class="footer">
-    <img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>
-    Desenvolvido por VendAI - AI & Sales Consulting
+    <img src="{{ url_for('static', filename='logo_vendai.png') }}" alt="VendAI"><br>
+    Desenvolvido por VendAI - AI &amp; Sales Consulting
 </div>
-</div>
+</main>
 
 <script>
 // ===== CONFIGURAÇÃO =====
@@ -354,17 +352,18 @@ function preencherFormularioDeEdicao() {
     const dadosSalvos = localStorage.getItem("dados_editar");
     if (!dadosSalvos) return;
 
-    try {
-        const dados = JSON.parse(dadosSalvos);
-        const evento = dados.evento || {};
-        const cliente = dados.cliente || {};
-        const numeroProposta = localStorage.getItem("editar_numero") || dados.numero || dados.numero_oficial || "";
+	    try {
+	        const dados = JSON.parse(dadosSalvos);
+	        const evento = dados.evento || {};
+	        const cliente = dados.cliente || {};
+	        const numeroProposta = localStorage.getItem("editar_numero") || dados.numero || dados.numero_oficial || "";
 
-        if (numeroProposta) {
-            const tituloEdicao = `EDITAR: Proposta ${numeroProposta}`;
-            document.getElementById("tituloPagina").textContent = tituloEdicao;
-            document.title = `${tituloEdicao} | SOULINK`;
-        }
+	        if (numeroProposta) {
+	            const tituloEdicao = `EDITAR: Proposta ${numeroProposta}`;
+	            const tituloPagina = document.getElementById("tituloPagina");
+	            if (tituloPagina) tituloPagina.textContent = tituloEdicao;
+	            document.title = `${tituloEdicao} | SOULINK`;
+	        }
 
         document.getElementById("busca_vendedor").value = evento.nome_vendedor || evento.vendedor || "";
         document.getElementById("id_vendedor").value = evento.id_vendedor || "";
@@ -425,8 +424,9 @@ function preencherFormularioDeEdicao() {
 }
 
 function restaurarTituloPadrao() {
-    document.getElementById("tituloPagina").textContent = "SOULINK | Orçamentos";
-    document.title = "SOULINK | Orçamentos";
+	    const tituloPagina = document.getElementById("tituloPagina");
+	    if (tituloPagina) tituloPagina.textContent = "SOULINK | Orçamentos";
+	    document.title = "SOULINK | Orçamentos";
 }
 
 function adicionarDias(data, dias) {
@@ -499,7 +499,12 @@ async function lerArquivoBriefing() {
     const arquivo = document.getElementById("arquivo_briefing").files?.[0];
     if (!arquivo) { textoArquivoBriefing = ""; return true; }
     const dados = new FormData(); dados.append("arquivo", arquivo);
-    const resposta = await fetch("/api/ia/briefing/arquivo", {method:"POST", body:dados});
+    let resposta;
+    try {
+        resposta = await fetch("/api/ia/briefing/arquivo", {method:"POST", body:dados});
+    } catch (_) {
+        throw new Error("Não foi possível alcançar o sistema local para ler o anexo. Confirme se a janela do PowerShell com ‘py app.py’ continua aberta e recarregue esta página.");
+    }
     const conteudo = await resposta.text();
     let retorno = {};
     try { retorno = conteudo ? JSON.parse(conteudo) : {}; }
@@ -514,8 +519,16 @@ async function analisarBriefingIA() {
     try {
         botao.disabled = true; botao.textContent = "Analisando para conferência...";
         await lerArquivoBriefing();
-        const resposta = await fetch("/api/ia/briefing", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({briefing:document.getElementById("briefing_ia").value,texto_anexo:textoArquivoBriefing})});
-        const retorno = await resposta.json();
+        let resposta;
+        try {
+            resposta = await fetch("/api/ia/briefing", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({briefing:document.getElementById("briefing_ia").value,texto_anexo:textoArquivoBriefing})});
+        } catch (_) {
+            throw new Error("Não foi possível alcançar o sistema local para analisar o briefing. Confirme se a janela do PowerShell com ‘py app.py’ continua aberta e recarregue esta página.");
+        }
+        const conteudo = await resposta.text();
+        let retorno = {};
+        try { retorno = conteudo ? JSON.parse(conteudo) : {}; }
+        catch (_) { throw new Error("O sistema local respondeu em um formato inesperado. Reinicie a aplicação e tente novamente."); }
         if (!resposta.ok || !retorno.sucesso) throw new Error(retorno.erro || "Não foi possível analisar o briefing.");
         analiseIACorrente = retorno.dados;
         const camposPreenchidos = aplicarCamposIA();

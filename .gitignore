@@ -40,6 +40,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Runtime data
+__pycache__/
+*.py[cod]
 pids
 *.pid
 *.seed
@@ -50,6 +52,8 @@ correcoes_tipo_itens.json
 propostas.json
 pdfs/
 relatorios/
+backups/
+avaliacoes_tecnicas_operacionais.json
 *.pdf
 *.zip
 *.key

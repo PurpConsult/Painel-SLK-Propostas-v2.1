@@ -1,0 +1,14 @@
+{% set pagina_soulink = request.path %}
+<header class="soulink-app-header">
+  <div class="soulink-app-header__inner">
+    <a class="soulink-app-header__brand" href="/" aria-label="Soulink Orçamentos — Nova proposta"><strong>SOULINK</strong><span>| Orçamentos</span></a>
+    <nav class="soulink-app-header__nav" aria-label="Navegação principal">
+      <a class="soulink-app-header__link{% if pagina_soulink == '/' %} is-active{% endif %}" href="/">Nova proposta</a>
+      <a class="soulink-app-header__link{% if pagina_soulink == '/propostas' %} is-active{% endif %}" href="/propostas">Meus orçamentos</a>
+      <a class="soulink-app-header__link{% if pagina_soulink == '/operacional' %} is-active{% endif %}" href="/operacional">Operação</a>
+      <a class="soulink-app-header__link{% if pagina_soulink == '/meus-itens' %} is-active{% endif %}" href="/meus-itens">Meus itens</a>
+      <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro' %} is-active{% endif %}" href="/financeiro">Financeiro</a>
+      <a class="soulink-app-header__link{% if pagina_soulink == '/relatorios' %} is-active{% endif %}" href="/relatorios">Relatórios</a>
+    </nav>
+  </div>
+</header>

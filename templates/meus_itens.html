@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOULINK | Meus Itens</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='soulink-header.css') }}">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #333; }
@@ -77,11 +78,8 @@
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1>SOULINK | Meus Itens</h1>
-        <div><a href="/relatorios">Relatórios</a><a href="/">← Voltar ao Formulário</a></div>
-    </div>
+    <body class="soulink-com-cabecalho">
+    {% include '_cabecalho_soulink.html' %}
 
     <div class="container">
         <div class="stats">
@@ -134,7 +132,7 @@
         </table>
 
         <div class="footer">
-            <img src="/manus-storage/logo_vendai_355f7a06.png" alt="VendAI"><br>
+            <img src="{{ url_for('static', filename='logo_vendai.png') }}" alt="VendAI"><br>
             Desenvolvido por VendAI - AI & Sales Consulting
         </div>
     </div>
