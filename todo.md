@@ -645,4 +645,4 @@
 - [x] Ampliar a agenda de Follow-ups e incluir filtro por vendedor responsável.
 - [x] Ajustar a Central Financeira para abrir no mês vigente e somente consultar períodos anteriores quando forem selecionados manualmente.
 - [x] Gerar pacote incremental de agendas e Financeiro que atualiza somente templates e preserva todos os dados operacionais locais.
-- [ ] Publicar no GitHub as melhorias de agenda ampliada, filtro de vendedor nos Follow-ups e período financeiro inicial no mês vigente, sem dados operacionais.
+- [x] Publicar no GitHub as melhorias de agenda ampliada, filtro de vendedor nos Follow-ups e período financeiro inicial no mês vigente, sem dados operacionais.
