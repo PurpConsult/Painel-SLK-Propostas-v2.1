@@ -85,6 +85,10 @@ def test_interfaces_comercial_e_resposta_de_relatorios_estao_presentes():
     propostas = (base / "templates" / "propostas.html").read_text(encoding="utf-8")
     assert "Comercial" in cabecalho and "/followups" in cabecalho
     assert "Agenda comercial dos próximos sete dias" in followups
+    assert "sellerFilter" in followups
+    assert "Todos os vendedores" in followups
+    assert "popularVendedores" in followups
+    assert "min-width:1360px" in followups
     assert "assistente-resposta-usuario" in relatorios
     assert "pedidoOriginalAssistente" in relatorios
     assert "resumo comercial" in nova_proposta.lower()

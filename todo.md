@@ -168,7 +168,7 @@
 - [x] Criar uma apresentação comercial sobre a plataforma de propostas e a estratégia de integração com o Meeventos.
 
 ## Acesso Diário Simplificado
-- [ ] Definir a alternativa de acesso diário mais simples para a equipe, sem execução manual de arquivo BAT.
+- [x] Definir a alternativa de acesso diário mais simples para a equipe, sem execução manual de arquivo BAT.
 
 ## Ajustes Visuais Pendentes — Formulário de Proposta
 - [x] Aplicar à frase "Conte comigo: Cole aqui o briefing do cliente!" a mesma identidade visual do cabeçalho Dados do Evento.
@@ -188,9 +188,16 @@
 - [x] Validar por teste automatizado o PDF provisório, a ausência de persistência e o retorno seguro da leitura de anexo.
 
 ## Versão Online da Plataforma Soulink
-- [ ] Manter a publicação, a importação do histórico e o uso diário da versão online em pausa até a aprovação final explícita da versão local.
+- [x] Confirmar se o Meeventos disponibiliza autenticação individual reutilizável por aplicações externas, distinta do token operacional da API.
+- [ ] Definir e configurar a alternativa segura de acesso individual da equipe conforme a capacidade confirmada do Meeventos.
+- [x] Verificar o domínio publicado, as rotas comerciais e o carregamento público após a ativação.
+- [ ] Validar o fluxo de autenticação e orientar o primeiro acesso da equipe à plataforma publicada.
+- [x] Auditar a versão online atual, seus fluxos comerciais, autenticação, persistência e integrações antes da publicação.
+- [x] Completar os fluxos indispensáveis de proposta, edição versionada e acesso individual para uso online da equipe.
+- [x] Validar o ambiente online e salvar um checkpoint pronto para a usuária ativar a publicação no painel.
+- [x] Manter a publicação, a importação do histórico e o uso diário da versão online em pausa até a aprovação final explícita da versão local.
 - [ ] Definir o acesso da equipe e a preservação do histórico atual para a versão online.
-- [ ] Estruturar uma versão online segura com integração Meeventos protegida no servidor.
+- [x] Estruturar uma versão online segura com integração Meeventos protegida no servidor.
 - [ ] Migrar proposta, PDF, histórico e edição versionada para a versão online.
 - [ ] Validar a aplicação online e preparar o link de uso diário da equipe.
 - [x] Criar o modelo de dados online para propostas, versões, itens, status, aprovações de imagem e arquivos em armazenamento seguro.
@@ -255,6 +262,8 @@
 - [x] Produzir, validar e entregar o relatório em PDF com comunicação visual comercial da Soulink.
 
 ## Revisão de Apresentação — PDF Lagune Hotel
+ - [ ] Reconstruir o relatório de comissão Lagune com a geometria, a distribuição e os componentes do PDF de referência, não apenas com paleta semelhante.
+ - [ ] Comparar visualmente as páginas de capa, gráfico, tabelas e detalhamento com o PDF de referência antes da nova entrega.
 - [x] Substituir as equações tributárias por explicações objetivas das porcentagens aplicadas.
 - [x] Inserir tabela geral com totais dos eventos, equipamentos após desconto, impostos, valor comissionável e comissão a pagar.
 - [x] Aplicar a comunicação visual do arquivo de referência após o reenvio bem-sucedido do anexo.
@@ -417,3 +426,223 @@
 
 ## Publicação de Meus Orçamentos e Operacional
 - [x] Publicar no repositório oficial as páginas comercial e operacional, os endpoints, as regressões e as notas técnicas, sem dados operacionais ou credenciais.
+
+## Padronização de Navegação e Status
+- [x] Aplicar o cabeçalho Soulink de referência, com marca, degradê azul e navegação consistente, em todas as páginas da plataforma.
+- [x] Destacar automaticamente no cabeçalho a seção ativa em cada página.
+- [x] Ajustar em Meus Orçamentos o botão Pré-reserva para tom pastel, Confirmar para verde e Perdida para vermelho.
+- [x] Validar a navegação e os controles de status em telas amplas e estreitas antes da atualização local.
+
+## Orçamentos Meeventos como Cópias Editáveis Soulink
+- [x] Importar por ação humana um orçamento Meeventos como cópia local, com identificador e origem externa preservados.
+- [x] Impedir a duplicação de cópias locais para o mesmo orçamento Meeventos sem confirmação explícita da equipe.
+- [x] Permitir editar a cópia local importada sem tentar editar ou sobrescrever o orçamento original no Meeventos.
+- [x] Permitir emitir PDFs em Português, Inglês e Espanhol para a cópia local importada.
+- [x] Exibir claramente na interface e no histórico que a proposta é uma cópia Soulink vinculada a um orçamento Meeventos.
+- [x] Ao confirmar uma cópia Soulink importada, migrar somente sua última versão aprovada ao Meeventos como evento e registrar o ID retornado.
+- [x] Validar importação, edição, emissão de PDF e preservação de vínculo sem criar ou alterar dados no Meeventos.
+- [ ] Após aprovação explícita do fluxo local, preparar a publicação online e definir o login individual da equipe.
+
+## Correção do Pacote Local — Dependências Visuais
+- [x] Incluir no pacote de importação Meeventos o cabeçalho compartilhado e seu CSS para evitar erro de template no ambiente local.
+- [x] Validar a estrutura do pacote corrigido e orientar a restauração segura da página Meus Orçamentos.
+
+## Navegação Unificada e Itens de Orçamentos Meeventos
+- [x] Replicar em todas as páginas o menu visual azul usado em Meus Orçamentos, preservando a seção ativa e as rotas existentes.
+- [x] Mapear os campos de itens disponibilizados nos detalhes de um orçamento Meeventos antes de gravar uma cópia local.
+- [x] Importar somente itens efetivamente retornados pelo Meeventos para a cópia Soulink, preservando descrição, quantidade, preço e identificador disponível.
+- [x] Validar o recálculo comercial, a edição local e a emissão de PDF após importar itens de orçamento Meeventos.
+
+## Correção de Fidelidade do Menu Soulink
+- [ ] Substituir a variação com botões em contorno pelo mesmo menu compacto de Meus Orçamentos em todas as páginas.
+- [ ] Validar visualmente que a marca, altura, espaçamentos e seção ativa são idênticos ao cabeçalho de referência.
+
+## Correção de Edição Local
+- [ ] Corrigir o preenchimento do formulário ao editar uma proposta, evitando falha quando um elemento visual opcional não existir.
+- [ ] Validar a abertura, edição e nova emissão de PDF de propostas locais após o ajuste.
+
+## Atualização de Comissão — Lagune 2026
+- [x] Aplicar comissão de 2% aos serviços terceirizados e manter 15% somente para equipamentos comissionáveis.
+- [x] Identificar itens de palco/praticável, fotografia, filmagem, flores, backdrops, plantas, cenografia e letra-caixa para classificação terceirizada.
+- [x] Tratar a letra-caixa do evento Jump como item terceirizado de 2%, sem abater R$ 5.000,00 do total do evento.
+- [x] Listar os sete eventos Eurofarma, seus valores totais e o abatimento integral da comissão devida ao Lagune.
+- [x] Excluir da base de comissão a Reunião dos Gerentes Gerais da Barra – Lagune e a Reunião Lagune.
+
+## Memória de Cálculo Bruta — Lagune 2026
+- [x] Reconciliar a base antes das exclusões com os valores de Eurofarma e dos eventos próprios do hotel.
+- [x] Apresentar a comissão em sequência: base bruta, abatimentos, bases líquidas por categoria e total final.
+
+## Esclarecimento de Exclusões — Lagune 2026
+- [x] Separar, na apresentação, a base que já exclui eventos próprios do Lagune da visão bruta usada apenas para reconciliação.
+
+## Revisão do PDF Comercial — Lagune 2026
+- [x] Atualizar no mesmo layout do relatório a memória de cálculo para iniciar na base já excluída dos eventos próprios do Lagune.
+- [x] Exibir o abatimento Eurofarma uma única vez antes da comissão final a pagar.
+- [x] Preservar o padrão visual do PDF de referência enviado pela equipe na versão revisada.
+
+## Legibilidade dos Valores — Relatório Lagune
+- [x] Ampliar os cartões de destaque dos valores para evitar quebra de linhas.
+- [x] Revisar visualmente a leitura dos valores no PDF atualizado.
+
+## Identidade Visual — Relatório Lagune
+- [x] Inserir a logo Soulink no cabeçalho do relatório de comissão, preservando o layout e as informações aprovadas.
+
+## Correção da Marca Soulink — Relatório Lagune
+- [ ] Substituir a logo branca pela versão preta sobre fundo preto, conforme o PDF de referência.
+- [ ] Revisar visualmente a marca no PDF para assegurar que não haja bloco branco.
+
+## Layout de Referência Final — Relatório Lagune
+- [x] Reintegrar todos os indicadores financeiros e a memória de cálculo completa no relatório Lagune, mantendo o padrão visual de referência.
+- [x] Adicionar uma tabela auditável de eventos excluídos com ID, nome, motivo, valor do evento, base e comissão abatida.
+- [ ] Recriar o relatório de comissão revisado no mesmo layout e com a mesma logo do PDF de referência final enviado pela equipe.
+- [ ] Validar visualmente a equivalência de cabeçalho, identidade da marca e composição das páginas antes da entrega.
+- [ ] Conciliar o relatório Lagune com o cálculo da cliente para aplicar o abatimento Eurofarma de 85%, preservando o crédito de 15% de comissão.
+- [ ] Reapresentar a memória completa dos 48 eventos: Lagune e Eurofarma incluídos na comissão e lançados somente como créditos no fechamento.
+
+## Melhorias Operacionais Solicitadas — Próxima Etapa
+- [x] Exportar a proposta local 1763 e importá-la na plataforma online como cópia editável, sem alterar a origem local.
+- [x] Conferir a cópia online da proposta 1763 antes de qualquer efetivação no Meeventos.
+- [x] Conferir a proposta 1763, seus itens e seu vínculo no Meeventos antes de qualquer efetivação externa.
+- [x] Efetivar a proposta 1763 somente após confirmação explícita, validando evento criado, itens migrados e ausência de duplicidade.
+- [x] Migrar o cadastro manual de novo cliente ao ambiente online, com validação, conferência de duplicidade e criação no Meeventos somente após ação humana.
+- [x] Mapear os layouts, componentes e fluxos validados na versão local para reproduzi-los fielmente na versão online.
+- [x] Recriar no ambiente online a interface local de propostas, cabeçalho, catálogo, totais, prévia, orçamentos, operação e demais páginas comerciais.
+- [x] Validar visualmente e funcionalmente a equivalência entre as versões antes de atualizar a publicação online.
+- [x] Corrigir a exibição da logo VendAI, eliminando o erro de carregamento na plataforma e nos documentos aplicáveis.
+- [ ] Completar a inclusão de todos os kits do Meeventos na categoria Equipamentos, preservando composição e edição por proposta.
+- [x] Ajustar o calendário operacional: eventos passados sem cor de status, confirmados em verde, pré-reservas em tom pastel e cancelados ocultos.
+- [x] Exibir alerta na cotação quando a data escolhida já tiver dois ou mais eventos e exigir aval explícito da equipe técnica para prosseguir.
+- [x] Exibir na página Operacional uma pendência de aval técnico para cotações salvas em datas com dois ou mais eventos.
+- [x] Melhorar o documento de Ordem de Serviço com conteúdo e apresentação adequados à operação.
+- [x] Executar teste controlado de efetivação de proposta e migração para evento no Meeventos, conferindo itens, quantidades, valores e ausência de duplicidade.
+- [x] Implementar o procedimento online de criação idempotente de evento no Meeventos, registrando o identificador externo e a resposta de auditoria por proposta.
+
+## Equivalência da Plataforma Online com o Ambiente Local
+- [x] Inventariar e mapear, arquivo a arquivo, os fluxos validados do ambiente local para a arquitetura online.
+- [x] Migrar o campo e a abertura segura do link de referência em nova aba para a proposta online.
+- [x] Migrar a foto de referência, incluindo imagem-padrão e abertura em nova aba, para a proposta online.
+- [x] Reproduzir o PDF comercial online no mesmo padrão visual, cálculos e conteúdo do PDF local validado.
+- [x] Sincronizar catálogo, quantidade de itens, kits e composição editável para a mesma cobertura do ambiente local.
+- [x] Reproduzir a organização visual e o layout em duas colunas aprovados no ambiente local.
+- [x] Remover o campo de número da tela de Nova Proposta e atribuir a numeração somente após o primeiro salvamento.
+- [x] Posicionar a caixa de Seleção de itens antes dos quadros de Equipamentos e Serviços.
+- [x] Exibir cada kit selecionado em caixa expandida com seus componentes e permitir editar quantidade ou excluir componentes por proposta.
+- [x] Exibir o catálogo apenas após busca ativa e adicionar o item escolhido ao clicar no resultado, sem listar todos os itens por padrão.
+- [x] Exibir o botão Visualizar proposta/PDF na Nova Proposta, com abertura da prévia antes do primeiro salvamento.
+- [x] Substituir o menu superior por uma barra lateral retrátil, preservando os atalhos e a responsividade da plataforma online.
+- [x] Reorganizar a Nova Proposta online na mesma ordem e hierarquia das duas colunas aprovadas localmente, incluindo a área comercial à direita.
+- [x] Reproduzir a prévia comercial online com o conteúdo, as miniaturas, as informações operacionais e a estrutura visual do PDF local.
+- [ ] Validar com a equipe autenticada a prévia temporária aberta antes do salvamento e os pontos de refinamento visual restantes.
+- [x] Ratear o desconto comercial de um kit entre seus componentes, exibindo os valores individuais ajustados e usando-os na efetivação no Meeventos.
+- [x] Verificar o acesso público à última versão publicada e corrigir eventual cache, domínio ou disponibilidade da plataforma.
+- [x] Compactar o estado de carregamento e eliminar o espaço excessivo abaixo do cabeçalho após recolher a barra lateral.
+- [x] Aplicar fundo com contraste ao nome SOULINK | ORÇAMENTOS na barra lateral, preservando a legibilidade no modo recolhido.
+- [x] Exibir e editar o desconto de cada componente do kit diretamente no cartão expandido, sem depender apenas do desconto geral da proposta.
+- [x] Adicionar o item à proposta ao clicar diretamente em seu nome nos resultados da busca, sem exigir o uso de ícone separado.
+- [x] Exibir os resultados da busca exclusivamente em lista suspensa após a digitação, sem ocupar espaço fixo no formulário.
+- [x] Reequilibrar os quadrantes da prévia/PDF, reduzindo a faixa de referência, controlando a descrição dos itens e alinhando o resumo de investimento à grade do documento.
+- [x] Restaurar a navegação horizontal em substituição ao menu lateral retrátil.
+- [x] Analisar o PDF orcamento_1790_v1_pt.pdf e registrar seus elementos visuais, ordem de blocos, tipografia e espaçamentos como referência de reprodução.
+- [x] Reproduzir a prévia/PDF comercial online conforme o PDF de referência aprovado, sem alterar os dados ou as regras comerciais.
+- [ ] Vincular o subdomínio vendai.soulink.com.br à plataforma online após a configuração do registro DNS pela administradora do domínio.
+- [x] Restaurar a prévia por briefing e permitir anexar um PDF para leitura assistida e sugestão de proposta, sempre sob confirmação humana.
+- [x] Separar Tipo de Evento, carregado das opções Meeventos, de Formato do Evento, preenchido em texto livre.
+- [x] Carregar e exibir os dados cadastrais completos do cliente, incluindo CNPJ, e-mail e telefone, mantendo-os editáveis quando necessário.
+- [x] Remover o valor manual da linha principal do kit e exibi-lo somente nos componentes editáveis do kit.
+- [x] Listar os componentes de cada kit em linhas verticais individuais na prévia/PDF comercial.
+- [x] Reduzir e reposicionar o quadro de investimento para manter proporção com as tabelas do documento comercial.
+- [ ] Executar uma matriz de equivalência entre ambiente local e online, abrangendo cada campo, cálculo, fluxo, documento e estado operacional antes da aprovação final da equipe.
+- [ ] Manter o ambiente local como fonte de verdade e corrigir cada divergência encontrada antes de considerar a versão online apta para uso.
+- [ ] Concluir a equivalência funcional e visual do ambiente online com o sistema local antes do aceite definitivo da equipe.
+- [x] Priorizar a revisão e os ajustes da interface local para a apresentação da Soulink em 20/08/2026, sem sobrescrever propostas, PDFs ou histórico.
+- [x] Padronizar todas as páginas da interface local com o cabeçalho horizontal Soulink | Orçamentos e indicação clara da página ativa.
+- [x] Adicionar à página local de Relatórios uma assistente de IA paciente para traduzir pedidos em consultas de dados e cálculos explicáveis, sempre com confirmação humana antes de gerar o relatório.
+- [x] Integrar a tela Operacional local à leitura de eventos do Meeventos e consolidar eventos confirmados, pré-reservas e cotações.
+- [x] Destacar propostas em pré-reserva e alertar cotações no mesmo dia de eventos confirmados, sem editar dados no Meeventos.
+- [x] Replicar a opção local “Evento sem data definida”, mantendo datas e alerta operacional coerentes na proposta online.
+- [x] Diagnosticar e corrigir o erro de acesso ao painel online informado pela equipe após a última publicação.
+- [x] Corrigir o fluxo de análise de briefing para aceitar texto e PDF anexado no editor publicado.
+- [x] Normalizar a resposta de análise recebida após leitura de PDF, evitando rejeição quando a IA devolver campos equivalentes em estrutura alternativa.
+- [x] Reproduzir a chamada real de análise de briefing com PDF e corrigir o erro persistente informado após a normalização inicial.
+- [ ] Executar uma reprodução ponta a ponta com PDF real para isolar se a falha está no upload, na extração, na IA ou na aplicação da prévia.
+- [x] Capturar de forma segura o erro técnico real da próxima tentativa de briefing em PDF e corrigir sua causa raiz.
+- [x] Registrar apenas metadados seguros da resposta do modelo em produção para identificar o envelope real que ainda causa o erro de briefing.
+- [x] Consultar os metadados seguros registrados na tentativa real mais recente e aplicar a correção correspondente ao envelope identificado.
+- [x] Preparar instruções para a equipe acessar a instalação local pela rede interna, sem exposição pública do sistema.
+- [x] Registrar uma trilha de auditoria por usuário para ações relevantes: criação, edição, visualização de proposta, geração de PDF e efetivação no Meeventos.
+- [x] Remover o desconto individual dos componentes de kit, mantendo a edição apenas do valor manual por componente.
+- [x] Substituir a seleção atual de cliente por uma lista flutuante filtrável, equivalente à busca suspensa de itens.
+- [x] Corrigir o fluxo local de leitura de briefing por PDF e entregar somente um pacote PowerShell seguro para atualização do computador da equipe, sem alterar propostas, PDFs, tokens ou backups.
+- [x] Padronizar no ambiente local as páginas Nova Proposta e Relatórios com o layout aprovado de Meus Orçamentos, preservando as funcionalidades e os dados existentes.
+- [x] Redesenhar a tela Operação local com indicadores, calendário e agenda lateral conforme a referência aprovada, preservando alertas, consulta Meeventos e geração de OS.
+- [x] Destacar cotações locais em datas com eventos confirmados do Meeventos e exigir uma decisão registrada da equipe técnica antes do comercial confirmar com o cliente.
+- [x] Tornar a agenda semanal contínua a visão padrão da Operação local, com visão mensal por filtro e todos os registros passados em cinza.
+- [x] Permitir imprimir a OS dos eventos Meeventos pela tela Operação local, sem editar o evento externo.
+- [x] Reorganizar a agenda horizontal local para iniciar sempre na data atual e exibir os próximos seis dias, em vez de uma semana fixa de segunda a domingo.
+- [x] Aplicar em todas as páginas locais o mesmo cabeçalho e menu horizontal aprovados em Meus Orçamentos, preservando cada fluxo específico.
+- [x] Corrigir regras locais que fazem o cabeçalho da Operação divergir visualmente do padrão de Meus Orçamentos, removendo centralização, cantos arredondados e botões contornados indevidos.
+- [x] Publicar no repositório GitHub existente apenas a correção do cabeçalho compartilhado, sem propostas, PDFs, credenciais, backups ou dados operacionais.
+- [x] Inventariar e documentar as divergências funcionais e visuais entre a versão local validada e o ambiente online atual, usando a versão local como fonte de verdade.
+- [x] Replicar no online o formulário local de Nova Proposta: busca suspensa de cliente e itens, campos cadastrais completos, Tipo de Evento separado de Formato, foto de referência e visualização do PDF antes da confirmação.
+- [x] Replicar no online o catálogo local, incluindo kits com prefixo KIT, expansão de componentes, edição de quantidade, exclusão de componente e valor manual somente nos componentes.
+- [x] Replicar no online os cálculos locais de desconto rateado, equipamentos e serviços, impostos compostos e totais comerciais exibidos no PDF.
+- [x] Replicar no online o fluxo local de briefing por PDF com sugestões revisáveis, sem inserção automática de itens nem envio automático ao Meeventos.
+- [x] Replicar no online o documento comercial local e suas regras de idioma, detalhamento vertical de kits, imagens de referência e proporções visuais aprovadas.
+- [x] Replicar no online a Operação local: agenda horizontal de hoje aos próximos seis dias, visão mensal, eventos Meeventos em leitura, propostas locais, estados visuais, avisos de conflito, aprovação técnica e OS.
+- [x] Validar no online que o token Meeventos permanece exclusivamente no servidor e que a criação de evento exige confirmação humana e é idempotente.
+- [ ] Executar testes automatizados e validação visual dos fluxos online equivalentes antes de disponibilizar a versão para a equipe.
+- [x] Confirmar com o suporte oficial da plataforma a continuidade do projeto, do domínio e dos acessos individuais após o aviso informado para o dia 25.
+- [x] Corrigir o login online que está enviando o usuário para um redirect_uri temporário não autorizado, garantindo o retorno pelo domínio publicado do projeto.
+- [x] Corrigir a falha ao selecionar Tipo de Evento no formulário online e preservar todo o rascunho já preenchido caso ocorra qualquer erro de interface.
+- [x] Corrigir o briefing por texto e a prévia por briefing em PDF no ambiente online, mantendo revisão humana e sem inserir itens automaticamente.
+- [x] Diagnosticar e corrigir a falha persistente ao gerar prévia de briefing por PDF no ambiente online, incluindo leitura do anexo, armazenamento e retorno estruturado da IA.
+- [x] Corrigir a análise de briefing por texto livre no ambiente online, que falha no mesmo fluxo comum da prévia por PDF.
+- [x] Adicionar um botão “×” para remover o PDF anexado ao briefing antes da análise, sem apagar o texto livre já informado.
+- [x] Transportar e adaptar ao online o fluxo comprovadamente funcional de briefing do ambiente local, em vez de manter implementações divergentes.
+- [x] Auditar a normalização de preços do catálogo Meeventos e corrigir valores fora de escala, como o Coordenador de Eventos exibido a R$ 100.000,00.
+- [ ] Corrigir a confirmação de proposta online para vincular a proposta ao Meeventos uma única vez, registrar o identificador externo e usar a numeração comercial correta.
+- [x] Manter a confirmação de proposta sem vínculo, criação ou alteração de evento no Meeventos nesta rodada, conforme orientação da usuária.
+- [x] Adicionar ao ambiente online a aba Relatórios com a assistente guiada, consulta somente leitura ao Meeventos e revisão humana, equivalente ao fluxo local.
+- [x] Corrigir a rota direta `/nova-proposta` para abrir o editor online, em vez de exibir página inexistente.
+- [x] Investigar a nova tentativa real de briefing que ainda retorna “não trouxe dados aproveitáveis” e adaptar o normalizador ao conteúdo efetivamente recebido, sem aplicar dados automaticamente.
+- [x] Implementar login individual na versão local, com papéis Administradora, Comercial e Técnica, registro de ações e roteiro seguro de acesso pela rede interna.
+- [x] Gerar relatório de eventos realizados no Square Design Hotel entre junho e agosto de 2026, com ID, nome do evento e valor total conferidos no Meeventos.
+- [x] Remover da versão local a dependência de pesquisa online para fotos de itens e usar somente imagens aprovadas, armazenadas localmente e associadas ao catálogo.
+- [x] Fazer a Nova Proposta local abrir sempre sem recuperar rascunho anterior e disponibilizar um botão para limpar completamente o formulário, itens e anexos.
+- [x] Diagnosticar e corrigir a ausência da logo VendAI no ambiente local, garantindo que ela seja carregada por arquivo local disponível.
+- [x] Permitir responder na própria tela de Relatórios às perguntas de esclarecimento da assistente local, preservando o pedido inicial e a confirmação humana antes da geração.
+- [x] Corrigir a instalação local da interação de Relatórios, pois a tela atual ainda não exibe o campo para responder às perguntas da assistente.
+- [ ] Estruturar proposta de representação comercial para a usuária negociar com a SLK, com escopo, remuneração fixa, comissão, metas e regras de despesas.
+- [x] Criar uma tela local de Follow-ups no visual da Operação, organizada por data de contato e incluindo propostas e eventos.
+- [x] Reorganizar o menu local em uma aba Comercial com acesso a Nova Proposta, Meus Orçamentos e Follow-ups, mantendo Operação separada.
+- [x] Preservar o quadro destacado de Resumo Comercial logo após a escolha dos itens na Nova Proposta, com totais de equipamentos, serviços, subtotal, desconto e investimento total.
+- [x] Diagnosticar e corrigir a instalação local do pacote Comercial, pois as telas e melhorias não apareceram após a execução do roteiro.
+- [x] Corrigir o roteiro do pacote Comercial para instalar no caminho local em uso: C:\\Users\\Anyaht\\Soulink_Propostas_Local_R2_Imagens\\app.
+- [x] Mapear a estrutura real da pasta local em uso e aplicar as atualizações nos arquivos efetivamente carregados pelo sistema.
+- [x] Remover os subtotais duplicados da Nova Proposta, mantendo totais e desconto somente no Resumo Comercial azul.
+- [x] Compactar e equilibrar visualmente o valor de Investimento total dentro do Resumo Comercial.
+- [x] Corrigir a assistente local de Relatórios, que continua pedindo detalhes sem retornar a consulta solicitada ao Meeventos.
+- [x] Transformar a página inicial local em um dashboard de gestão com dados reais de propostas, agenda, follow-ups e alertas, mantendo a Nova Proposta dentro da área Comercial.
+- [x] Transformar a página Financeiro em uma central local somente leitura dos dados financeiros disponíveis no Meeventos, com filtros, valores, status e visão de comissões.
+- [x] Permitir que Administradora e Comercial cadastrem data e objetivo de follow-up diretamente em cada proposta de Meus Orçamentos.
+- [x] Exibir o nome do vendedor responsável nos cards da agenda de Operação e da agenda de Follow-ups.
+- [ ] Preparar backup local após a validação da implantação, preservando propostas, PDFs, imagens, usuários e configurações.
+- [x] Atualizar o GitHub somente com código e documentação, após confirmar que arquivos operacionais e credenciais permanecem excluídos.
+- [x] Publicar no GitHub as melhorias locais validadas, excluindo a correção pendente da assistente de Relatórios e quaisquer dados operacionais.
+- [ ] Avaliar e desenhar uma conciliação bancária assistida para Contas a Receber, comparando extratos importados com dados do Meeventos e exigindo confirmação humana antes de qualquer baixa.
+- [ ] Definir e implementar o modelo de importação CSV de extrato bancário para a conciliação assistida de Contas a Receber.
+- [ ] Preparar na tela Financeiro a área de conciliação CSV com importação, instruções, prévia vazia e estados de conferência, sem usar dados fictícios.
+- [x] Reorganizar visualmente os cards da Nova Proposta em seções claras, com espaçamento e hierarquia que evitem a sensação de elementos mesclados, preservando a composição atual em duas colunas.
+- [x] Reorganizar o Financeiro local em uma área com subpáginas de Visão Geral, Contas a Receber, Conciliação CSV e Lançamentos, preservando o acesso somente leitura ao Meeventos.
+- [x] Priorizar na Visão Geral os indicadores financeiros e as pendências de recebimento, separando receitas pendentes, vencidas e liquidadas no período.
+- [x] Implementar uma página de Contas a Receber com filtros claros, status, detalhes comerciais e nenhuma baixa automática.
+- [x] Manter Lançamentos Gerais como consulta secundária para receitas e despesas do Meeventos, com filtros por período e tipo.
+- [ ] Transformar a Conciliação CSV em fluxo guiado de importação, prévia, sugestão e confirmação humana por lançamento, sem dados fictícios.
+- [ ] Validar a navegação financeira, os filtros e a integridade dos dados retornados pelo Meeventos antes de gerar a atualização local.
+- [x] Criar contingência segura na assistente de Relatórios para consultas explicitamente pedidas ao Meeventos quando a IA estiver indisponível ou solicitar esclarecimentos sem necessidade.
+- [x] Gerar pacote PowerShell da atualização Financeiro e Relatórios que substitui somente arquivos de código e preserva propostas, PDFs, imagens, usuários, credenciais e backups locais.
+- [x] Ampliar a agenda de Operação com uma visualização semanal maior, mais visual e legível para a equipe técnica.
+- [x] Ampliar a agenda de Follow-ups e incluir filtro por vendedor responsável.
+- [x] Ajustar a Central Financeira para abrir no mês vigente e somente consultar períodos anteriores quando forem selecionados manualmente.
+- [x] Gerar pacote incremental de agendas e Financeiro que atualiza somente templates e preserva todos os dados operacionais locais.
+- [ ] Publicar no GitHub as melhorias de agenda ampliada, filtro de vendedor nos Follow-ups e período financeiro inicial no mês vigente, sem dados operacionais.

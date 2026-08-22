@@ -30,8 +30,11 @@ def test_interfaces_de_gestao_tem_controles_solicitados():
     assert "Conciliação bancária por CSV" in financeiro
     assert "arquivoCsv" in financeiro
     assert "Nenhuma baixa será realizada automaticamente" in financeiro
+    assert "definirMesVigente" in financeiro
+    assert "getMonth()+1" in financeiro
     assert "Agendar follow-up" in propostas
     assert "Vendedor" in operacional
+    assert "min-width:1360px" in operacional
 
 
 def test_financeiro_separa_receitas_pendentes_e_lancamentos_sem_editar_meeventos():
