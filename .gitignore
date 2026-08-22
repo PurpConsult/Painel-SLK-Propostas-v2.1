@@ -54,6 +54,11 @@ pdfs/
 relatorios/
 backups/
 avaliacoes_tecnicas_operacionais.json
+configuracoes_relatorios.json
+followups_comerciais.json
+usuarios_local.json
+auditoria_local.json
+segredo_sessao_local.txt
 *.pdf
 *.zip
 *.key

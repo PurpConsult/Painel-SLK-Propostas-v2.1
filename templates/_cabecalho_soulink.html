@@ -1,14 +1,41 @@
 {% set pagina_soulink = request.path %}
 <header class="soulink-app-header">
   <div class="soulink-app-header__inner">
-    <a class="soulink-app-header__brand" href="/" aria-label="Soulink Orçamentos — Nova proposta"><strong>SOULINK</strong><span>| Orçamentos</span></a>
+    <a class="soulink-app-header__brand" href="/" aria-label="Soulink Orçamentos — Painel"><strong>SOULINK</strong><span>| Orçamentos</span></a>
     <nav class="soulink-app-header__nav" aria-label="Navegação principal">
-      <a class="soulink-app-header__link{% if pagina_soulink == '/' %} is-active{% endif %}" href="/">Nova proposta</a>
-      <a class="soulink-app-header__link{% if pagina_soulink == '/propostas' %} is-active{% endif %}" href="/propostas">Meus orçamentos</a>
+      {% if not usuario_soulink or usuario_soulink.papel in ['admin', 'comercial'] %}
+      <details class="soulink-app-header__group{% if pagina_soulink in ['/nova-proposta', '/propostas', '/followups'] %} is-active{% endif %}">
+        <summary>Comercial <span aria-hidden="true">⌄</span></summary>
+        <div class="soulink-app-header__submenu">
+          <a class="soulink-app-header__link{% if pagina_soulink == '/nova-proposta' %} is-active{% endif %}" href="/nova-proposta">Nova proposta</a>
+          <a class="soulink-app-header__link{% if pagina_soulink == '/propostas' %} is-active{% endif %}" href="/propostas">Meus orçamentos</a>
+          <a class="soulink-app-header__link{% if pagina_soulink == '/followups' %} is-active{% endif %}" href="/followups">Follow-ups</a>
+        </div>
+      </details>
+      {% endif %}
+      <a class="soulink-app-header__link{% if pagina_soulink == '/' %} is-active{% endif %}" href="/">Painel</a>
       <a class="soulink-app-header__link{% if pagina_soulink == '/operacional' %} is-active{% endif %}" href="/operacional">Operação</a>
       <a class="soulink-app-header__link{% if pagina_soulink == '/meus-itens' %} is-active{% endif %}" href="/meus-itens">Meus itens</a>
-      <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro' %} is-active{% endif %}" href="/financeiro">Financeiro</a>
+      {% if not usuario_soulink or usuario_soulink.papel in ['admin', 'comercial'] %}
+      <details class="soulink-app-header__group{% if pagina_soulink.startswith('/financeiro') %} is-active{% endif %}">
+        <summary>Financeiro <span aria-hidden="true">⌄</span></summary>
+        <div class="soulink-app-header__submenu">
+          <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro' %} is-active{% endif %}" href="/financeiro">Visão geral</a>
+          <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro/contas-a-receber' %} is-active{% endif %}" href="/financeiro/contas-a-receber">Contas a receber</a>
+          <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro/conciliacao' %} is-active{% endif %}" href="/financeiro/conciliacao">Conciliação CSV</a>
+          <a class="soulink-app-header__link{% if pagina_soulink == '/financeiro/lancamentos' %} is-active{% endif %}" href="/financeiro/lancamentos">Lançamentos</a>
+        </div>
+      </details>
+      {% endif %}
       <a class="soulink-app-header__link{% if pagina_soulink == '/relatorios' %} is-active{% endif %}" href="/relatorios">Relatórios</a>
     </nav>
+    {% if usuario_soulink %}
+      <div class="soulink-app-header__account">
+        <span><b>{{ usuario_soulink.nome }}</b><small>{{ {'admin':'Administradora','comercial':'Comercial','tecnica':'Técnica'}.get(usuario_soulink.papel, usuario_soulink.papel) }}</small></span>
+        {% if usuario_soulink.papel == 'admin' %}<a class="soulink-app-header__link" href="/acesso/usuarios">Equipe</a>{% endif %}
+        <a class="soulink-app-header__link" href="/acesso/senha">Senha</a>
+        <form action="/sair" method="post"><button type="submit">Sair</button></form>
+      </div>
+    {% endif %}
   </div>
 </header>

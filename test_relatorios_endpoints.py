@@ -24,10 +24,39 @@ ITENS = [{
 }]
 
 
+def test_assistente_consulta_eventos_quando_ia_indisponivel():
+    """Um pedido explícito continua consultável em modo leitura, mesmo sem resposta do modelo."""
+    configuracao_testing_original = sistema.app.config.get("TESTING")
+    login_ativo_original = sistema.app.config.get("LOGIN_LOCAL_ATIVO")
+    sistema.app.config["TESTING"] = True
+    sistema.app.config["LOGIN_LOCAL_ATIVO"] = False
+    resposta_meeventos = Mock()
+    resposta_meeventos.raise_for_status.return_value = None
+    resposta_meeventos.json.return_value = {"data": EVENTOS}
+    try:
+        with sistema.app.test_client() as cliente, patch.object(sistema, "_planejar_relatorio_com_ia", side_effect=RuntimeError("IA indisponível")), patch.object(sistema.requests, "get", return_value=resposta_meeventos):
+            resposta = cliente.post("/api/relatorios/assistente", json={"mensagem": "Quero os eventos de junho, julho e agosto de 2026"})
+        assert resposta.status_code == 200, resposta.get_data(as_text=True)
+        dados = resposta.get_json()
+        assert dados["sucesso"] is True
+        assert dados["plano"]["acao"] == "consultar_meeventos"
+        assert dados["plano"]["recurso"] == "events"
+        assert dados["plano"]["data_inicio"] == "2026-06-01"
+        assert dados["plano"]["data_fim"] == "2026-08-31"
+        assert dados["dados_consultados"]["quantidade"] == 1
+    finally:
+        sistema.app.config["TESTING"] = configuracao_testing_original
+        sistema.app.config["LOGIN_LOCAL_ATIVO"] = login_ativo_original
+
+
 def executar():
     with tempfile.TemporaryDirectory() as pasta_temporaria:
         pasta_original = sistema.PASTA_RELATORIOS
+        testing_original = sistema.app.config.get("TESTING")
+        login_ativo_original = sistema.app.config.get("LOGIN_LOCAL_ATIVO")
         sistema.PASTA_RELATORIOS = pasta_temporaria
+        sistema.app.config["TESTING"] = True
+        sistema.app.config["LOGIN_LOCAL_ATIVO"] = False
         cliente = sistema.app.test_client()
         try:
             with patch.object(sistema, "consultar_eventos_relatorio", return_value=EVENTOS), patch.object(sistema, "consultar_itens_evento_relatorio", return_value=ITENS):
@@ -56,6 +85,9 @@ def executar():
                 pagina = cliente.get("/relatorios")
                 assert pagina.status_code == 200
                 assert b"Revis\xc3\xa3o humana obrigat\xc3\xb3ria" in pagina.data
+                assert b"Continue a conversa" in pagina.data
+                assert b"Enviar mensagem" in pagina.data
+                assert b"Consulta segura" in pagina.data
 
                 pdf = cliente.get(f"/api/relatorio/comissao/{identificador}/pdf")
                 assert pdf.status_code == 200
@@ -77,6 +109,8 @@ def executar():
             assert "MEEVENTOS_TOKEN" in falha.get_json()["detalhes"]
         finally:
             sistema.PASTA_RELATORIOS = pasta_original
+            sistema.app.config["TESTING"] = testing_original
+            sistema.app.config["LOGIN_LOCAL_ATIVO"] = login_ativo_original
 
     print("OK: rotas, persistência temporária, PDF e planilha de relatórios validados.")
 

@@ -32,6 +32,8 @@ No bloco **Prévia assistida por IA**, descreva o briefing ou envie um arquivo `
 
 > Os preços e os itens sugeridos vêm exclusivamente do catálogo oficial carregado do Meeventos. A IA não define valores nem cria itens fora desse catálogo.
 
+Para ativar essa função no computador local, configure a chave Claude como variável de ambiente do Windows. Siga o arquivo `INSTRUCOES_IA_CLAUDE_LOCAL.md`; a chave não deve ser inserida em `app.py`, no GitHub ou em arquivos do projeto.
+
 ## Usar imagens de itens no PDF
 
 Abra **Meus Itens** e revise as imagens candidatas. Use **Aprovar** somente quando a foto representar corretamente o item. Apenas fotos aprovadas podem aparecer no PDF comercial, em miniatura clicável; ao clicar, o cliente pode abrir a imagem em tamanho maior. Uma imagem rejeitada não será inserida nas próximas propostas.
@@ -39,6 +41,20 @@ Abra **Meus Itens** e revise as imagens candidatas. Use **Aprovar** somente quan
 ## Controlar pré-reserva, aprovação e financeiro
 
 Em **Meus Orçamentos**, os botões da última versão permitem marcar a proposta como **Pré-reserva**, **Aprovada** ou **Perdida**. Quando aprovada, a versão fica protegida como uma cópia fechada; novas edições continuam como nova versão de trabalho, sem alterar o registro aprovado. A página **Financeiro** exibe exclusivamente versões aprovadas, em modo de consulta e com acesso ao PDF.
+
+## Usar a Central Financeira
+
+A área **Financeiro** está dividida em quatro rotinas: **Visão geral**, **Contas a receber**, **Conciliação CSV** e **Lançamentos**. A Visão geral mostra os recebimentos em aberto, vencidos e pagos; Contas a receber separa receitas; e Lançamentos permite consultar receitas e despesas retornadas pelo Meeventos.
+
+> A Central Financeira funciona somente em modo de leitura. Ela não cria cobranças, não altera registros e não realiza baixas no Meeventos.
+
+Na Conciliação CSV, o extrato é lido apenas no navegador para gerar uma prévia. Nenhum arquivo é enviado ou gravado, e nenhuma correspondência será confirmada automaticamente. Quando houver um CSV de exemplo sem dados sensíveis, os cabeçalhos reais poderão ser mapeados para a etapa de sugestões e conferência humana.
+
+## Consultar dados com a assistente de Relatórios
+
+Na tela **Relatórios**, descreva a necessidade em linguagem natural. Quando o pedido trouxer uma consulta clara, como “quero os eventos de junho, julho e agosto de 2026”, a assistente consulta apenas os dados permitidos do Meeventos e apresenta uma amostra para refinamento. Caso o serviço de IA esteja indisponível, o sistema ainda consegue reconhecer pedidos diretos de eventos, orçamentos, clientes ou lançamentos financeiros, sempre em modo somente leitura.
+
+Nenhuma consulta cria, edita ou exclui dados no Meeventos. A criação de PDF e quaisquer decisões comerciais continuam sujeitas à revisão humana.
 
 ## Conferir o PDF comercial e escolher o idioma
 
